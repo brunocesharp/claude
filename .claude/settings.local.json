@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node send_whatsapp.js)",
+      "Bash(taskkill /IM chrome.exe /F)",
+      "Bash(start chrome:*)",
+      "Bash(npm list:*)",
+      "Bash(node send_osvaldo.js)",
+      "Bash(cd /tmp)",
+      "Bash(npx playwright:*)",
+      "Bash(node send-whatsapp.js)",
+      "Bash(tasklist)",
+      "Bash(taskkill /PID 45652 /F)",
+      "Bash(taskkill /F /IM node.exe /FI \"WINDOWTITLE eq send-whatsapp*\")",
+      "Bash(start:*)",
+      "Bash(powershell:*)",
+      "Read(//c/Users/alves/.claude/skills/whatsapp-app/**)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \".\\\\send-whatsapp.ps1\" -Phone \"5531995416605\" -Message \"teste de envio de mensgaem pelo claude\")",
+      "Bash(powershell.exe:*)"
+    ]
+  }
+}
