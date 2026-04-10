@@ -1,16 +1,25 @@
-# Skills de Discovery para Claude Code
+# Skills para Claude Code — Do Discovery ao Deploy
 
-Um conjunto de skills conversacionais para guiar equipes de desenvolvimento através do ciclo completo de um projeto de software — da ideação à produção.
+Um conjunto de skills conversacionais e de geração de código para guiar equipes de desenvolvimento através do ciclo completo de um projeto de software — da ideação ao deploy em produção.
 
 ## O que é isso?
 
-Este repositório contém **skills modulares** para o Claude Code que ajudam a construir documentação de projeto de forma estruturada e conversacional. Cada skill conduz uma conversa focada em um aspecto específico do projeto e gera documentos `.md` padronizados.
+Este repositório contém **skills modulares** para o Claude Code que cobrem todo o ciclo de vida de desenvolvimento:
+
+- **Discovery** — entender o problema antes de codar
+- **Escopo** — formalizar o que será construído
+- **Especificação** — detalhar regras de negócio com BDD
+- **Arquitetura** — gerar código .NET seguindo Clean Architecture e CQRS
+- **Plano de Execução** — decompor features em tarefas ordenadas
+- **Deploy** — publicar em homologação e produção
 
 **Por que usar?**
 - Garante que nenhum aspecto importante seja esquecido
 - Cria documentação consistente entre projetos
-- Funciona como um facilitador de discovery e escopo
+- Gera código seguindo padrões estabelecidos (Clean Architecture, DDD, CQRS, Result Pattern)
 - Permite usar apenas as peças que você precisa
+
+---
 
 ## Quick Start
 
@@ -20,8 +29,8 @@ Este repositório contém **skills modulares** para o Claude Code que ajudam a c
 # Clone este repositório
 git clone <url-do-repositorio> claude-skills
 
-# Copie a versão mais recente de cada skill para seu projeto
-cp -r claude-skills/Skills/discovery-init/v2/SKILL.md seu-projeto/.claude/skills/discovery-init/SKILL.md
+# Copie as skills desejadas para seu projeto
+cp -r claude-skills/Skills/discovery-init/v2/* seu-projeto/.claude/skills/discovery-init/
 # Repita para cada skill que quiser usar
 ```
 
@@ -33,11 +42,7 @@ No Claude Code, dentro do seu projeto:
 > iniciar projeto
 ```
 
-O Claude vai guiar você pelo setup inicial.
-
-### 3. Siga o fluxo de discovery
-
-Após o init, siga as skills de discovery na ordem que fizer sentido:
+### 3. Siga o fluxo
 
 ```
 > definir visão do projeto
@@ -45,15 +50,15 @@ Após o init, siga as skills de discovery na ordem que fizer sentido:
 > levantar hipóteses
 > identificar stakeholders
 > definir métricas de sucesso
-```
-
-### 4. Gere o escopo
-
-Com o discovery completo (ou parcialmente completo):
-
-```
 > gerar escopo
+> especificação funcional
+> criar entidade Pedido
+> criar command ProcessarPedido
+> criar endpoint POST /pedidos
+> deploy homologação
 ```
+
+---
 
 ## Skills Disponíveis
 
@@ -74,255 +79,347 @@ Com o discovery completo (ou parcialmente completo):
 |-------|---------|-------|
 | `discovery-scoped` | "gerar escopo", "criar escopo" | `escopo.md` + cópia do discovery |
 
-## Estrutura do Repositório
+### Fase: Especificação
 
-As skills são versionadas. A versão mais recente é sempre a que deve ser usada em projetos novos.
+| Skill | Gatilho | Frameworks | Saída |
+|-------|---------|------------|-------|
+| `spec-functional` | "especificação funcional", "regras de negócio", "cenários BDD" | BDD, Given-When-Then, Feature Injection | `spec-functional.md` |
+
+### Fase: Arquitetura .NET
+
+Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result Pattern.
+
+| Skill | Gatilho | Camada | Saída |
+|-------|---------|--------|-------|
+| `architecture-init` | "clean architecture", "estrutura de projeto .NET" | Todas | Estrutura de solução |
+| `architecture-entities` | "criar entidade", "aggregate root", "value object" | Domain | `{Entity}.cs`, `I{Entity}Repository.cs` |
+| `architecture-feature` | "criar command", "criar query", "use case", "CQRS" | Application | `{Action}{Entity}Command/Query.cs` + Handler + Validator |
+| `architecture-repository` | "criar repositório", "repository", "persistência" | Infrastructure | `{Entity}Repository.cs` |
+| `architecture-external-service` | "integração com API", "API externa", "adapter", "gateway" | Infrastructure | `{Provider}Adapter.cs` + Gateway + Settings |
+| `architecture-controller` | "criar endpoint", "controller", "rota HTTP" | Presentation | Controller/Minimal API + Request/Response models |
+
+### Fase: Plano de Execução
+
+| Skill | Gatilho | Saída |
+|-------|---------|-------|
+| `plan-execution` | "plano de execução", "dividir em tarefas", "como implementar" | `execution-plan.md` |
+
+### Fase: Deploy .NET
+
+| Skill | Gatilho | Ambiente | Saída |
+|-------|---------|----------|-------|
+| `deploy-dotnet-homolog` | "deploy homologação", "deploy homolog", "subir para homolog" | Staging | Relatório de deploy |
+| `deploy-dotnet-prod` | "deploy produção", "deploy prod", "go live" | Production | Relatório de deploy + info de rollback |
+
+---
+
+## Estrutura do Repositório
 
 ```
 Skills/
-├── discovery-init/
-│   ├── v1/
-│   │   └── SKILL.md
-│   └── v2/
-│       └── SKILL.md
-├── discovery-vision/
-│   ├── v1/
-│   │   └── SKILL.md
-│   └── v2/
-│       └── SKILL.md
-├── discovery-opportunity/
-│   ├── v1/
-│   │   └── SKILL.md
-│   └── v2/
-│       ├── SKILL.md
-│       └── references/
-│           ├── frameworks.md
-│           ├── template-opportunity.md
-│           ├── troubleshooting.md
-│           └── examples.md
-├── discovery-assumptions/
-│   ├── v1/
-│   │   └── SKILL.md
-│   └── v2/
-│       ├── SKILL.md
-│       └── references/
-│           ├── frameworks.md
-│           ├── prioritization.md
-│           ├── validation-methods.md
-│           ├── template-assumptions.md
-│           ├── troubleshooting.md
-│           └── examples.md
-├── discovery-stakeholders/
-│   ├── v1/
-│   │   └── SKILL.md
-│   └── v2/
-│       ├── SKILL.md
-│       └── references/
-│           ├── frameworks.md
-│           ├── classification.md
-│           ├── engagement-strategies.md
-│           ├── template-stakeholders.md
-│           ├── troubleshooting.md
-│           └── examples.md
-├── discovery-metrics/
-│   ├── v1/
-│   │   └── SKILL.md
-│   └── v2/
-│       ├── SKILL.md
-│       └── references/
-│           ├── frameworks.md
-│           ├── metrics-catalog.md
-│           ├── baseline-and-goals.md
-│           ├── template-metrics.md
-│           ├── troubleshooting.md
-│           └── examples.md
-└── discovery-scoped/
-    ├── v1/
-    │   └── SKILL.md
-    └── v2/
-        ├── SKILL.md
-        └── references/
-            ├── template-escopo.md
-            ├── checklist.md
-            ├── situation-management.md
-            ├── troubleshooting.md
-            └── examples.md
+├── discovery-init/          # v1/ e v2/
+├── discovery-vision/        # v1/ e v2/
+├── discovery-opportunity/   # v1/ e v2/ (com references/)
+├── discovery-assumptions/   # v1/ e v2/ (com references/)
+├── discovery-stakeholders/  # v1/ e v2/ (com references/)
+├── discovery-metrics/       # v1/ e v2/ (com references/)
+├── discovery-scoped/        # v1/ e v2/ (com references/)
+│
+├── spec-functional/
+│   ├── SKILL.md
+│   └── References/
+│       ├── bdd-teoria.md
+│       ├── cenarios-given-when-then.md
+│       ├── extracao-de-exemplos.md
+│       └── template-spec-functional.md
+│
+├── architecture-init/
+│   ├── SKILL.md
+│   └── References/
+│       ├── domain-layer.md
+│       ├── application-layer.md
+│       ├── infrastructure-layer.md
+│       └── presentation-layer.md
+│
+├── architecture-entities/
+│   ├── SKILL.md
+│   └── references/
+│       ├── entity-template.md
+│       ├── value-objects.md
+│       └── repository-interface.md
+│
+├── architecture-feature/
+│   ├── SKILL.md
+│   └── references/
+│       ├── command-template.md
+│       ├── query-template.md
+│       └── behaviors.md
+│
+├── architecture-repository/
+│   ├── SKILL.md
+│   └── references/
+│       ├── repository-base.md
+│       ├── repository-implementation.md
+│       └── unit-of-work.md
+│
+├── architecture-external-service/
+│   ├── SKILL.md
+│   └── references/
+│       ├── http-client-base.md
+│       ├── adapter-gateway.md
+│       ├── resilience.md
+│       └── authentication.md
+│
+├── architecture-controller/
+│   ├── SKILL.md
+│   └── References/
+│       ├── patterns.md
+│       ├── structure.md
+│       └── examples.md
+│
+├── plan-execution/
+│   ├── SKILL.md
+│   └── references/
+│       ├── plan-structure.md
+│       ├── task-breakdown.md
+│       ├── skill-mapping.md
+│       └── examples.md
+│
+├── deploy-dotnet-homolog/
+│   ├── SKILL.md
+│   └── references/
+│       ├── pipeline-steps.md
+│       ├── health-check.md
+│       └── troubleshooting.md
+│
+└── deploy-dotnet-prod/
+    ├── SKILL.md
+    └── references/
+        ├── pre-deploy-checklist.md
+        ├── pipeline-steps.md
+        └── rollback.md
 ```
+
+> Skills de discovery usam versionamento (`v1/`, `v2/`). Skills de arquitetura e deploy não são versionadas — apenas a versão atual existe na raiz da pasta.
+
+---
 
 ## Estrutura de Pastas Gerada no Projeto
 
-Após usar as skills, seu projeto terá esta estrutura:
+Após usar as skills, seu projeto de documentação terá:
 
 ```
-seu-projeto/
-├── .claude/
-│   └── skills/           # Skills copiadas para cá
-│       ├── discovery-init/
-│       │   └── SKILL.md
-│       ├── discovery-vision/
-│       │   └── SKILL.md
-│       ├── discovery-opportunity/
-│       │   ├── SKILL.md
-│       │   └── references/
-│       ├── discovery-assumptions/
-│       │   ├── SKILL.md
-│       │   └── references/
-│       ├── discovery-stakeholders/
-│       │   ├── SKILL.md
-│       │   └── references/
-│       ├── discovery-metrics/
-│       │   ├── SKILL.md
-│       │   └── references/
-│       └── discovery-scoped/
-│           ├── SKILL.md
-│           └── references/
-│
-└── docs/
-    └── nome-do-projeto/
-        ├── project.md              # Metadados do projeto
-        ├── discovery/
-        │   ├── vision.md
-        │   ├── opportunity.md
-        │   ├── assumptions.md
-        │   ├── stakeholders.md
-        │   └── success-metrics.md
-        └── escopo/
-            └── titulo-do-escopo/
-                ├── escopo.md       # Documento consolidado
-                └── discovery/      # Snapshot do discovery usado
+docs/
+└── nome-do-projeto/
+    ├── project.md
+    ├── discovery/
+    │   ├── vision.md
+    │   ├── opportunity.md
+    │   ├── assumptions.md
+    │   ├── stakeholders.md
+    │   └── success-metrics.md
+    ├── escopo/
+    │   └── titulo-do-escopo/
+    │       ├── escopo.md
+    │       └── discovery/        # snapshot do discovery usado
+    └── especificacao/
+        └── titulo-do-escopo/
+            └── spec-functional.md
 ```
 
-## Para quem é isso?
+E seu projeto .NET terá a estrutura Clean Architecture:
 
-- **Product Managers** — para conduzir discovery estruturado
-- **Tech Leads** — para garantir alinhamento antes de codar
-- **Desenvolvedores** — para entender o contexto completo
-- **Analistas de Sistemas** — para documentação consistente
+```
+src/
+├── {Solution}.Domain/
+│   ├── Entities/
+│   ├── ValueObjects/
+│   ├── Aggregates/
+│   ├── Events/
+│   ├── Exceptions/
+│   └── Interfaces/
+├── {Solution}.Application/
+│   ├── {Feature}/
+│   │   ├── Commands/
+│   │   └── Queries/
+│   ├── DTOs/
+│   └── Behaviors/
+├── {Solution}.Infrastructure/
+│   ├── Persistence/
+│   │   ├── Repositories/
+│   │   └── Configurations/
+│   └── ExternalServices/
+│       └── {Provider}/
+└── {Solution}.Presentation/
+    └── Controllers/
+```
+
+---
 
 ## Como funciona cada skill
 
 ### discovery-init
 
-Ponto de entrada. Coleta informações básicas:
-- Nome do projeto
-- Descrição resumida
-- URL do repositório Git
-- Tipo de projeto
+Ponto de entrada. Coleta nome, descrição, URL do repositório e tipo do projeto. Gera `project.md` e cria a estrutura de pastas `discovery/` e `escopo/`.
 
-Gera `project.md` e cria a estrutura de pastas `discovery/` e `escopo/`.
+### discovery-vision / opportunity / assumptions / stakeholders / metrics
 
-### discovery-vision
-
-Baseada em **Lean Canvas** e **Value Proposition Canvas**. Explora:
-- Qual problema estamos resolvendo?
-- Para quem?
-- Qual a proposta de valor?
-- Quais as restrições?
-
-### discovery-opportunity
-
-Baseada em **Opportunity Solution Tree** (Teresa Torres) e **Jobs to Be Done**. Mapeia:
-- Jobs que o usuário quer realizar
-- Dores atuais
-- Desejos e expectativas
-- Tentativas anteriores de resolver
-
-Nunca sugere soluções durante essa etapa — foco total no problema.
-
-### discovery-assumptions
-
-Baseada em **Assumption Mapping** (Bland & Osterwalder) e **Lean Startup**. Identifica:
-- Hipóteses sobre usuários
-- Hipóteses de negócio
-- Hipóteses técnicas
-- Priorização por impacto × certeza
-
-Hipóteses com **alto impacto + baixa certeza** são priorizadas para validação imediata.
-
-### discovery-stakeholders
-
-Baseada na **Power-Interest Matrix**. Mapeia:
-- Quem aprova?
-- Quem é afetado?
-- Classificação por influência × interesse
-- Estratégia de comunicação por perfil
-
-### discovery-metrics
-
-Baseada em **OKRs**, **North Star Metric**, **HEART Framework** e **AARRR**. Define:
-- Métrica principal (North Star — uma única)
-- KPIs de negócio
-- KPIs de produto/usuário
-- Critérios de aceitação
-- Baseline e metas com prazo
+Cada skill conduz uma conversa em blocos temáticos e gera um documento `.md` estruturado. Requerem que `project.md` exista. Podem ser usadas em qualquer ordem — use só as que fazem sentido para o seu contexto.
 
 ### discovery-scoped
 
-Consolida todo o discovery em um documento de escopo formal:
-- Lê todos os arquivos de `discovery/` existentes
-- Verifica escopos já criados (evita duplicidade com escopos `Aprovado` ou `Em execução`)
-- Define título, abrangência (inclui/não inclui) e situação inicial (`Rascunho`)
-- Gera `escopo.md` com funcionalidades, métricas, hipóteses críticas e stakeholders
-- Copia snapshot do discovery usado
+Lê todos os arquivos de `discovery/`, verifica escopos já existentes (evita repetição com escopos `Aprovado` ou `Em execução`) e gera `escopo.md` com estado inicial `Rascunho`. Suporta escopos parciais (módulo, feature, fase).
 
-## Roadmap
+### spec-functional
 
-| Fase | Status | Skills |
-|------|--------|--------|
-| Discovery | Implementado | 6 skills (v2) |
-| Escopo | Implementado | 1 skill (v2) |
-| Especificação | Planejado | `spec-business-rules`, `spec-functional`, `spec-nonfunctional` |
-| Refinamento | Planejado | `refinement-screens`, `refinement-api`, `refinement-data-model` |
-| Plano de Execução | Planejado | `plan-tasks`, `plan-estimation` |
-| Homologação | Planejado | `deploy-homolog` |
-| Produção | Planejado | `deploy-production` |
+Baseada em **BDD** e **Feature Injection**. Para cada funcionalidade do escopo, define narrativa (`In order to / As / I want`) e levanta cenários `Given / When / Then`. Usa Esquema do Cenário para múltiplas combinações de dados. Requer que `escopo.md` exista.
+
+### architecture-init
+
+Define e documenta a estrutura de camadas Clean Architecture para a solução .NET. Serve como referência para todas as outras skills de arquitetura.
+
+### architecture-entities
+
+Gera entidades de domínio ricas (Rich Domain Model), Value Objects imutáveis, Aggregates e interfaces de repositório. Entidades com construtor privado e factory method `Create()`. Sem dependências de infraestrutura.
+
+### architecture-feature
+
+Gera Commands (escrita) e Queries (leitura) seguindo **CQRS** com MediatR. Todos os handlers retornam `Result<T>` (Result Pattern). Commands incluem Validator com FluentValidation. Queries de lista incluem paginação.
+
+### architecture-repository
+
+Gera implementações de repositório na camada Infrastructure herdando de `RepositoryBase<TEntity, TId>`. Usa EF Core com `AsNoTracking()` para queries de leitura. Registra no DI em `DependencyInjection.cs`.
+
+### architecture-external-service
+
+Gera integrações com APIs externas usando padrão **Adapter/Gateway**. Herda de `HttpClientBase`, configura Polly (retry, circuit breaker, timeout), define interface em Application e implementação em Infrastructure.
+
+### architecture-controller
+
+Gera endpoints ASP.NET Core (Controller ou Minimal API) com Request/Response models, validators FluentValidation, documentação OpenAPI e tratamento de erros via Result Pattern. Usa `ISender` do MediatR.
+
+### plan-execution
+
+Analisa a especificação funcional e decompõe em entregas incrementais com tarefas ordenadas por camada (Domain → Infrastructure → Application → Presentation). Referencia a skill correta para cada tipo de tarefa. Inclui estimativas de esforço.
+
+### deploy-dotnet-homolog
+
+Executa pipeline sequencial: Restore → Build → Test → Docker Build → Deploy → Health Check. Interrompe imediatamente em caso de falha. Gera relatório com artefatos e status de cada etapa.
+
+### deploy-dotnet-prod
+
+Igual ao homolog, com etapas extras: confirmação explícita do usuário, validação prévia (branch, commits pendentes, variáveis de ambiente) e procedimento de rollback documentado no relatório.
+
+---
+
+## Para quem é isso?
+
+- **Product Managers** — para conduzir discovery estruturado e gerar escopos
+- **Tech Leads** — para garantir alinhamento antes de codar e definir arquitetura
+- **Desenvolvedores .NET** — para gerar código seguindo padrões Clean Architecture
+- **Analistas de Sistemas** — para especificação funcional com BDD
+
+---
+
+## Fluxo Completo
+
+```
+discovery-init
+     │
+     ▼
+discovery-vision ──► discovery-opportunity ──► discovery-assumptions
+     │                                               │
+     └──────────────────────────────────────────────┘
+                          │
+                          ▼
+              discovery-stakeholders ──► discovery-metrics
+                          │
+                          ▼
+                  discovery-scoped
+                          │
+                          ▼
+                  spec-functional
+                          │
+                          ▼
+                  plan-execution
+                          │
+                          ▼
+         ┌────────────────┼────────────────┐
+         ▼                ▼                ▼
+ architecture-      architecture-    architecture-
+   entities           feature         repository
+                          │
+                          ▼
+              architecture-controller
+              architecture-external-service
+                          │
+                          ▼
+               deploy-dotnet-homolog
+                          │
+                          ▼
+                deploy-dotnet-prod
+```
+
+---
 
 ## Dicas de Uso
 
 **Não precisa fazer tudo**
-Use só as skills que fazem sentido para seu contexto. Um projeto pequeno pode precisar só de `discovery-vision` e `discovery-scoped`.
+Um projeto pequeno pode precisar só de `discovery-vision` + `discovery-scoped` + skills de arquitetura.
 
 **Itere**
 Os documentos são vivos. Rode as skills novamente quando tiver novas informações.
 
 **Escopo parcial**
-Um escopo pode cobrir só uma feature ou módulo, não precisa ser o projeto inteiro.
+Um escopo pode cobrir só uma feature ou módulo. O plano de execução divide em entregas incrementais.
 
-**Múltiplos escopos**
-Projetos grandes podem ter vários escopos, cada um com seu ciclo de vida independente.
+**Skills de arquitetura são independentes**
+Podem ser usadas sem ter feito discovery — basta saber o que construir.
+
+---
+
+## Roadmap
+
+| Fase | Status | Skills |
+|------|--------|--------|
+| Discovery | Implementado (v2) | 6 skills |
+| Escopo | Implementado (v2) | 1 skill |
+| Especificação Funcional | Implementado | `spec-functional` |
+| Arquitetura .NET | Implementado | 6 skills |
+| Plano de Execução | Implementado | `plan-execution` |
+| Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
+| Especificação Não-Funcional | Planejado | `spec-nonfunctional` |
+| Refinamento | Planejado | `refinement-screens`, `refinement-api`, `refinement-data-model` |
+
+---
+
+## Estrutura de uma skill
+
+```
+nome-da-skill/
+├── SKILL.md          # Frontmatter com name/description/metadata + fluxo de execução
+└── references/       # Arquivos de referência consultados durante a execução
+    ├── template-*.md
+    ├── frameworks.md
+    ├── troubleshooting.md
+    └── examples.md
+```
+
+O frontmatter do `SKILL.md` deve ter:
+- `name` — identificador
+- `description` — gatilhos e quando NÃO usar
+- `metadata` — versão, categoria, `depends-on`, `output`
+
+---
 
 ## Contribuindo
 
 1. Fork este repositório
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-skill`)
-3. Commit suas mudanças (`git commit -m 'Adiciona skill X'`)
-4. Push para a branch (`git push origin feature/nova-skill`)
-5. Abra um Pull Request
+2. Crie uma branch (`git checkout -b feature/nova-skill`)
+3. Commit suas mudanças
+4. Abra um Pull Request
 
-### Estrutura de uma skill (v2)
-
-```
-nome-da-skill/
-└── v2/
-    ├── SKILL.md          # Instruções principais para o Claude
-    └── references/       # Arquivos de referência (frameworks, templates, exemplos)
-        ├── frameworks.md
-        ├── template-*.md
-        ├── troubleshooting.md
-        └── examples.md
-```
-
-O `SKILL.md` deve conter no frontmatter:
-- `name` — identificador da skill
-- `description` — texto completo com gatilhos e quando NÃO usar
-- `metadata` — versão, categoria, dependências, output
-
-O corpo do `SKILL.md` deve conter:
-- Pré-requisitos
-- Fluxo conversacional por blocos temáticos
-- Regras obrigatórias e o que NÃO fazer
-- Adaptação de tom por perfil de usuário
-- Referências para arquivos em `references/`
+---
 
 ## Licença
 
@@ -330,4 +427,4 @@ MIT
 
 ---
 
-**Feito para times que querem parar de começar projetos no escuro.**
+**Feito para times que querem parar de começar projetos no escuro — e terminar deploys no escuro também.**
