@@ -40,8 +40,9 @@ metadata:
 
 Quando as skills são executadas num projeto real, os artefatos são salvos em:
 
+**Com repositório Git** (o repositório já é exclusivo do projeto):
 ```
-docs/{nome-do-projeto}/
+docs/
 ├── project.md                        # gerado por discovery-init
 ├── discovery/
 │   ├── vision.md                     # discovery-vision
@@ -53,6 +54,15 @@ docs/{nome-do-projeto}/
     └── {titulo-kebab-case}/
         ├── escopo.md                 # discovery-scoped
         └── discovery/               # snapshot dos docs de discovery usados
+```
+
+**Sem repositório Git** (criado localmente):
+```
+{nome-do-projeto}/
+└── docs/
+    ├── project.md
+    ├── discovery/
+    └── escopo/
 ```
 
 A skill `discovery-init` é sempre o ponto de entrada — ela cria o `project.md` e a estrutura de pastas. Todas as outras skills verificam se `project.md` existe antes de executar.

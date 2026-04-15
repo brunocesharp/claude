@@ -2,7 +2,7 @@
 name: discovery-init
 description: Inicia o discovery de um novo projeto de software criando o project.md e a estrutura de pastas. Use quando o usuário disser "iniciar projeto", "novo projeto", "começar discovery", "criar projeto", "setup do projeto", "quero começar um projeto". NÃO use se o projeto já foi iniciado — nesses casos leia o project.md existente.
 metadata:
-  version: 2.0.0
+  version: 2.1.0
   category: discovery
 ---
 
@@ -18,7 +18,10 @@ Skill responsável por inicializar um novo projeto, coletar informações básic
 
 ### Passo 1 — Verificar se o projeto já existe
 
-Antes de qualquer pergunta, verifique se já existe um arquivo `docs/*/project.md` no repositório clonado que corresponda ao que o usuário está descrevendo.
+Antes de qualquer pergunta, verifique se já existe um `project.md` que corresponda ao que o usuário está descrevendo:
+
+- **Com repositório clonado**: procure em `docs/project.md`
+- **Sem repositório** (local): procure em `{nome-do-projeto}/docs/project.md`
 
 - **Se existir**: não sobrescreva. Leia o arquivo, informe o usuário e pergunte se deseja atualizar algum campo.
 - **Se não existir**: siga para o Passo 2.
@@ -70,10 +73,14 @@ Guarde o nome da branch para usar no push (Passo 6).
 
 ### Passo 4 — Gerar o arquivo `project.md` no repositório alvo
 
-Crie o arquivo dentro do repositório clonado:
+O caminho do arquivo depende se há repositório ou não:
 
-- **Com repositório clonado**: `/tmp/{nome-do-projeto}/docs/{nome-do-projeto}/project.md`
-- **Sem repositório** (URL "a definir"): `docs/{nome-do-projeto}/project.md` no diretório atual
+| Situação | Caminho do arquivo |
+|---|---|
+| Com repositório clonado | `/tmp/{nome-do-projeto}/docs/project.md` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/project.md` |
+
+O repositório já é exclusivo do projeto — o nome do projeto está no nome do repositório, não na pasta `docs/`.
 
 Template:
 
@@ -92,8 +99,8 @@ Template:
 - Responsável: {perguntar ao usuário ou deixar "a definir"}
 
 ## Estrutura de Documentação
-- Discovery: `docs/{nome-do-projeto}/discovery/`
-- Escopo: `docs/{nome-do-projeto}/escopo/`
+- Discovery: `docs/discovery/`
+- Escopo: `docs/escopo/`
 
 ## Status das Fases
 - [ ] Discovery
@@ -109,16 +116,23 @@ Template:
 
 ### Passo 5 — Criar estrutura de pastas no repositório alvo
 
-Crie as pastas com `.gitkeep` para que o Git as versione:
+Crie as pastas com `.gitkeep` para que o Git as versione.
 
+**Com repositório clonado** (`/tmp/{nome-do-projeto}/`):
 ```bash
-mkdir -p /tmp/{nome-do-projeto}/docs/{nome-do-projeto}/discovery
-mkdir -p /tmp/{nome-do-projeto}/docs/{nome-do-projeto}/escopo
-touch /tmp/{nome-do-projeto}/docs/{nome-do-projeto}/discovery/.gitkeep
-touch /tmp/{nome-do-projeto}/docs/{nome-do-projeto}/escopo/.gitkeep
+mkdir -p /tmp/{nome-do-projeto}/docs/discovery
+mkdir -p /tmp/{nome-do-projeto}/docs/escopo
+touch /tmp/{nome-do-projeto}/docs/discovery/.gitkeep
+touch /tmp/{nome-do-projeto}/docs/escopo/.gitkeep
 ```
 
-> **Sem repositório clonado**: crie as pastas no diretório atual e pule o Passo 6.
+**Sem repositório** (local, pule o Passo 6):
+```bash
+mkdir -p {nome-do-projeto}/docs/discovery
+mkdir -p {nome-do-projeto}/docs/escopo
+touch {nome-do-projeto}/docs/discovery/.gitkeep
+touch {nome-do-projeto}/docs/escopo/.gitkeep
+```
 
 ---
 
@@ -136,9 +150,9 @@ git push origin {branch}
 Após o push, confirme ao usuário:
 
 > "Estrutura de documentação criada e publicada no repositório! Branch: `{branch}`
-> - `docs/{nome-do-projeto}/project.md`
-> - `docs/{nome-do-projeto}/discovery/`
-> - `docs/{nome-do-projeto}/escopo/`"
+> - `docs/project.md`
+> - `docs/discovery/`
+> - `docs/escopo/`"
 
 ---
 
@@ -158,7 +172,8 @@ Após o push, confirme ao usuário:
 ## Regras importantes
 
 - Todos os arquivos vão para o **repositório alvo** — nunca para o repositório de skills.
-- O nome da pasta deve ser sempre em **kebab-case** — confirme com o usuário antes de criar.
+- **Com repositório**: a pasta `docs/` fica na raiz do repo — o nome do projeto está no nome do repositório, não dentro de `docs/`.
+- **Sem repositório**: crie a pasta `{nome-do-projeto}/` em kebab-case no diretório atual — confirme o nome com o usuário antes de criar.
 - Nunca sobrescreva um `project.md` existente sem confirmação explícita.
 - Se o usuário não souber responder algo, registre como `"a definir"` e siga.
 - O diretório temporário `/tmp/{nome-do-projeto}` pode ser descartado após o push — o usuário pode clonar o repo localmente depois.
