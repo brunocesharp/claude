@@ -7,7 +7,7 @@ metadata:
   category: discovery
   depends-on: discovery-init
   recommended-after: discovery-vision
-  output: docs/discovery/opportunity.md
+  output: "{docs_root}/discovery/opportunity.md"
   frameworks: Opportunity Solution Tree, Jobs to Be Done
 ---
 
@@ -21,15 +21,12 @@ Para detalhes sobre os frameworks utilizados (Opportunity Solution Tree, Jobs to
 
 ## Pré-requisito
 
-Verifique a existência do `project.md` no caminho correto:
+Leia `docs/project-config.json` para obter a configuração do projeto.
 
-| Situação | Caminho |
-|---|---|
-| Com repositório clonado | `docs/project.md` |
-| Sem repositório (local) | `{nome-do-projeto}/docs/project.md` |
+- **Se não existir**: informe que é necessário executar `discovery-init`. Pergunte: "Quer que eu inicie o projeto agora?"
+- **Se existir**: extraia `docs_root` (padrão: `"docs"`). Se `{docs_root}/discovery/vision.md` existir, leia-o para contextualizar as perguntas.
 
-- **Se não existir**: pergunte "Quer que eu inicie o projeto agora usando a skill discovery-init?"
-- **Se existir**: leia o arquivo. Se `vision.md` também existir, use-o para contextualizar as perguntas.
+> Execute sempre as skills a partir da raiz do projeto (pasta que contém `docs/`).
 
 ---
 
@@ -114,18 +111,13 @@ Perguntas:
 
 ## Gerar o Documento
 
-Após coletar as informações, gere o arquivo usando o template em `references/template-opportunity.md` no caminho correto:
-
-| Situação | Caminho do arquivo |
-|---|---|
-| Com repositório clonado | `docs/discovery/opportunity.md` |
-| Sem repositório (local) | `{nome-do-projeto}/docs/discovery/opportunity.md` |
+Após coletar as informações, gere `{docs_root}/discovery/opportunity.md` usando o template em `references/template-opportunity.md`.
 
 ---
 
 ## Após Gerar o Documento
 
-1. **Salve o arquivo** no caminho correto (com repositório: `docs/discovery/opportunity.md` / sem repositório: `{nome-do-projeto}/docs/discovery/opportunity.md`)
+1. **Salve o arquivo** em `{docs_root}/discovery/opportunity.md`
 
 2. **Informe o usuário:**
 

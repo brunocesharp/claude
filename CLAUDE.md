@@ -32,17 +32,46 @@ metadata:
   version: 1.0.0
   category: discovery | scope | spec | architecture | plan | deploy
   depends-on: skill-anterior     # opcional
-  output: docs/{projeto}/pasta/arquivo.md
+  output: "{docs_root}/pasta/arquivo.md"
 ---
 ```
 
+## Arquivo de configuração do projeto
+
+Toda skill lê `docs/project-config.json` na raiz do projeto para resolver caminhos e obter contexto. O arquivo é criado por `discovery-init` e nunca precisa ser duplicado em outras skills.
+
+```json
+{
+  "name": "Nome do Projeto",
+  "slug": "nome-do-projeto",
+  "version": "1.0.0",
+  "setup": "git",
+  "docs_root": "docs",
+  "repository_url": "https://github.com/org/repo",
+  "project_type": "web-api",
+  "tech_stack": "dotnet",
+  "responsible": "a definir",
+  "created_at": "15/04/2026"
+}
+```
+
+| Campo | Descrição |
+|-------|-----------|
+| `setup` | `"git"` — repositório existe; `"local"` — sem repositório ainda |
+| `docs_root` | Pasta raiz dos documentos (padrão `"docs"`). Todas as skills prefixam caminhos com esse valor |
+| `tech_stack` | Tecnologia principal — permite que skills de arquitetura carreguem padrões corretos |
+
+> **Regra de execução:** as skills devem ser sempre executadas a partir da pasta que contém `docs/` (raiz do repositório para setup git; pasta `{slug}/` para setup local).
+
+Schema completo em `Skills/discovery-init/v2/references/project-config-schema.md`.
+
 ## Fluxo de saída dos documentos
 
-Quando as skills são executadas num projeto real, os artefatos são salvos em:
+Quando as skills são executadas num projeto real, os artefatos são salvos relativos ao `docs_root` do `project-config.json`:
 
-**Com repositório Git** (o repositório já é exclusivo do projeto):
 ```
-docs/
+{docs_root}/
+├── project-config.json               # gerado por discovery-init — lido por todas as skills
 ├── project.md                        # gerado por discovery-init
 ├── discovery/
 │   ├── vision.md                     # discovery-vision
@@ -50,22 +79,20 @@ docs/
 │   ├── assumptions.md                # discovery-assumptions
 │   ├── stakeholders.md               # discovery-stakeholders
 │   └── success-metrics.md            # discovery-metrics
-└── escopo/
+├── escopo/
+│   └── {titulo-kebab-case}/
+│       ├── escopo.md                 # discovery-scoped
+│       └── discovery/               # snapshot dos docs de discovery usados
+└── especificacao/
     └── {titulo-kebab-case}/
-        ├── escopo.md                 # discovery-scoped
-        └── discovery/               # snapshot dos docs de discovery usados
+        └── spec-functional.md        # spec-functional
 ```
 
-**Sem repositório Git** (criado localmente):
-```
-{nome-do-projeto}/
-└── docs/
-    ├── project.md
-    ├── discovery/
-    └── escopo/
-```
+**Com repositório Git**: `docs_root = "docs"` na raiz do repo clonado.
 
-A skill `discovery-init` é sempre o ponto de entrada — ela cria o `project.md` e a estrutura de pastas. Todas as outras skills verificam se `project.md` existe antes de executar.
+**Sem repositório Git**: cria-se `{slug}/docs/` localmente — execute as skills de dentro de `{slug}/`.
+
+A skill `discovery-init` é sempre o ponto de entrada — ela cria `project-config.json`, `project.md` e a estrutura de pastas. Todas as outras skills leem `docs/project-config.json` antes de executar.
 
 ## Dependências entre skills
 

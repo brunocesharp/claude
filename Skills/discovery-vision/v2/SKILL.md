@@ -6,7 +6,7 @@ metadata:
   version: 1.1.0
   category: discovery
   depends-on: discovery-init
-  output: docs/discovery/vision.md
+  output: "{docs_root}/discovery/vision.md"
 ---
 
 # Discovery Vision
@@ -17,15 +17,12 @@ Skill responsável por conduzir a conversa de visão do projeto e gerar o docume
 
 ## Pré-requisito
 
-Antes de iniciar, verifique a existência do `project.md` no caminho correto:
+Leia `docs/project-config.json` para obter a configuração do projeto.
 
-| Situação | Caminho |
-|---|---|
-| Com repositório clonado | `docs/project.md` |
-| Sem repositório (local) | `{nome-do-projeto}/docs/project.md` |
+- **Se não existir**: informe que é necessário executar `discovery-init` para inicializar o projeto. Pergunte: "Quer que eu inicie o projeto agora?"
+- **Se existir**: extraia `docs_root` (padrão: `"docs"` se o campo estiver ausente). Leia também `{docs_root}/project.md` para extrair o nome e contexto do projeto — use essas informações para personalizar as perguntas.
 
-- **Se não existir**: informe o usuário que é necessário iniciar o projeto primeiro e pergunte: "Quer que eu inicie o projeto agora usando a skill discovery-init?"
-- **Se existir**: leia o arquivo para extrair o nome do projeto e contexto já registrado. Use essas informações para personalizar as perguntas.
+> Todas as skills devem ser executadas a partir da raiz do projeto (a pasta que contém `docs/`).
 
 ---
 
@@ -97,12 +94,7 @@ Perguntas de aprofundamento:
 
 ## Gerar o Documento
 
-Após coletar as informações, gere o arquivo no caminho correto:
-
-| Situação | Caminho do arquivo |
-|---|---|
-| Com repositório clonado | `docs/discovery/vision.md` |
-| Sem repositório (local) | `{nome-do-projeto}/docs/discovery/vision.md` |
+Após coletar as informações, gere o arquivo em `{docs_root}/discovery/vision.md`, usando o `docs_root` lido do `project-config.json`.
 
 ### Template do Documento
 
@@ -197,13 +189,13 @@ Com base nesta visão, as próximas etapas recomendadas de discovery são:
 
 ## Após Gerar o Documento
 
-1. **Salve o arquivo** no caminho correto (com repositório: `docs/discovery/vision.md` / sem repositório: `{nome-do-projeto}/docs/discovery/vision.md`)
+1. **Salve o arquivo** em `{docs_root}/discovery/vision.md`
 
-2. **Atualize o `project.md`** marcando o item Discovery como "em andamento"
+2. **Atualize o `{docs_root}/project.md`** marcando o item Discovery como "em andamento"
 
 3. **Informe o usuário:**
 
-> "O documento `vision.md` foi salvo em `docs/discovery/` (ou `{nome-do-projeto}/docs/discovery/` se sem repositório).
+> "O documento `vision.md` foi salvo em `{docs_root}/discovery/`.
 > 
 > Com base no que conversamos, as próximas etapas mais relevantes parecem ser:
 > 
