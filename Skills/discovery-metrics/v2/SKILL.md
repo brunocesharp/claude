@@ -7,7 +7,7 @@ metadata:
   category: discovery
   depends-on: discovery-init
   recommended-after: discovery-stakeholders
-  output: docs/{projeto}/discovery/success-metrics.md
+  output: docs/discovery/success-metrics.md
   frameworks: OKR, North Star Metric, HEART, AARRR
 ---
 
@@ -23,7 +23,12 @@ Para exemplos de métricas por tipo de projeto, consulte `references/metrics-cat
 
 ## Pré-requisito
 
-Verifique se `docs/{nome-do-projeto}/project.md` existe.
+Verifique a existência do `project.md` no caminho correto:
+
+| Situação | Caminho |
+|---|---|
+| Com repositório clonado | `docs/project.md` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/project.md` |
 
 - **Se não existir**: pergunte "Quer que eu inicie o projeto agora usando a skill discovery-init?"
 - **Se existir**: leia também `vision.md`, `opportunity.md` e `assumptions.md` — eles definem o problema e hipóteses que as métricas devem validar.
@@ -144,13 +149,18 @@ Para técnicas de definição de baseline e metas, consulte `references/baseline
 
 ## Gerar o Documento
 
-Após coletar as informações, gere `docs/{nome-do-projeto}/discovery/success-metrics.md` usando o template em `references/template-metrics.md`.
+Após coletar as informações, gere o arquivo usando o template em `references/template-metrics.md` no caminho correto:
+
+| Situação | Caminho do arquivo |
+|---|---|
+| Com repositório clonado | `docs/discovery/success-metrics.md` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/discovery/success-metrics.md` |
 
 ---
 
 ## Após Gerar o Documento
 
-1. **Salve o arquivo** em `docs/{nome-do-projeto}/discovery/success-metrics.md`
+1. **Salve o arquivo** no caminho correto (com repositório: `docs/discovery/success-metrics.md` / sem repositório: `{nome-do-projeto}/docs/discovery/success-metrics.md`)
 
 2. **Informe o usuário:**
 

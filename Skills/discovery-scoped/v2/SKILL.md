@@ -7,7 +7,7 @@ metadata:
   category: scope
   depends-on: discovery-init
   recommended-after: discovery-metrics
-  output: docs/{projeto}/escopo/{titulo}/escopo.md
+  output: docs/escopo/{titulo}/escopo.md
   consolidates: vision, opportunity, assumptions, stakeholders, success-metrics
 ---
 
@@ -23,7 +23,12 @@ Para o fluxo de aprovação e estados, consulte `references/situation-management
 
 ## Pré-requisito
 
-Verifique se `docs/{nome-do-projeto}/project.md` existe.
+Verifique a existência do `project.md` no caminho correto:
+
+| Situação | Caminho |
+|---|---|
+| Com repositório clonado | `docs/project.md` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/project.md` |
 
 - **Se não existir**: informe que é necessário iniciar com `discovery-init`
 - **Se existir**: leia para obter nome do projeto e contexto geral
@@ -39,14 +44,21 @@ Verifique se `docs/{nome-do-projeto}/project.md` existe.
 Leia o `project.md` do projeto informado.
 
 **Validação:**
-- O projeto deve existir em `docs/{nome}/project.md`
+- O projeto deve existir em `docs/project.md` (com repositório) ou `{nome}/docs/project.md` (sem repositório)
 - Se não existir, ofereça criar com `discovery-init`
 
 ---
 
 ### Passo 2 — Ler os documentos de discovery
 
-Leia todos os arquivos em `docs/{nome-do-projeto}/discovery/`:
+Leia todos os arquivos na pasta `discovery/` no caminho correto:
+
+| Situação | Caminho da pasta |
+|---|---|
+| Com repositório clonado | `docs/discovery/` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/discovery/` |
+
+Arquivos a ler:
 
 - `vision.md` — visão, problema, público-alvo
 - `opportunity.md` — dores, jobs to be done
@@ -63,7 +75,12 @@ Leia todos os arquivos em `docs/{nome-do-projeto}/discovery/`:
 
 ### Passo 3 — Ler escopos já existentes
 
-Leia todos os `escopo.md` em `docs/{nome-do-projeto}/escopo/*/`:
+Leia todos os `escopo.md` na pasta de escopos no caminho correto:
+
+| Situação | Caminho |
+|---|---|
+| Com repositório clonado | `docs/escopo/*/escopo.md` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/escopo/*/escopo.md` |
 
 Para cada escopo, extraia:
 - Título
@@ -122,9 +139,15 @@ Converta título para kebab-case:
 - "Módulo de Autenticação" → `modulo-de-autenticacao`
 - "Fase 1 — MVP" → `fase-1-mvp`
 
-Crie:
+Crie a estrutura no caminho correto:
+
+| Situação | Caminho base |
+|---|---|
+| Com repositório clonado | `docs/escopo/{titulo-kebab}/` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/escopo/{titulo-kebab}/` |
+
 ```
-docs/{nome-do-projeto}/escopo/{titulo-kebab}/
+{caminho-base}/
 ├── escopo.md
 └── discovery/
     ├── vision.md          (cópia, se relevante)
@@ -159,8 +182,8 @@ Para checklist de qualidade, consulte `references/checklist.md`.
 
 > "Escopo **'{título}'** criado com sucesso!
 >
-> 📄 `docs/{nome}/escopo/{titulo-kebab}/escopo.md`
-> 📁 Discovery copiado para `docs/{nome}/escopo/{titulo-kebab}/discovery/`
+> 📄 `docs/escopo/{titulo-kebab}/escopo.md` (ou `{nome}/docs/escopo/{titulo-kebab}/escopo.md` se sem repositório)
+> 📁 Discovery copiado para `docs/escopo/{titulo-kebab}/discovery/` (ou `{nome}/docs/escopo/{titulo-kebab}/discovery/` se sem repositório)
 >
 > **Situação:** Rascunho
 >

@@ -7,7 +7,7 @@ metadata:
   category: discovery
   depends-on: discovery-init
   recommended-after: discovery-vision
-  output: docs/{projeto}/discovery/opportunity.md
+  output: docs/discovery/opportunity.md
   frameworks: Opportunity Solution Tree, Jobs to Be Done
 ---
 
@@ -21,7 +21,12 @@ Para detalhes sobre os frameworks utilizados (Opportunity Solution Tree, Jobs to
 
 ## Pré-requisito
 
-Verifique se `docs/{nome-do-projeto}/project.md` existe.
+Verifique a existência do `project.md` no caminho correto:
+
+| Situação | Caminho |
+|---|---|
+| Com repositório clonado | `docs/project.md` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/project.md` |
 
 - **Se não existir**: pergunte "Quer que eu inicie o projeto agora usando a skill discovery-init?"
 - **Se existir**: leia o arquivo. Se `vision.md` também existir, use-o para contextualizar as perguntas.
@@ -109,13 +114,18 @@ Perguntas:
 
 ## Gerar o Documento
 
-Após coletar as informações, gere `docs/{nome-do-projeto}/discovery/opportunity.md` usando o template em `references/template-opportunity.md`.
+Após coletar as informações, gere o arquivo usando o template em `references/template-opportunity.md` no caminho correto:
+
+| Situação | Caminho do arquivo |
+|---|---|
+| Com repositório clonado | `docs/discovery/opportunity.md` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/discovery/opportunity.md` |
 
 ---
 
 ## Após Gerar o Documento
 
-1. **Salve o arquivo** em `docs/{nome-do-projeto}/discovery/opportunity.md`
+1. **Salve o arquivo** no caminho correto (com repositório: `docs/discovery/opportunity.md` / sem repositório: `{nome-do-projeto}/docs/discovery/opportunity.md`)
 
 2. **Informe o usuário:**
 

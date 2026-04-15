@@ -6,7 +6,7 @@ metadata:
   version: 1.1.0
   category: discovery
   depends-on: discovery-init
-  output: docs/{projeto}/discovery/vision.md
+  output: docs/discovery/vision.md
 ---
 
 # Discovery Vision
@@ -17,7 +17,12 @@ Skill responsável por conduzir a conversa de visão do projeto e gerar o docume
 
 ## Pré-requisito
 
-Antes de iniciar, verifique se o arquivo `docs/{nome-do-projeto}/project.md` existe.
+Antes de iniciar, verifique a existência do `project.md` no caminho correto:
+
+| Situação | Caminho |
+|---|---|
+| Com repositório clonado | `docs/project.md` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/project.md` |
 
 - **Se não existir**: informe o usuário que é necessário iniciar o projeto primeiro e pergunte: "Quer que eu inicie o projeto agora usando a skill discovery-init?"
 - **Se existir**: leia o arquivo para extrair o nome do projeto e contexto já registrado. Use essas informações para personalizar as perguntas.
@@ -92,11 +97,12 @@ Perguntas de aprofundamento:
 
 ## Gerar o Documento
 
-Após coletar as informações, gere o arquivo em:
+Após coletar as informações, gere o arquivo no caminho correto:
 
-```
-docs/{nome-do-projeto}/discovery/vision.md
-```
+| Situação | Caminho do arquivo |
+|---|---|
+| Com repositório clonado | `docs/discovery/vision.md` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/discovery/vision.md` |
 
 ### Template do Documento
 
@@ -191,13 +197,13 @@ Com base nesta visão, as próximas etapas recomendadas de discovery são:
 
 ## Após Gerar o Documento
 
-1. **Salve o arquivo** em `docs/{nome-do-projeto}/discovery/vision.md`
+1. **Salve o arquivo** no caminho correto (com repositório: `docs/discovery/vision.md` / sem repositório: `{nome-do-projeto}/docs/discovery/vision.md`)
 
 2. **Atualize o `project.md`** marcando o item Discovery como "em andamento"
 
 3. **Informe o usuário:**
 
-> "O documento `vision.md` foi salvo em `docs/{nome-do-projeto}/discovery/`.
+> "O documento `vision.md` foi salvo em `docs/discovery/` (ou `{nome-do-projeto}/docs/discovery/` se sem repositório).
 > 
 > Com base no que conversamos, as próximas etapas mais relevantes parecem ser:
 > 
