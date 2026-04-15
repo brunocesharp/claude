@@ -2,13 +2,15 @@
 name: discovery-init
 description: Inicia o discovery de um novo projeto de software criando o project.md e a estrutura de pastas. Use quando o usuário disser "iniciar projeto", "novo projeto", "começar discovery", "criar projeto", "setup do projeto", "quero começar um projeto". NÃO use se o projeto já foi iniciado — nesses casos leia o project.md existente.
 metadata:
-  version: 1.1.0
+  version: 2.0.0
   category: discovery
 ---
 
 # Discovery Init
 
-Skill responsável por inicializar um novo projeto, coletar informações básicas, criar o arquivo `project.md` e (opcionalmente) montar a estrutura de pastas de documentação.
+Skill responsável por inicializar um novo projeto, coletar informações básicas, criar o arquivo `project.md`, montar a estrutura de pastas de documentação e publicar tudo no repositório Git do projeto.
+
+> **Importante:** todos os arquivos e pastas criados por esta skill vão para o **repositório do projeto alvo** (informado pelo usuário), nunca para o repositório de skills onde esta skill está instalada.
 
 ---
 
@@ -16,7 +18,7 @@ Skill responsável por inicializar um novo projeto, coletar informações básic
 
 ### Passo 1 — Verificar se o projeto já existe
 
-Antes de qualquer pergunta, verifique se já existe um arquivo `docs/*/project.md` que corresponda ao que o usuário está descrevendo.
+Antes de qualquer pergunta, verifique se já existe um arquivo `docs/*/project.md` no repositório clonado que corresponda ao que o usuário está descrevendo.
 
 - **Se existir**: não sobrescreva. Leia o arquivo, informe o usuário e pergunte se deseja atualizar algum campo.
 - **Se não existir**: siga para o Passo 2.
@@ -35,20 +37,43 @@ Faça as perguntas abaixo uma de cada vez, em tom conversacional:
    - "Em uma frase, qual é a ideia central desse projeto?"
 
 3. **Repositório Git**
-   - "Qual é a URL do repositório Git?"
-   - Se não tiver ainda, registre como `"a definir"` e siga normalmente. Não execute `git clone` automaticamente — apenas registre a URL.
+   - "Qual é a URL do repositório Git? (ex: https://github.com/org/repo)"
+   - Se não tiver ainda, registre como `"a definir"` e siga para o Passo 3 sem executar nenhum comando git.
 
 4. **Tipo de projeto** *(opcional)*
    - "Que tipo de sistema é esse? (ex: web app, API, mobile, integração, etc.)"
 
 ---
 
-### Passo 3 — Gerar o arquivo `project.md`
+### Passo 3 — Clonar o repositório alvo
 
-Salve o arquivo em:
+> **Execute apenas se uma URL de repositório válida foi informada. Pule este passo se a URL for "a definir".**
+
+Execute os comandos abaixo via Bash:
+
+```bash
+# Clona o repositório alvo em um diretório temporário
+git clone {url-do-repositorio} /tmp/{nome-do-projeto}
 ```
-docs/{nome-do-projeto}/project.md
+
+Se o clone falhar (repo privado, credenciais, URL inválida), informe o erro ao usuário e pergunte se deseja corrigir a URL ou continuar sem repositório (registrando como "a definir").
+
+Após o clone bem-sucedido, confirme a branch padrão:
+
+```bash
+cd /tmp/{nome-do-projeto} && git branch --show-current
 ```
+
+Guarde o nome da branch para usar no push (Passo 6).
+
+---
+
+### Passo 4 — Gerar o arquivo `project.md` no repositório alvo
+
+Crie o arquivo dentro do repositório clonado:
+
+- **Com repositório clonado**: `/tmp/{nome-do-projeto}/docs/{nome-do-projeto}/project.md`
+- **Sem repositório** (URL "a definir"): `docs/{nome-do-projeto}/project.md` no diretório atual
 
 Template:
 
@@ -82,27 +107,42 @@ Template:
 
 ---
 
-### Passo 4 — Perguntar sobre estrutura de pastas
+### Passo 5 — Criar estrutura de pastas no repositório alvo
 
-Após salvar o `project.md`, pergunte:
+Crie as pastas com `.gitkeep` para que o Git as versione:
 
-> "Deseja que eu crie agora a estrutura de pastas de documentação para este projeto?"
-
-**Se sim**, crie as pastas com `.gitkeep` para que o Git as versione:
+```bash
+mkdir -p /tmp/{nome-do-projeto}/docs/{nome-do-projeto}/discovery
+mkdir -p /tmp/{nome-do-projeto}/docs/{nome-do-projeto}/escopo
+touch /tmp/{nome-do-projeto}/docs/{nome-do-projeto}/discovery/.gitkeep
+touch /tmp/{nome-do-projeto}/docs/{nome-do-projeto}/escopo/.gitkeep
 ```
-docs/{nome-do-projeto}/discovery/.gitkeep
-docs/{nome-do-projeto}/escopo/.gitkeep
-```
 
-Confirme:
-> "Estrutura criada! Discovery em `docs/{nome-do-projeto}/discovery/` e escopo em `docs/{nome-do-projeto}/escopo/`."
-
-**Se não**, informe:
-> "Tudo bem! O `project.md` foi salvo em `docs/{nome-do-projeto}/project.md`. Quando quiser criar a estrutura de pastas, é só pedir."
+> **Sem repositório clonado**: crie as pastas no diretório atual e pule o Passo 6.
 
 ---
 
-### Passo 5 — Sugerir próximos passos
+### Passo 6 — Commit e push no repositório alvo
+
+> **Execute apenas se o clone foi realizado com sucesso no Passo 3.**
+
+```bash
+cd /tmp/{nome-do-projeto}
+git add docs/
+git commit -m "docs: inicializa estrutura de documentação do projeto"
+git push origin {branch}
+```
+
+Após o push, confirme ao usuário:
+
+> "Estrutura de documentação criada e publicada no repositório! Branch: `{branch}`
+> - `docs/{nome-do-projeto}/project.md`
+> - `docs/{nome-do-projeto}/discovery/`
+> - `docs/{nome-do-projeto}/escopo/`"
+
+---
+
+### Passo 7 — Sugerir próximos passos
 
 > "O projeto **{nome}** foi iniciado! As próximas etapas do discovery são:
 > - **Visão do projeto** — definir o problema, público-alvo e proposta de valor
@@ -117,10 +157,11 @@ Confirme:
 
 ## Regras importantes
 
+- Todos os arquivos vão para o **repositório alvo** — nunca para o repositório de skills.
 - O nome da pasta deve ser sempre em **kebab-case** — confirme com o usuário antes de criar.
 - Nunca sobrescreva um `project.md` existente sem confirmação explícita.
-- Nunca execute `git clone` automaticamente — apenas registre a URL.
 - Se o usuário não souber responder algo, registre como `"a definir"` e siga.
+- O diretório temporário `/tmp/{nome-do-projeto}` pode ser descartado após o push — o usuário pode clonar o repo localmente depois.
 
 ---
 
@@ -129,11 +170,21 @@ Confirme:
 **`project.md` já existe para esse projeto**
 Não sobrescreva. Leia o conteúdo atual, apresente os campos existentes ao usuário e pergunte: "Deseja atualizar algum campo?"
 
+**Clone falha (repositório privado ou credenciais ausentes)**
+Informe o erro exato. Oriente o usuário a configurar autenticação (SSH key ou token) e tente novamente. Se não for possível resolver, registre a URL como "a definir" e continue sem git.
+
+**Push rejeitado (sem permissão ou branch protegida)**
+Informe o erro. Pergunte se o usuário deseja usar outra branch:
+```bash
+git checkout -b docs/init-discovery
+git push origin docs/init-discovery
+```
+
 **Nome do projeto com caracteres especiais ou acentos**
 Normalize para kebab-case sem acentos (ex: "Gestão de Estoque" → `gestao-de-estoque`). Confirme com o usuário antes de usar.
 
 **Usuário não tem repositório Git ainda**
-Registre a URL como `"a definir"` no `project.md`. Não bloqueie o fluxo — o repositório pode ser adicionado depois atualizando o arquivo.
+Registre a URL como `"a definir"` no `project.md`. Crie os arquivos localmente. Não bloqueie o fluxo — o repositório pode ser adicionado depois atualizando o arquivo.
 
 **Usuário quer iniciar mais de um projeto na mesma conversa**
-Execute o fluxo completo para cada projeto separadamente, um de cada vez.
+Execute o fluxo completo para cada projeto separadamente, um de cada vez. Use diretórios temporários diferentes (`/tmp/{nome-projeto-1}`, `/tmp/{nome-projeto-2}`).
