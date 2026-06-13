@@ -1,0 +1,33 @@
+{
+  "name": "claude",
+  "owner": {
+    "name": "brunocesharp"
+  },
+  "plugins": [
+    {
+      "name": "discovery",
+      "source": "./plugins/discovery",
+      "description": "Skills de discovery: visão, oportunidades, hipóteses, stakeholders, métricas e geração de escopo."
+    },
+    {
+      "name": "spec-plan",
+      "source": "./plugins/spec-plan",
+      "description": "Skills de especificação funcional (BDD) e plano de execução para decompor escopos em tarefas."
+    },
+    {
+      "name": "architecture-dotnet",
+      "source": "./plugins/architecture-dotnet",
+      "description": "Skills de geração de código .NET seguindo Clean Architecture, DDD, CQRS e Result Pattern, além de deploy para homologação e produção."
+    },
+    {
+      "name": "architecture-angular",
+      "source": "./plugins/architecture-angular",
+      "description": "Skills de geração de código Angular (camadas core, feature, shared e RxJS transversal) com SignalR e NgRx."
+    },
+    {
+      "name": "business-docs",
+      "source": "./plugins/business-docs",
+      "description": "Skill para documentação das regras de negócio do domínio."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "spec-plan",
+  "description": "Skills de especificação funcional (BDD) e plano de execução para decompor escopos em tarefas.",
+  "version": "1.0.0",
+  "author": {
+    "name": "brunocesharp"
+  }
+}
