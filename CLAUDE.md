@@ -4,21 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## O que é este repositório
 
-Coleção de **skills modulares** para o Claude Code que cobrem o ciclo completo de desenvolvimento de software — do discovery ao deploy. As skills são instaladas em `.claude/skills/` de projetos externos e guiam equipes através de fases estruturadas de descoberta, especificação, arquitetura e publicação.
+**Marketplace de plugins** do Claude Code que cobre o ciclo completo de desenvolvimento de software — do discovery ao deploy. Cada plugin agrupa um conjunto de skills relacionadas e é instalado via `/plugin marketplace add` + `/plugin install`, guiando equipes através de fases estruturadas de descoberta, especificação, arquitetura e publicação.
 
-## Estrutura de uma skill
+## Estrutura do repositório
 
 ```
-Skills/
-└── nome-da-skill/
-    ├── v1/            # versões antigas (apenas skills de discovery)
-    ├── v2/            # versão atual (apenas skills de discovery)
-    │   ├── SKILL.md   # frontmatter + fluxo de execução
-    │   └── references/
-    └── SKILL.md       # skills sem versionamento ficam na raiz da pasta
+.claude-plugin/
+└── marketplace.json          # catálogo dos plugins deste repositório
+
+plugins/
+└── nome-do-plugin/
+    ├── .claude-plugin/
+    │   └── plugin.json        # metadados do plugin
+    └── skills/
+        └── nome-da-skill/
+            ├── SKILL.md        # frontmatter + fluxo de execução
+            └── references/
 ```
 
-Skills de discovery (`discovery-*`, `discovery-scoped`) usam versionamento `v1/`/`v2/`. Skills de arquitetura, spec, plan e deploy não têm versionamento — apenas a versão atual existe na raiz da pasta.
+Cada plugin reúne as skills de uma fase/stack (discovery, spec-plan, architecture-dotnet, architecture-angular, business-docs). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
 
 ## Frontmatter obrigatório no SKILL.md
 
@@ -105,7 +109,8 @@ Geram código seguindo Clean Architecture + DDD + CQRS + Result Pattern:
 
 ## Como adicionar ou modificar uma skill
 
-1. Criar a pasta em `Skills/nome-da-skill/` (com versão se for skill de discovery, sem versão para as demais)
-2. Criar `SKILL.md` com frontmatter válido e fluxo de execução detalhado
-3. Adicionar arquivos de referência em `references/` (templates, exemplos, frameworks teóricos)
-4. Atualizar o `README.md` com a nova skill nas tabelas e no diagrama de fluxo
+1. Escolher o plugin correto em `plugins/<plugin>/skills/` (ou criar um novo plugin com `.claude-plugin/plugin.json` e registrá-lo em `.claude-plugin/marketplace.json`)
+2. Criar a pasta `plugins/<plugin>/skills/nome-da-skill/`
+3. Criar `SKILL.md` com frontmatter válido e fluxo de execução detalhado
+4. Adicionar arquivos de referência em `references/` (templates, exemplos, frameworks teóricos)
+5. Atualizar o `README.md` com a nova skill nas tabelas e no diagrama de fluxo

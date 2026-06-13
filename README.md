@@ -23,15 +23,34 @@ Este repositório contém **skills modulares** para o Claude Code que cobrem tod
 
 ## Quick Start
 
-### 1. Copie as skills para seu projeto
+### 1. Adicione este marketplace e instale os plugins
 
-```bash
-# Clone este repositório
-git clone <url-do-repositorio> claude-skills
+No Claude Code, dentro do seu projeto:
 
-# Copie as skills desejadas para seu projeto
-cp -r claude-skills/Skills/discovery-init/v2/* seu-projeto/.claude/skills/discovery-init/
-# Repita para cada skill que quiser usar
+```
+/plugin marketplace add brunocesharp/claude
+/plugin install discovery@claude
+/plugin install spec-plan@claude
+/plugin install architecture-dotnet@claude
+/plugin install architecture-angular@claude
+/plugin install business-docs@claude
+```
+
+Instale apenas os plugins relevantes para o seu projeto. Para padronizar o time sem que cada dev digite os comandos, declare o marketplace e os plugins no `.claude/settings.json` do projeto:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "claude": {
+      "source": { "source": "github", "repo": "brunocesharp/claude" }
+    }
+  },
+  "enabledPlugins": {
+    "discovery@claude": true,
+    "spec-plan@claude": true,
+    "architecture-dotnet@claude": true
+  }
+}
 ```
 
 ### 2. Inicie um novo projeto
@@ -111,96 +130,123 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 | `deploy-dotnet-homolog` | "deploy homologação", "deploy homolog", "subir para homolog" | Staging | Relatório de deploy |
 | `deploy-dotnet-prod` | "deploy produção", "deploy prod", "go live" | Production | Relatório de deploy + info de rollback |
 
+### Fase: Documentação de Negócio
+
+| Skill | Gatilho | Saída |
+|-------|---------|-------|
+| `business-docs` | "documentar regras de negócio", "gerar docs de negócio", "business docs", "documentar domínio" | `docs/business/{area}.md` |
+
 ---
 
 ## Estrutura do Repositório
 
-```
-Skills/
-├── discovery-init/          # v1/ e v2/
-├── discovery-vision/        # v1/ e v2/
-├── discovery-opportunity/   # v1/ e v2/ (com references/)
-├── discovery-assumptions/   # v1/ e v2/ (com references/)
-├── discovery-stakeholders/  # v1/ e v2/ (com references/)
-├── discovery-metrics/       # v1/ e v2/ (com references/)
-├── discovery-scoped/        # v1/ e v2/ (com references/)
-│
-├── spec-functional/
-│   ├── SKILL.md
-│   └── References/
-│       ├── bdd-teoria.md
-│       ├── cenarios-given-when-then.md
-│       ├── extracao-de-exemplos.md
-│       └── template-spec-functional.md
-│
-├── architecture-init/
-│   ├── SKILL.md
-│   └── References/
-│       ├── domain-layer.md
-│       ├── application-layer.md
-│       ├── infrastructure-layer.md
-│       └── presentation-layer.md
-│
-├── architecture-entities/
-│   ├── SKILL.md
-│   └── references/
-│       ├── entity-template.md
-│       ├── value-objects.md
-│       └── repository-interface.md
-│
-├── architecture-feature/
-│   ├── SKILL.md
-│   └── references/
-│       ├── command-template.md
-│       ├── query-template.md
-│       └── behaviors.md
-│
-├── architecture-repository/
-│   ├── SKILL.md
-│   └── references/
-│       ├── repository-base.md
-│       ├── repository-implementation.md
-│       └── unit-of-work.md
-│
-├── architecture-external-service/
-│   ├── SKILL.md
-│   └── references/
-│       ├── http-client-base.md
-│       ├── adapter-gateway.md
-│       ├── resilience.md
-│       └── authentication.md
-│
-├── architecture-controller/
-│   ├── SKILL.md
-│   └── References/
-│       ├── patterns.md
-│       ├── structure.md
-│       └── examples.md
-│
-├── plan-execution/
-│   ├── SKILL.md
-│   └── references/
-│       ├── plan-structure.md
-│       ├── task-breakdown.md
-│       ├── skill-mapping.md
-│       └── examples.md
-│
-├── deploy-dotnet-homolog/
-│   ├── SKILL.md
-│   └── references/
-│       ├── pipeline-steps.md
-│       ├── health-check.md
-│       └── troubleshooting.md
-│
-└── deploy-dotnet-prod/
-    ├── SKILL.md
-    └── references/
-        ├── pre-deploy-checklist.md
-        ├── pipeline-steps.md
-        └── rollback.md
-```
+Este repositório é um **marketplace de plugins** do Claude Code. Cada plugin agrupa as skills de uma fase ou stack:
 
-> Skills de discovery usam versionamento (`v1/`, `v2/`). Skills de arquitetura e deploy não são versionadas — apenas a versão atual existe na raiz da pasta.
+```
+.claude-plugin/
+└── marketplace.json              # catálogo dos plugins
+
+plugins/
+├── discovery/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       ├── discovery-init/
+│       ├── discovery-vision/
+│       ├── discovery-opportunity/   # com references/
+│       ├── discovery-assumptions/   # com references/
+│       ├── discovery-stakeholders/  # com references/
+│       ├── discovery-metrics/       # com references/
+│       └── discovery-scoped/        # com references/
+│
+├── spec-plan/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       ├── spec-functional/
+│       │   ├── SKILL.md
+│       │   └── References/
+│       │       ├── bdd-teoria.md
+│       │       ├── cenarios-given-when-then.md
+│       │       ├── extracao-de-exemplos.md
+│       │       └── template-spec-functional.md
+│       └── plan-execution/
+│           ├── SKILL.md
+│           └── references/
+│               ├── plan-structure.md
+│               ├── task-breakdown.md
+│               ├── skill-mapping.md
+│               └── examples.md
+│
+├── architecture-dotnet/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       ├── architecture-init/
+│       │   ├── SKILL.md
+│       │   └── References/
+│       │       ├── domain-layer.md
+│       │       ├── application-layer.md
+│       │       ├── infrastructure-layer.md
+│       │       └── presentation-layer.md
+│       ├── architecture-entities/
+│       │   ├── SKILL.md
+│       │   └── references/
+│       │       ├── entity-template.md
+│       │       ├── value-objects.md
+│       │       └── repository-interface.md
+│       ├── architecture-feature/
+│       │   ├── SKILL.md
+│       │   └── references/
+│       │       ├── command-template.md
+│       │       ├── query-template.md
+│       │       └── behaviors.md
+│       ├── architecture-repository/
+│       │   ├── SKILL.md
+│       │   └── references/
+│       │       ├── repository-base.md
+│       │       ├── repository-implementation.md
+│       │       └── unit-of-work.md
+│       ├── architecture-external-service/
+│       │   ├── SKILL.md
+│       │   └── references/
+│       │       ├── http-client-base.md
+│       │       ├── adapter-gateway.md
+│       │       ├── resilience.md
+│       │       └── authentication.md
+│       ├── architecture-controller/
+│       │   ├── SKILL.md
+│       │   └── References/
+│       │       ├── patterns.md
+│       │       ├── structure.md
+│       │       └── examples.md
+│       ├── deploy-dotnet-homolog/
+│       │   ├── SKILL.md
+│       │   └── references/
+│       │       ├── pipeline-steps.md
+│       │       ├── health-check.md
+│       │       └── troubleshooting.md
+│       └── deploy-dotnet-prod/
+│           ├── SKILL.md
+│           └── references/
+│               ├── pre-deploy-checklist.md
+│               ├── pipeline-steps.md
+│               └── rollback.md
+│
+├── architecture-angular/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       ├── angular-core-layer/       # com assets/ e references/
+│       ├── angular-feature-layer/    # com assets/ e references/
+│       ├── angular-shared-layer/     # com assets/ e references/
+│       └── angular-rxjs-transversal/ # com assets/ e references/
+│
+└── business-docs/
+    ├── .claude-plugin/plugin.json
+    └── skills/
+        └── business-docs/
+            ├── SKILL.md
+            └── references/
+                ├── areas.md
+                └── template-business-rule.md
+```
 
 ---
 
@@ -388,6 +434,7 @@ Podem ser usadas sem ter feito discovery — basta saber o que construir.
 | Arquitetura .NET | Implementado | 6 skills |
 | Plano de Execução | Implementado | `plan-execution` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
+| Documentação de Negócio | Implementado | `business-docs` |
 | Especificação Não-Funcional | Planejado | `spec-nonfunctional` |
 | Refinamento | Planejado | `refinement-screens`, `refinement-api`, `refinement-data-model` |
 
@@ -396,7 +443,7 @@ Podem ser usadas sem ter feito discovery — basta saber o que construir.
 ## Estrutura de uma skill
 
 ```
-nome-da-skill/
+plugins/<plugin>/skills/nome-da-skill/
 ├── SKILL.md          # Frontmatter com name/description/metadata + fluxo de execução
 └── references/       # Arquivos de referência consultados durante a execução
     ├── template-*.md

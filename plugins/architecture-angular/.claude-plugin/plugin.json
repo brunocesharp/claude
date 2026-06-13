@@ -1,0 +1,8 @@
+{
+  "name": "architecture-angular",
+  "description": "Skills de geração de código Angular (camadas core, feature, shared e RxJS transversal) com SignalR e NgRx.",
+  "version": "1.0.0",
+  "author": {
+    "name": "brunocesharp"
+  }
+}
