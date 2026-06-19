@@ -1,0 +1,8 @@
+{
+  "name": "business-docs",
+  "description": "Skill para documentação das regras de negócio do domínio.",
+  "version": "1.0.0",
+  "author": {
+    "name": "brunocesharp"
+  }
+}
