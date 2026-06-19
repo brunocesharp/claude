@@ -45,12 +45,67 @@ Faça as perguntas abaixo uma de cada vez, em tom conversacional:
 
 ---
 
-### Passo 3 — Gerar o arquivo `project.md`
+### Passo 3 — Clonar o repositório alvo
 
-Salve o arquivo em:
+> **Execute apenas se uma URL de repositório válida foi informada. Pule este passo se a URL for "a definir".**
+
+Execute os comandos abaixo via Bash:
+
+```bash
+# Clona o repositório alvo em um diretório temporário
+git clone {url-do-repositorio} /tmp/{nome-do-projeto}
 ```
-docs/project.md
+
+Se o clone falhar (repo privado, credenciais, URL inválida), informe o erro ao usuário e pergunte se deseja corrigir a URL ou continuar sem repositório (registrando como "a definir").
+
+Após o clone bem-sucedido, confirme a branch padrão:
+
+```bash
+cd /tmp/{nome-do-projeto} && git branch --show-current
 ```
+
+Guarde o nome da branch para usar no push (Passo 6).
+
+---
+
+### Passo 4 — Gerar `project-config.json` e `project.md` no repositório alvo
+
+O caminho base depende do setup:
+
+| Situação | Pasta base |
+|---|---|
+| Com repositório clonado | `/tmp/{nome-do-projeto}/docs/` |
+| Sem repositório (local) | `{nome-do-projeto}/docs/` |
+
+O repositório já é exclusivo do projeto — o nome do projeto está no nome do repositório, não na pasta `docs/`.
+
+> Consulte `references/project-config-schema.md` para a descrição completa de cada campo.
+
+#### 4a — Criar `project-config.json`
+
+Este arquivo é lido por todas as outras skills para resolver caminhos e obter contexto do projeto.
+
+Template (ajuste os valores com as respostas do usuário):
+
+```json
+{
+  "name": "{Nome do Projeto}",
+  "slug": "{nome-do-projeto}",
+  "version": "1.0.0",
+  "setup": "git",
+  "docs_root": "docs",
+  "repository_url": "{url ou a definir}",
+  "project_type": "{tipo do projeto ou a definir}",
+  "tech_stack": "a definir",
+  "responsible": "{responsável ou a definir}",
+  "created_at": "{data atual no formato DD/MM/YYYY}"
+}
+```
+
+- Use `"setup": "git"` se repositório foi clonado; `"setup": "local"` se sem repositório.
+- `docs_root` é sempre `"docs"` salvo se o usuário solicitar outro nome.
+
+#### 4b — Criar `project.md`
 
 Template:
 
@@ -98,11 +153,36 @@ docs/discovery/.gitkeep
 docs/escopo/.gitkeep
 ```
 
-Confirme:
-> "Estrutura criada! Discovery em `docs/discovery/` e escopo em `docs/escopo/`."
+**Sem repositório** (local, pule o Passo 6):
+```bash
+mkdir -p {nome-do-projeto}/docs/discovery
+mkdir -p {nome-do-projeto}/docs/escopo
+touch {nome-do-projeto}/docs/discovery/.gitkeep
+touch {nome-do-projeto}/docs/escopo/.gitkeep
+```
 
-**Se não**, informe:
-> "Tudo bem! O `project.md` foi salvo em `docs/project.md`. Quando quiser criar a estrutura de pastas, é só pedir."
+> **Setup local:** após a criação, informe o usuário: "Para usar as outras skills, execute-as **a partir da pasta `{nome-do-projeto}/`**, onde está a pasta `docs/`."
+
+---
+
+### Passo 6 — Commit e push no repositório alvo
+
+> **Execute apenas se o clone foi realizado com sucesso no Passo 3.**
+
+```bash
+cd /tmp/{nome-do-projeto}
+git add docs/
+git commit -m "docs: inicializa estrutura de documentação do projeto"
+git push origin {branch}
+```
+
+Após o push, confirme ao usuário:
+
+> "Estrutura de documentação criada e publicada no repositório! Branch: `{branch}`
+> - `docs/project-config.json`
+> - `docs/project.md`
+> - `docs/discovery/`
+> - `docs/escopo/`"
 
 ---
 
@@ -123,8 +203,9 @@ Confirme:
 
 - Todos os arquivos vão para o **repositório alvo** — nunca para o repositório de skills.
 - **Com repositório**: a pasta `docs/` fica na raiz do repo — o nome do projeto está no nome do repositório, não dentro de `docs/`.
-- **Sem repositório**: crie a pasta `{nome-do-projeto}/` em kebab-case no diretório atual — confirme o nome com o usuário antes de criar.
-- Nunca sobrescreva um `project.md` existente sem confirmação explícita.
+- **Sem repositório**: crie a pasta `{nome-do-projeto}/` em kebab-case no diretório atual — confirme o nome com o usuário antes de criar. Informe que as outras skills devem ser executadas **de dentro dessa pasta**.
+- Crie sempre **`project-config.json` e `project.md`** — o config é lido pelas outras skills para resolver caminhos.
+- Nunca sobrescreva arquivos existentes sem confirmação explícita.
 - Se o usuário não souber responder algo, registre como `"a definir"` e siga.
 - O diretório temporário `/tmp/{nome-do-projeto}` pode ser descartado após o push — o usuário pode clonar o repo localmente depois.
 

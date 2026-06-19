@@ -7,7 +7,7 @@ metadata:
   category: discovery
   depends-on: discovery-init
   recommended-after: discovery-assumptions
-  output: docs/discovery/stakeholders.md
+  output: "{docs_root}/discovery/stakeholders.md"
   frameworks: Power-Interest Matrix, Stakeholder Mapping
 ---
 
@@ -21,10 +21,12 @@ Para detalhes sobre os frameworks (Power-Interest Matrix, Stakeholder Mapping), 
 
 ## Pré-requisito
 
-Verifique se `docs/project.md` existe.
+Leia `docs/project-config.json` para obter a configuração do projeto.
 
-- **Se não existir**: pergunte "Quer que eu inicie o projeto agora usando a skill discovery-init?"
-- **Se existir**: leia também `vision.md` se disponível — ajuda a identificar quem pode ser afetado.
+- **Se não existir**: informe que é necessário executar `discovery-init`. Pergunte: "Quer que eu inicie o projeto agora?"
+- **Se existir**: extraia `docs_root` (padrão: `"docs"`). Leia também `{docs_root}/discovery/vision.md` se disponível — ajuda a identificar quem pode ser afetado.
+
+> Execute sempre as skills a partir da raiz do projeto (pasta que contém `docs/`).
 
 ---
 
@@ -107,13 +109,13 @@ Para estratégias específicas por tipo, consulte `references/engagement-strateg
 
 ## Gerar o Documento
 
-Após coletar as informações, gere `docs/discovery/stakeholders.md` usando o template em `references/template-stakeholders.md`.
+Após coletar as informações, gere `{docs_root}/discovery/stakeholders.md` usando o template em `references/template-stakeholders.md`.
 
 ---
 
 ## Após Gerar o Documento
 
-1. **Salve o arquivo** em `docs/discovery/stakeholders.md`
+1. **Salve o arquivo** em `{docs_root}/discovery/stakeholders.md`
 
 2. **Informe o usuário:**
 

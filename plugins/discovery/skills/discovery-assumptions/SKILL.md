@@ -7,7 +7,7 @@ metadata:
   category: discovery
   depends-on: discovery-init
   recommended-after: discovery-opportunity
-  output: docs/discovery/assumptions.md
+  output: "{docs_root}/discovery/assumptions.md"
   frameworks: Assumption Mapping, Lean Startup
 ---
 
@@ -21,10 +21,12 @@ Para detalhes sobre os frameworks (Assumption Mapping, Lean Startup), consulte `
 
 ## Pré-requisito
 
-Verifique se `docs/project.md` existe.
+Leia `docs/project-config.json` para obter a configuração do projeto.
 
-- **Se não existir**: pergunte "Quer que eu inicie o projeto agora usando a skill discovery-init?"
-- **Se existir**: leia também `vision.md` e `opportunity.md` — eles são a melhor fonte para identificar hipóteses implícitas.
+- **Se não existir**: informe que é necessário executar `discovery-init`. Pergunte: "Quer que eu inicie o projeto agora?"
+- **Se existir**: extraia `docs_root` (padrão: `"docs"`). Leia também `{docs_root}/discovery/vision.md` e `{docs_root}/discovery/opportunity.md` se existirem — são a melhor fonte para identificar hipóteses implícitas.
+
+> Execute sempre as skills a partir da raiz do projeto (pasta que contém `docs/`).
 
 ---
 
@@ -104,7 +106,7 @@ Resumo rápido:
 
 ## Gerar o Documento
 
-Após coletar as informações, gere `docs/discovery/assumptions.md` usando o template em `references/template-assumptions.md`.
+Após coletar as informações, gere `{docs_root}/discovery/assumptions.md` usando o template em `references/template-assumptions.md`.
 
 Para técnicas de validação, consulte `references/validation-methods.md`.
 
@@ -112,7 +114,7 @@ Para técnicas de validação, consulte `references/validation-methods.md`.
 
 ## Após Gerar o Documento
 
-1. **Salve o arquivo** em `docs/discovery/assumptions.md`
+1. **Salve o arquivo** em `{docs_root}/discovery/assumptions.md`
 
 2. **Informe o usuário:**
 

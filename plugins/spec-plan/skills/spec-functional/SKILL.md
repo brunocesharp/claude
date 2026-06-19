@@ -6,7 +6,7 @@ metadata:
   version: 1.1.0
   category: specification
   depends-on: scope-generate
-  output: docs/especificacao/{escopo}/spec-functional.md
+  output: "{docs_root}/especificacao/{escopo}/spec-functional.md"
 ---
 
 # Spec Functional
@@ -23,7 +23,9 @@ Antes de iniciar qualquer especificação, consulte os arquivos de referência:
 
 ## Pré-requisito
 
-Verifique se existe `docs/escopo/{nome-do-escopo}/escopo.md`.
+Leia `docs/project-config.json` e extraia `docs_root` (padrão: `"docs"`).
+
+Verifique se existe `{docs_root}/escopo/{nome-do-escopo}/escopo.md`.
 
 - **Não existe:** informe o usuário e ofereça executar `scope-generate` agora.
 - **Existe:** leia o arquivo completamente e extraia: título, funcionalidades listadas, usuários afetados, hipóteses críticas e restrições. Não repita perguntas já respondidas.
@@ -135,13 +137,13 @@ Ao concluir todas as features:
 
 Use o template em `references/template-spec-functional.md` como base.
 
-Salve em: `docs/especificacao/{nome-do-escopo}/spec-functional.md`
+Salve em `{docs_root}/especificacao/{nome-do-escopo}/spec-functional.md`.
 
 ---
 
 ## Após Gerar o Documento
 
-> "Documento salvo em `docs/especificacao/{escopo}/spec-functional.md`.
+> "Documento salvo em `{docs_root}/especificacao/{escopo}/spec-functional.md`.
 > {N} features especificadas, {M} cenários no total.
 > {Se houver pontos em aberto}: {X} pontos precisam de resposta dos stakeholders."
 
