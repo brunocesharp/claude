@@ -1,0 +1,8 @@
+{
+  "name": "architecture-java",
+  "description": "Skills de geração de código Java seguindo Clean Architecture, DDD, CQRS e Result Pattern, além de deploy para homologação e produção.",
+  "version": "1.0.0",
+  "author": {
+    "name": "brunocesharp"
+  }
+}

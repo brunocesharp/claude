@@ -25,6 +25,11 @@
       "description": "Skills de geração de código Angular (camadas core, feature, shared e RxJS transversal) com SignalR e NgRx."
     },
     {
+      "name": "architecture-java",
+      "source": "./plugins/architecture-java",
+      "description": "Skills de geração de código Java seguindo Clean Architecture, DDD, CQRS e Result Pattern, além de deploy para homologação e produção."
+    },
+    {
       "name": "business-docs",
       "source": "./plugins/business-docs",
       "description": "Skill para documentação das regras de negócio do domínio."
