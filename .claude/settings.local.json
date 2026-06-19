@@ -15,7 +15,6 @@
       "Bash(start:*)",
       "Bash(powershell:*)",
       "Read(//c/Users/alves/.claude/skills/whatsapp-app/**)",
-      "Bash(powershell.exe -ExecutionPolicy Bypass -File \".\\\\send-whatsapp.ps1\" -Phone \"5531995416605\" -Message \"teste de envio de mensgaem pelo claude\")",
       "Bash(powershell.exe:*)"
     ]
   }
