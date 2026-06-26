@@ -59,7 +59,30 @@ Ordem obrigatória dentro de cada entrega:
 6. Feature Module → Routing (lazy), Smart Components, Presentational Components, Forms
 7. State → BehaviorSubject ou NgRx (somente se necessário)
 
-### Passo 4: Gerar o Documento
+### Passo 4: Aplicar Nomenclatura de Backlog
+
+Antes de gerar o documento, aplique o padrão de nomenclatura da Tribo nas tarefas:
+
+| Tipo de item | Prefixo | Quando usar no plano |
+|---|---|---|
+| Tarefa de desenvolvimento | `[TASK] Desenvolver` | Implementação de código (entidade, command, componente…) |
+| Tarefa de análise | `[TASK] Analisar e especificar` | Levantamento técnico, spike, PoC |
+| Tarefa de testes | `[TASK] Testar` | Escrita e execução de testes |
+| Habilitador Técnico | `[HT]` | Migration, EF Config, Polly setup, refatoração técnica |
+| Feature | `[FEATURE]` | Título da feature no cabeçalho do plano |
+| Bug | `[BUG]` | Correção de comportamento incorreto identificado |
+| Fix | `[FIX]` | Ajuste técnico pontual sem quebra de requisito |
+| Requisição | `[REQ]` | Solicitação externa (Coordenadoria, time parceiro) |
+| Change | `[CHANGE]` | Alteração de requisito já implementado |
+
+**Formato de título da tarefa:**
+```
+[TASK] {Ação} - [{Módulo}] - {Descrição resumida}
+[HT] [{Módulo}] - {Ação técnica a ser realizada}
+[FEATURE] [{Módulo}] - {Ação esperada ou funcionalidade chave}
+```
+
+### Passo 5: Gerar o Documento
 
 Salve como `execution-plan.md` seguindo o template em `references/plan-structure.md`.
 
@@ -74,28 +97,29 @@ Salve como `execution-plan.md` seguindo o template em `references/plan-structure
 - **Dependências**: Nenhuma | Entrega N
 
 #### Backend
-| ID | Tarefa | Camada | Skill | Est. |
-|----|--------|--------|-------|------|
-| N.1 | Criar entidade `X` | Domain | dotnet-domain-entity | 2h |
-| N.2 | Criar repositório `X` | Infrastructure | dotnet-infrastructure-repository | 2h |
-| N.3 | Criar `CreateXCommand` | Application | dotnet-application-feature | 3h |
-| N.4 | Criar `XController` | Presentation | dotnet-endpoint-generator | 2h |
+| ID | Título do Item | Camada | Skill | Est. |
+|----|----------------|--------|-------|------|
+| N.1 | [TASK] Desenvolver - [{Módulo}] - Criar entidade `X` | Domain | dotnet-domain-entity | 2h |
+| N.2 | [TASK] Desenvolver - [{Módulo}] - Criar repositório `X` | Infrastructure | dotnet-infrastructure-repository | 2h |
+| N.3 | [TASK] Desenvolver - [{Módulo}] - Criar `CreateXCommand` | Application | dotnet-application-feature | 3h |
+| N.4 | [TASK] Desenvolver - [{Módulo}] - Criar `XController` | Presentation | dotnet-endpoint-generator | 2h |
+| N.5 | [HT] [{Módulo}] - Criar migration inicial | Infrastructure | - | 0.5h |
 
 #### Frontend (Angular)
-| ID | Tarefa | Camada | Tipo | Est. |
-|----|--------|--------|------|------|
-| N.5 | Criar model `X` | Core/Models | Interface | 0.5h |
-| N.6 | Criar `XService` (HttpClient) | Core/Services | Service | 2h |
-| N.7 | Criar `XListComponent` | Feature | Smart Component | 3h |
-| N.8 | Criar rota `/x` com lazy loading | Feature | Routing | 1h |
+| ID | Título do Item | Camada | Tipo | Est. |
+|----|----------------|--------|------|------|
+| N.6 | [TASK] Desenvolver - [{Módulo}] - Criar model `X` | Core/Models | Interface | 0.5h |
+| N.7 | [TASK] Desenvolver - [{Módulo}] - Criar `XService` (HttpClient) | Core/Services | Service | 2h |
+| N.8 | [TASK] Desenvolver - [{Módulo}] - Criar `XListComponent` | Feature | Smart Component | 3h |
+| N.9 | [TASK] Desenvolver - [{Módulo}] - Criar rota `/x` com lazy loading | Feature | Routing | 1h |
 
 #### Testes
-| ID | Tarefa | Tipo | Est. |
-|----|--------|------|------|
-| N.9 | Testes unitários Domain | Unit (.NET) | 2h |
-| N.10 | Testes unitários Handlers | Unit (.NET) | 2h |
-| N.11 | Testes unitários Service Angular | Unit (Angular) | 1h |
-| N.12 | Testes integração API | Integration | 2h |
+| ID | Título do Item | Tipo | Est. |
+|----|----------------|------|------|
+| N.10 | [TASK] Testar - [{Módulo}] - Testes unitários Domain | Unit (.NET) | 2h |
+| N.11 | [TASK] Testar - [{Módulo}] - Testes unitários Handlers | Unit (.NET) | 2h |
+| N.12 | [TASK] Testar - [{Módulo}] - Testes unitários Service Angular | Unit (Angular) | 1h |
+| N.13 | [TASK] Testar - [{Módulo}] - Testes de integração API | Integration | 2h |
 
 #### Critérios de Aceite
 - [ ] Endpoint POST /api/x funcional e testado via Swagger

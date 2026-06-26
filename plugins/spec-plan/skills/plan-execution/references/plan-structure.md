@@ -18,7 +18,7 @@ docs/
 ## Template: execution-plan.md
 
 ```markdown
-# Plano de Execução: {Nome da Feature}
+# Plano de Execução: [FEATURE] [{Módulo}] - {Nome da Feature}
 
 ## Metadados
 | Campo | Valor |
@@ -77,56 +77,56 @@ docs/
 ### Tarefas
 
 #### Domain Layer
-| ID | Tarefa | Tipo | Skill | Est. | Responsável |
-|----|--------|------|-------|------|-------------|
-| 1.1 | Criar entidade `{Entity}` | Entity | `dotnet-domain-entity` | 2h | - |
-| 1.2 | Criar Value Object `{VO}` | ValueObject | `dotnet-domain-entity` | 1h | - |
-| 1.3 | Criar interface `I{Entity}Repository` | Interface | `dotnet-domain-entity` | 0.5h | - |
+| ID | Título do Item | Tipo | Skill | Est. | Responsável |
+|----|----------------|------|-------|------|-------------|
+| 1.1 | [TASK] Desenvolver - [{Módulo}] - Criar entidade `{Entity}` | Entity | `dotnet-domain-entity` | 2h | - |
+| 1.2 | [TASK] Desenvolver - [{Módulo}] - Criar Value Object `{VO}` | ValueObject | `dotnet-domain-entity` | 1h | - |
+| 1.3 | [TASK] Desenvolver - [{Módulo}] - Criar interface `I{Entity}Repository` | Interface | `dotnet-domain-entity` | 0.5h | - |
 
 #### Infrastructure Layer
-| ID | Tarefa | Tipo | Skill | Est. | Responsável |
-|----|--------|------|-------|------|-------------|
-| 1.4 | Criar `{Entity}Configuration` | EF Config | - | 1h | - |
-| 1.5 | Criar `{Entity}Repository` | Repository | `dotnet-infrastructure-repository` | 2h | - |
-| 1.6 | Criar migration | Migration | - | 0.5h | - |
+| ID | Título do Item | Tipo | Skill | Est. | Responsável |
+|----|----------------|------|-------|------|-------------|
+| 1.4 | [HT] [{Módulo}] - Criar `{Entity}Configuration` (EF Core) | EF Config | - | 1h | - |
+| 1.5 | [TASK] Desenvolver - [{Módulo}] - Criar `{Entity}Repository` | Repository | `dotnet-infrastructure-repository` | 2h | - |
+| 1.6 | [HT] [{Módulo}] - Criar migration inicial | Migration | - | 0.5h | - |
 
 #### Application Layer
-| ID | Tarefa | Tipo | Skill | Est. | Responsável |
-|----|--------|------|-------|------|-------------|
-| 1.7 | Criar `{Entity}Dto` | DTO | `dotnet-application-feature` | 0.5h | - |
-| 1.8 | Criar `Create{Entity}Command` + Handler | Command | `dotnet-application-feature` | 3h | - |
-| 1.9 | Criar `Get{Entity}ByIdQuery` + Handler | Query | `dotnet-application-feature` | 2h | - |
+| ID | Título do Item | Tipo | Skill | Est. | Responsável |
+|----|----------------|------|-------|------|-------------|
+| 1.7 | [TASK] Desenvolver - [{Módulo}] - Criar `{Entity}Dto` | DTO | `dotnet-application-feature` | 0.5h | - |
+| 1.8 | [TASK] Desenvolver - [{Módulo}] - Criar `Create{Entity}Command` + Handler | Command | `dotnet-application-feature` | 3h | - |
+| 1.9 | [TASK] Desenvolver - [{Módulo}] - Criar `Get{Entity}ByIdQuery` + Handler | Query | `dotnet-application-feature` | 2h | - |
 
 #### Presentation Layer
-| ID | Tarefa | Tipo | Skill | Est. | Responsável |
-|----|--------|------|-------|------|-------------|
-| 1.10 | Criar `{Entity}Controller` | Controller | `dotnet-endpoint-generator` | 2h | - |
-| 1.11 | Criar validators de request | Validator | `dotnet-endpoint-generator` | 1h | - |
+| ID | Título do Item | Tipo | Skill | Est. | Responsável |
+|----|----------------|------|-------|------|-------------|
+| 1.10 | [TASK] Desenvolver - [{Módulo}] - Criar `{Entity}Controller` | Controller | `dotnet-endpoint-generator` | 2h | - |
+| 1.11 | [TASK] Desenvolver - [{Módulo}] - Criar validators de request | Validator | `dotnet-endpoint-generator` | 1h | - |
 
 #### Frontend — Core / Shared
 > Criado uma única vez por feature; reutilizado por todas as entregas subsequentes.
 
-| ID | Tarefa | Tipo | Est. | Responsável |
-|----|--------|------|------|-------------|
-| 1.12 | Criar model `{Entity}` (espelha DTO) | Interface TS | 0.5h | - |
-| 1.13 | Criar `{Entity}Service` (HttpClient) | Service | 2h | - |
-| 1.14 | Criar `{Entity}StateService` (BehaviorSubject) | State Service | 2h | - |
+| ID | Título do Item | Tipo | Est. | Responsável |
+|----|----------------|------|------|-------------|
+| 1.12 | [TASK] Desenvolver - [{Módulo}] - Criar model `{Entity}` (espelha DTO) | Interface TS | 0.5h | - |
+| 1.13 | [TASK] Desenvolver - [{Módulo}] - Criar `{Entity}Service` (HttpClient) | Service | 2h | - |
+| 1.14 | [TASK] Desenvolver - [{Módulo}] - Criar `{Entity}StateService` (BehaviorSubject) | State Service | 2h | - |
 
 #### Frontend — Feature Module
-| ID | Tarefa | Tipo | Est. | Responsável |
-|----|--------|------|------|-------------|
-| 1.15 | Criar `{feature}.module.ts` + rota lazy | Module / Routing | 1h | - |
-| 1.16 | Criar `{Entity}ListComponent` (Smart) | Component | 3h | - |
-| 1.17 | Criar `{Entity}CardComponent` (Presentational) | Component | 1.5h | - |
+| ID | Título do Item | Tipo | Est. | Responsável |
+|----|----------------|------|------|-------------|
+| 1.15 | [TASK] Desenvolver - [{Módulo}] - Criar `{feature}.module.ts` + rota lazy | Module / Routing | 1h | - |
+| 1.16 | [TASK] Desenvolver - [{Módulo}] - Criar `{Entity}ListComponent` (Smart) | Component | 3h | - |
+| 1.17 | [TASK] Desenvolver - [{Módulo}] - Criar `{Entity}CardComponent` (Presentational) | Component | 1.5h | - |
 
 #### Testes
-| ID | Tarefa | Tipo | Est. | Responsável |
-|----|--------|------|------|-------------|
-| 1.18 | Testes unitários Domain | Unit (.NET) | 2h | - |
-| 1.19 | Testes unitários Application | Unit (.NET) | 3h | - |
-| 1.20 | Testes unitários `{Entity}Service` Angular | Unit (Angular) | 1h | - |
-| 1.21 | Testes unitários `{Entity}ListComponent` | Unit (Angular) | 1.5h | - |
-| 1.22 | Testes de integração API | Integration | 3h | - |
+| ID | Título do Item | Tipo | Est. | Responsável |
+|----|----------------|------|------|-------------|
+| 1.18 | [TASK] Testar - [{Módulo}] - Testes unitários Domain | Unit (.NET) | 2h | - |
+| 1.19 | [TASK] Testar - [{Módulo}] - Testes unitários Application | Unit (.NET) | 3h | - |
+| 1.20 | [TASK] Testar - [{Módulo}] - Testes unitários `{Entity}Service` Angular | Unit (Angular) | 1h | - |
+| 1.21 | [TASK] Testar - [{Módulo}] - Testes unitários `{Entity}ListComponent` | Unit (Angular) | 1.5h | - |
+| 1.22 | [TASK] Testar - [{Módulo}] - Testes de integração API | Integration | 3h | - |
 
 ### Subtotal Entrega 1
 | Categoria | Estimativa |
@@ -272,7 +272,7 @@ Uma **entrega** está "pronta" quando:
 ## Exemplo Preenchido
 
 ```markdown
-# Plano de Execução: Gestão de Produtos
+# Plano de Execução: [FEATURE] [PRODUTO] - Gestão de Produtos
 
 ## Metadados
 | Campo | Valor |
@@ -329,58 +329,58 @@ e interface Angular exibindo a lista e o formulário integrados com dados reais.
 ### Tarefas
 
 #### Domain Layer
-| ID | Tarefa | Tipo | Skill | Est. |
-|----|--------|------|-------|------|
-| 1.1 | Criar Value Object `Money` | ValueObject | `dotnet-domain-entity` | 1h |
-| 1.2 | Criar entidade `Product` | Entity | `dotnet-domain-entity` | 2h |
-| 1.3 | Criar interface `IProductRepository` | Interface | `dotnet-domain-entity` | 0.5h |
+| ID | Título do Item | Tipo | Skill | Est. |
+|----|----------------|------|-------|------|
+| 1.1 | [TASK] Desenvolver - [PRODUTO] - Criar Value Object `Money` | ValueObject | `dotnet-domain-entity` | 1h |
+| 1.2 | [TASK] Desenvolver - [PRODUTO] - Criar entidade `Product` | Entity | `dotnet-domain-entity` | 2h |
+| 1.3 | [TASK] Desenvolver - [PRODUTO] - Criar interface `IProductRepository` | Interface | `dotnet-domain-entity` | 0.5h |
 
 #### Infrastructure Layer
-| ID | Tarefa | Tipo | Skill | Est. |
-|----|--------|------|-------|------|
-| 1.4 | Criar `ProductConfiguration` | EF Config | - | 1h |
-| 1.5 | Criar `ProductRepository` | Repository | `dotnet-infrastructure-repository` | 2h |
-| 1.6 | Criar migration inicial | Migration | - | 0.5h |
+| ID | Título do Item | Tipo | Skill | Est. |
+|----|----------------|------|-------|------|
+| 1.4 | [HT] [PRODUTO] - Criar `ProductConfiguration` (EF Core) | EF Config | - | 1h |
+| 1.5 | [TASK] Desenvolver - [PRODUTO] - Criar `ProductRepository` | Repository | `dotnet-infrastructure-repository` | 2h |
+| 1.6 | [HT] [PRODUTO] - Criar migration inicial | Migration | - | 0.5h |
 
 #### Application Layer
-| ID | Tarefa | Tipo | Skill | Est. |
-|----|--------|------|-------|------|
-| 1.7 | Criar `ProductDto` | DTO | `dotnet-application-feature` | 0.5h |
-| 1.8 | Criar `CreateProductCommand` | Command | `dotnet-application-feature` | 2h |
-| 1.9 | Criar `UpdateProductCommand` | Command | `dotnet-application-feature` | 2h |
-| 1.10 | Criar `DeleteProductCommand` | Command | `dotnet-application-feature` | 1h |
-| 1.11 | Criar `GetProductByIdQuery` | Query | `dotnet-application-feature` | 1.5h |
-| 1.12 | Criar `GetProductListQuery` | Query | `dotnet-application-feature` | 1.5h |
+| ID | Título do Item | Tipo | Skill | Est. |
+|----|----------------|------|-------|------|
+| 1.7 | [TASK] Desenvolver - [PRODUTO] - Criar `ProductDto` | DTO | `dotnet-application-feature` | 0.5h |
+| 1.8 | [TASK] Desenvolver - [PRODUTO] - Criar `CreateProductCommand` | Command | `dotnet-application-feature` | 2h |
+| 1.9 | [TASK] Desenvolver - [PRODUTO] - Criar `UpdateProductCommand` | Command | `dotnet-application-feature` | 2h |
+| 1.10 | [TASK] Desenvolver - [PRODUTO] - Criar `DeleteProductCommand` | Command | `dotnet-application-feature` | 1h |
+| 1.11 | [TASK] Desenvolver - [PRODUTO] - Criar `GetProductByIdQuery` | Query | `dotnet-application-feature` | 1.5h |
+| 1.12 | [TASK] Desenvolver - [PRODUTO] - Criar `GetProductListQuery` | Query | `dotnet-application-feature` | 1.5h |
 
 #### Presentation Layer
-| ID | Tarefa | Tipo | Skill | Est. |
-|----|--------|------|-------|------|
-| 1.13 | Criar `ProductsController` | Controller | `dotnet-endpoint-generator` | 3h |
-| 1.14 | Criar Request Validators | Validator | `dotnet-endpoint-generator` | 1h |
+| ID | Título do Item | Tipo | Skill | Est. |
+|----|----------------|------|-------|------|
+| 1.13 | [TASK] Desenvolver - [PRODUTO] - Criar `ProductsController` | Controller | `dotnet-endpoint-generator` | 3h |
+| 1.14 | [TASK] Desenvolver - [PRODUTO] - Criar Request Validators | Validator | `dotnet-endpoint-generator` | 1h |
 
 #### Frontend — Core / Shared
-| ID | Tarefa | Tipo | Est. |
-|----|--------|------|------|
-| 1.15 | Criar model `Product` (espelha `ProductDto`) | Interface TS | 0.5h |
-| 1.16 | Criar `ProductService` com HttpClient (GET, POST, PUT, DELETE) | Service | 3h |
-| 1.17 | Criar `ProductStateService` com BehaviorSubject | State Service | 2h |
+| ID | Título do Item | Tipo | Est. |
+|----|----------------|------|------|
+| 1.15 | [TASK] Desenvolver - [PRODUTO] - Criar model `Product` (espelha `ProductDto`) | Interface TS | 0.5h |
+| 1.16 | [TASK] Desenvolver - [PRODUTO] - Criar `ProductService` com HttpClient (GET, POST, PUT, DELETE) | Service | 3h |
+| 1.17 | [TASK] Desenvolver - [PRODUTO] - Criar `ProductStateService` com BehaviorSubject | State Service | 2h |
 
 #### Frontend — Feature Module
-| ID | Tarefa | Tipo | Est. |
-|----|--------|------|------|
-| 1.18 | Criar `products.module.ts` + rota lazy `/products` | Module / Routing | 1h |
-| 1.19 | Criar `ProductListComponent` (Smart — injeta StateService) | Component | 3h |
-| 1.20 | Criar `ProductCardComponent` (Presentational — OnPush) | Component | 1.5h |
-| 1.21 | Criar `ProductFormComponent` com Reactive Form | Component | 4h |
+| ID | Título do Item | Tipo | Est. |
+|----|----------------|------|------|
+| 1.18 | [TASK] Desenvolver - [PRODUTO] - Criar `products.module.ts` + rota lazy `/products` | Module / Routing | 1h |
+| 1.19 | [TASK] Desenvolver - [PRODUTO] - Criar `ProductListComponent` (Smart) | Component | 3h |
+| 1.20 | [TASK] Desenvolver - [PRODUTO] - Criar `ProductCardComponent` (Presentational — OnPush) | Component | 1.5h |
+| 1.21 | [TASK] Desenvolver - [PRODUTO] - Criar `ProductFormComponent` com Reactive Form | Component | 4h |
 
 #### Testes
-| ID | Tarefa | Tipo | Est. |
-|----|--------|------|------|
-| 1.22 | Testes unitários Domain (`Product`, `Money`) | Unit (.NET) | 2h |
-| 1.23 | Testes unitários Handlers | Unit (.NET) | 3h |
-| 1.24 | Testes unitários `ProductService` Angular | Unit (Angular) | 1.5h |
-| 1.25 | Testes unitários `ProductListComponent` | Unit (Angular) | 1.5h |
-| 1.26 | Testes integração API | Integration | 2h |
+| ID | Título do Item | Tipo | Est. |
+|----|----------------|------|------|
+| 1.22 | [TASK] Testar - [PRODUTO] - Testes unitários Domain (`Product`, `Money`) | Unit (.NET) | 2h |
+| 1.23 | [TASK] Testar - [PRODUTO] - Testes unitários Handlers | Unit (.NET) | 3h |
+| 1.24 | [TASK] Testar - [PRODUTO] - Testes unitários `ProductService` Angular | Unit (Angular) | 1.5h |
+| 1.25 | [TASK] Testar - [PRODUTO] - Testes unitários `ProductListComponent` | Unit (Angular) | 1.5h |
+| 1.26 | [TASK] Testar - [PRODUTO] - Testes de integração API | Integration | 2h |
 
 ### Subtotal Entrega 1
 | Categoria | Estimativa |
