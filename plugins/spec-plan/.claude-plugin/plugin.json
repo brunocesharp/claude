@@ -4,5 +4,9 @@
   "version": "1.0.0",
   "author": {
     "name": "brunocesharp"
-  }
+  },
+  "homepage": "https://github.com/brunocesharp/claude/tree/main/plugins/spec-plan",
+  "repository": "https://github.com/brunocesharp/claude",
+  "license": "MIT",
+  "keywords": ["specification", "bdd", "acceptance-criteria", "given-when-then", "execution-plan", "planning"]
 }

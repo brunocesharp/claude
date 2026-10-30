@@ -4,5 +4,9 @@
   "version": "1.0.0",
   "author": {
     "name": "brunocesharp"
-  }
+  },
+  "homepage": "https://github.com/brunocesharp/claude/tree/main/plugins/architecture-dotnet",
+  "repository": "https://github.com/brunocesharp/claude",
+  "license": "MIT",
+  "keywords": ["dotnet", "csharp", "clean-architecture", "ddd", "cqrs", "result-pattern", "deploy", "docker"]
 }

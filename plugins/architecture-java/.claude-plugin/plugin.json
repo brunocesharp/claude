@@ -4,5 +4,9 @@
   "version": "1.0.0",
   "author": {
     "name": "brunocesharp"
-  }
+  },
+  "homepage": "https://github.com/brunocesharp/claude/tree/main/plugins/architecture-java",
+  "repository": "https://github.com/brunocesharp/claude",
+  "license": "MIT",
+  "keywords": ["java", "clean-architecture", "ddd", "cqrs", "unit-tests", "bdd", "testing"]
 }

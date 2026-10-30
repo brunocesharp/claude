@@ -4,5 +4,9 @@
   "version": "1.0.0",
   "author": {
     "name": "brunocesharp"
-  }
+  },
+  "homepage": "https://github.com/brunocesharp/claude/tree/main/plugins/discovery",
+  "repository": "https://github.com/brunocesharp/claude",
+  "license": "MIT",
+  "keywords": ["discovery", "product", "vision", "stakeholders", "scope", "planning", "product-management"]
 }
