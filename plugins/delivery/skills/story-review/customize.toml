@@ -1,0 +1,60 @@
+# Campos customizáveis desta skill e seus valores padrão. NÃO edite este arquivo (o plugin o sobrescreve).
+# Para customizar num projeto, crie docs/{projeto}/_custom/{skill}.toml só com o que muda
+# (skill sdd-customize; regras em sdd-setup/references/customizacao.md).
+
+[workflow]
+# Fatos válidos durante toda a skill: texto literal ou "file:glob" relativo à raiz do workspace
+# (ex.: "file:docs/padroes/*.md").
+persistent_facts = []
+# Passos extras, em linguagem natural, antes do fluxo e depois dele.
+activation_steps_prepend = []
+activation_steps_append = []
+# O que fazer ao terminar com sucesso (ex.: "lembre de atualizar o card no Redmine"). Vazio = nada.
+on_complete = ""
+
+# Severidades que impedem a story de ir para done.
+block_on = ["high", "medium"]
+
+# Lentes (references/lentes.md). Mescla por "id": desligue com enabled = false ou acrescente uma lente nova
+# com id, name, focus e enabled. "integridade" é sempre o script review.py.
+[[workflow.lenses]]
+id = "aderencia"
+name = "Aderência à story"
+enabled = true
+focus = "Cada CA implementado e testado; tarefas [x] feitas; nada fora da story"
+
+[[workflow.lenses]]
+id = "integridade"
+name = "Integridade do registro"
+enabled = true
+focus = "review.py integrity"
+
+[[workflow.lenses]]
+id = "correcao"
+name = "Correção e casos de borda"
+enabled = true
+focus = "Nulos, limites, concorrência, erros, transação, performance óbvia"
+
+[[workflow.lenses]]
+id = "seguranca"
+name = "Segurança"
+enabled = true
+focus = "Autorização, validação, injeção, dados sensíveis, segredos"
+
+[[workflow.lenses]]
+id = "testes"
+name = "Testes"
+enabled = true
+focus = "Suíte rodada; cada CA com teste que falharia se quebrasse"
+
+[[workflow.lenses]]
+id = "arquitetura"
+name = "Arquitetura e padrões"
+enabled = true
+focus = "ADRs, camadas, padrões das skills de código e do repositório"
+
+[[workflow.lenses]]
+id = "contratos"
+name = "Contratos"
+enabled = true
+focus = "Provedor e consumidor batem; estratégia para incompatíveis; ordem de merge"

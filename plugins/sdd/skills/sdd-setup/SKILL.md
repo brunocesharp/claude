@@ -21,6 +21,7 @@ Leia antes de executar:
 - `references/config-schema.md` — chaves de configuração, arquivos, precedência e como as skills leem.
 - `references/proximos-passos.md` — como recomendar o próximo passo (ação Ajuda).
 - `references/sprint-status.md` — formato, estados e transições do `sprint-status.yaml` (quadro de entrega de cada projeto).
+- `references/customizacao.md` — customização das skills por projeto (para responder dúvidas; quem grava é a skill `sdd-customize`).
 
 ## Scripts
 
@@ -35,6 +36,7 @@ Leia antes de executar:
 | `story.py` | `_sdd/scripts/` (cópia) | Confere a completude do arquivo de uma story |
 | `review.py` | `_sdd/scripts/` (cópia) | Revisão: diff de todos os repositórios da story e integridade do registro (Arquivos alterados × git) |
 | `retro.py` | `_sdd/scripts/` (cópia) | Inventário de evidências de um épico para a retrospectiva |
+| `customize.py` | `_sdd/scripts/` (cópia) | Resolve a customização de uma skill para um projeto (base `customize.toml` + `docs/{projeto}/_custom/<skill>.toml`) |
 | `session.py` | `_sdd/scripts/` (cópia) | Monta (e, com confirmação, executa) o comando que abre uma sessão nova do Claude numa janela de terminal |
 
 Os de `_sdd/scripts/` são usados também pelas skills dos outros plugins. O plugin traz ainda um hook que valida o `sprint-status.yaml` sempre que o Claude grava ou edita esse arquivo (precisa do `uv`; sem ele, o hook não faz nada).

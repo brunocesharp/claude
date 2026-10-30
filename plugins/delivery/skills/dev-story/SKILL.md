@@ -24,6 +24,23 @@ Esta skill normalmente roda **dentro do repositório de código**, com o workspa
 2. **Configuração**: leia `{workspace}/_sdd/config.toml` e `config.user.toml` (o pessoal vence): `language.*`, `user.*`, `delivery.tdd` (`recomendado`), `delivery.auto_mode` (`nao`), `delivery.review_mode` (`sessao-nova`). Sem `_sdd/`: use os padrões.
 3. Sem id nem caminho: rode `status.py next` e use a story indicada, se a ação for `dev-story`.
 
+## Customização (por projeto)
+
+Depois de identificar o projeto, resolva a customização desta skill:
+
+```
+uv run _sdd/scripts/customize.py --skill-dir "${CLAUDE_SKILL_DIR}" --project docs/{projeto}
+```
+
+Sem o script (ou sem `uv`/`python`): leia `${CLAUDE_SKILL_DIR}/customize.toml` e, se existir, `docs/{projeto}/_custom/dev-story.toml`, e mescle pelas regras de `sdd-setup/references/customizacao.md`. Sem override, valem os padrões da skill.
+
+1. Execute os `workflow.activation_steps_prepend`, na ordem.
+2. Leia os arquivos de `facts` (e os textos literais): são fatos válidos durante toda a skill e vencem os padrões dela quando conflitarem.
+3. Use os valores de `resolved.workflow` onde esta skill os cita: `commands` (build/teste/suíte por stack, antes de `comandos-por-stack.md`), `definition_of_done` (conferida antes de mover para `review`) e `commit_message`.
+4. Ao terminar, execute os `workflow.activation_steps_append` e o `workflow.on_complete`.
+
+Mostre os `warnings` ao usuário uma vez (ex.: chave que não é customizável, override que repete a base).
+
 ## Scripts
 
 Rode a partir de `{workspace}` (`{P}` = `docs/{projeto}`):

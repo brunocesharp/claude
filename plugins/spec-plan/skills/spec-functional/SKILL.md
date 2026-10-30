@@ -43,6 +43,25 @@ Verifique se existe `docs/{projeto}/escopo/{nome-do-escopo}/escopo.md`.
 
 ---
 
+## Customização (por projeto)
+
+Depois de identificar o projeto, resolva a customização desta skill:
+
+```
+uv run _sdd/scripts/customize.py --skill-dir "${CLAUDE_SKILL_DIR}" --project docs/{projeto}
+```
+
+Sem o script (ou sem `uv`/`python`): leia `${CLAUDE_SKILL_DIR}/customize.toml` e, se existir, `docs/{projeto}/_custom/spec-functional.toml`, e mescle pelas regras de `sdd-setup/references/customizacao.md`. Sem override, valem os padrões da skill.
+
+1. Execute os `workflow.activation_steps_prepend`, na ordem.
+2. Leia os arquivos de `facts` (e os textos literais): são fatos válidos durante toda a skill e vencem os padrões dela quando conflitarem.
+3. Use os valores de `resolved.workflow` onde esta skill os cita: `gherkin_keywords` (`pt` = Dado/Quando/Então/E/Mas; `en` = Given/When/Then/And/But) nos cenários; `template` no lugar de `references/template-spec-functional.md`; `extra_rules` somadas às regras de escrita.
+4. Ao terminar, execute os `workflow.activation_steps_append` e o `workflow.on_complete`.
+
+Mostre os `warnings` ao usuário uma vez (ex.: chave que não é customizável, override que repete a base).
+
+---
+
 ## Fluxo de Execução
 
 ### Passo 1 — Abertura

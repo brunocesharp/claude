@@ -47,6 +47,23 @@ A raiz de trabalho é uma pasta de documentação com vários projetos, cada um 
 
 **Escopo.** Liste `docs/{projeto}/especificacao/*/` e pergunte qual escopo planejar (um só: use e avise). Sem especificação: ofereça `spec-functional` (ou aceite uma especificação colada na conversa, avisando que a cobertura não poderá ser verificada por script).
 
+## Customização (por projeto)
+
+Depois de identificar o projeto, resolva a customização desta skill:
+
+```
+uv run _sdd/scripts/customize.py --skill-dir "${CLAUDE_SKILL_DIR}" --project docs/{projeto}
+```
+
+Sem o script (ou sem `uv`/`python`): leia `${CLAUDE_SKILL_DIR}/customize.toml` e, se existir, `docs/{projeto}/_custom/plan-epics.toml`, e mescle pelas regras de `sdd-setup/references/customizacao.md`. Sem override, valem os padrões da skill.
+
+1. Execute os `workflow.activation_steps_prepend`, na ordem.
+2. Leia os arquivos de `facts` (e os textos literais): são fatos válidos durante toda a skill e vencem os padrões dela quando conflitarem.
+3. Use os valores de `resolved.workflow` onde esta skill os cita: `max_stories_per_epic` (Passo 3), `max_size` (maior tamanho aceito no Passo 5), `checkpoint_rules` (Passo 6) e `title_prefixes` (prefixos no corpo do épico).
+4. Ao terminar, execute os `workflow.activation_steps_append` e o `workflow.on_complete`.
+
+Mostre os `warnings` ao usuário uma vez (ex.: chave que não é customizável, override que repete a base).
+
 ## Scripts
 
 Rode a partir da raiz do workspace:

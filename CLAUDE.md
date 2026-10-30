@@ -22,7 +22,7 @@ plugins/
             └── references/
 ```
 
-Plugins: `sdd` (hub `sdd-setup`: setup, status e próximo passo), `delivery` (ciclo de stories: `sprint-planning`...), `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`, `art-direction` (direção de arte). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
+Plugins: `sdd` (hub `sdd-setup`: setup, status e próximo passo; `sdd-customize`), `delivery` (ciclo de stories: `sprint-planning`...), `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`, `art-direction` (direção de arte). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
 
 ## Frontmatter obrigatório no SKILL.md
 
@@ -54,6 +54,7 @@ docs/
 └── {projeto}/
     ├── project-config.json           # discovery-init: configuração lida pelas skills (schema em discovery-init/references)
     ├── project.md                    # discovery-init: resumo para pessoas
+    ├── _custom/{skill}.toml          # sdd-customize: override esparso da skill neste projeto
     ├── repositorios.md               # multi-repo (só com código em vários repositórios)
     ├── discovery/                    # discovery-vision / opportunity / assumptions / stakeholders / metrics
     ├── escopo/{titulo}/escopo.md     # discovery-scoped (+ discovery/ com o snapshot usado)
@@ -89,7 +90,7 @@ Nada fica guardado nos arquivos da skill por projeto: configuração específica
 
 - Cada plugin que precisa de configuração declara as perguntas em `plugins/sdd/skills/sdd-setup/modules/<plugin>.toml` (`key`, `prompt`, `default`, `scope` team|user). A `version` do registro é igual à do `plugin.json`: ao subir uma, suba a outra (há teste). Chaves e uso em `sdd-setup/references/config-schema.md`.
 - Scripts em Python ≥ 3.11, executados com `uv run` (fallback `python`), só biblioteca padrão ou dependências inline (PEP 723). Imprimem JSON; em erro, `error: <mensagem>` e código 1. Os de runtime são copiados pelo setup para `_sdd/scripts/`, de onde as skills de qualquer plugin os chamam (`${CLAUDE_PLUGIN_ROOT}` só vale dentro do próprio plugin). Toda skill que usa script descreve o caminho sem `uv`.
-- Runtime em `_sdd/scripts/`: `config.py` (configuração), `workspace.py` (projetos, fase, quadro do sprint), `epics.py` (validação dos épicos, cobertura cenário → story, texto literal da spec), `story.py` (completude do arquivo da story), `review.py` (diff e integridade do registro na revisão), `retro.py` (evidências do épico), `session.py` (abre sessão nova do Claude numa janela de terminal, só com confirmação) e `status.py` (estados do `sprint-status.yaml`, com as transições de `sdd-setup/references/sprint-status.md`). `setup.py` e `migrate.py` rodam da pasta da skill. O hook do plugin (`plugins/sdd/hooks/hooks.json`) valida o `sprint-status.yaml` a cada Write/Edit.
+- Runtime em `_sdd/scripts/`: `config.py` (configuração), `workspace.py` (projetos, fase, quadro do sprint), `epics.py` (validação dos épicos, cobertura cenário → story, texto literal da spec), `story.py` (completude do arquivo da story), `review.py` (diff e integridade do registro na revisão), `retro.py` (evidências do épico), `customize.py` (customização por projeto), `session.py` (abre sessão nova do Claude numa janela de terminal, só com confirmação) e `status.py` (estados do `sprint-status.yaml`, com as transições de `sdd-setup/references/sprint-status.md`). `setup.py` e `migrate.py` rodam da pasta da skill. O hook do plugin (`plugins/sdd/hooks/hooks.json`) valida o `sprint-status.yaml` a cada Write/Edit.
 - Testes: `uv run --no-project --with pytest --with pyyaml pytest plugins/sdd/skills/sdd-setup/scripts/tests`.
 
 ## Dependências entre skills
@@ -112,6 +113,8 @@ discovery-init
 Skills de código (`architecture-*`, `angular-*`) são independentes entre si e podem ser usadas sem discovery prévio. A `arch-c4` também roda sem discovery, no modo Levantamento (lê o código do projeto).
 
 ## Padrões de design das skills
+
+- **Customização por projeto**: skill customizável tem `customize.toml` na pasta (campos `[workflow]` comuns + os próprios, com padrões e comentário) e um bloco `## Customização (por projeto)` logo após o Passo 0, que roda `customize.py` e cita onde cada campo é usado. O override fica em `docs/{projeto}/_custom/<skill>.toml`. Campo novo: acrescente no `customize.toml` e no bloco da skill. Regras em `sdd-setup/references/customizacao.md`.
 
 - **Interação conversacional por blocos**: cada skill conduz perguntas temáticas e ao final gera o(s) arquivo(s) `.md`
 - **Nunca sobrescrever sem confirmação**: verificar existência do arquivo antes de criar

@@ -24,6 +24,23 @@ Leia antes de executar:
 
 Igual ao `dev-story`: id ou caminho da story; `{P}` = `docs/{projeto}`, `{workspace}` = a pasta com `docs/` e `_sdd/` (procure no diretório atual, nos pais e nos diretórios adicionados à sessão). Leia `{workspace}/_sdd/config.toml` e `config.user.toml`: `language.*`, `user.*`, `delivery.review_depth` (`completa`). Sem id: `status.py next` com ação `story-review`.
 
+## Customização (por projeto)
+
+Depois de identificar o projeto, resolva a customização desta skill:
+
+```
+uv run _sdd/scripts/customize.py --skill-dir "${CLAUDE_SKILL_DIR}" --project docs/{projeto}
+```
+
+Sem o script (ou sem `uv`/`python`): leia `${CLAUDE_SKILL_DIR}/customize.toml` e, se existir, `docs/{projeto}/_custom/story-review.toml`, e mescle pelas regras de `sdd-setup/references/customizacao.md`. Sem override, valem os padrões da skill.
+
+1. Execute os `workflow.activation_steps_prepend`, na ordem.
+2. Leia os arquivos de `facts` (e os textos literais): são fatos válidos durante toda a skill e vencem os padrões dela quando conflitarem.
+3. Use os valores de `resolved.workflow` onde esta skill os cita: `lenses` (só as `enabled = true`; lente nova roda como as demais, com o `focus` dela e a Postura de `lentes.md`) e `block_on` (severidades que impedem o `done`).
+4. Ao terminar, execute os `workflow.activation_steps_append` e o `workflow.on_complete`.
+
+Mostre os `warnings` ao usuário uma vez (ex.: chave que não é customizável, override que repete a base).
+
 ## Scripts
 
 A partir de `{workspace}`:

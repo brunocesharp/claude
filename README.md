@@ -116,7 +116,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 
 | Plugin | Skills |
 |--------|--------|
-| `sdd` | `sdd-setup` |
+| `sdd` | `sdd-setup`, `sdd-customize` |
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
@@ -227,6 +227,7 @@ A `multi-repo` cria `docs/{projeto}/repositorios.md`, que as skills usam para sa
 
 | Skill | Gatilho | Saída |
 |-------|---------|-------|
+| `sdd-customize` | "customizar a skill", "desligar uma lente", "padrões do time na skill" | `docs/{projeto}/_custom/{skill}.toml` |
 | `sdd-setup` | "sdd setup", "configurar o workspace", "sdd status", "o que faço agora", "por onde começo" | `_sdd/config.toml`, `_sdd/config.user.toml`, `_sdd/version.toml`, `_sdd/scripts/` |
 | `multi-repo` | "vários repositórios", "cadastrar repositório", "status dos repositórios", "criar branch em todos", "feature em mais de um repositório" | `repositorios.md`, `plano-execucao/{escopo}/mudanca-multi-repo.md` |
 
@@ -335,6 +336,41 @@ Todas as saídas de documentação ficam dentro de `docs/{projeto}/` (ver "Estru
 
 ---
 
+## Customizar as skills
+
+As skills do fluxo (`spec-functional`, `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective` e `correct-course`) podem ser ajustadas **por projeto**, sem editar o plugin. Cada uma traz um `customize.toml` com os campos customizáveis e os padrões. O override fica em `docs/{projeto}/_custom/<skill>.toml`, que atualizar o plugin nunca toca.
+
+```
+> customizar a story-review do projeto loja: desligar a lente de contratos e acrescentar uma de acessibilidade
+```
+
+A `sdd-customize` mostra os campos, grava só o que muda e confere o resultado (`_sdd/scripts/customize.py`). Exemplo de override:
+
+```toml
+# docs/loja/_custom/dev-story.toml
+[workflow]
+persistent_facts = ["file:docs/padroes/*.md"]                    # padrões do time lidos em toda execução
+definition_of_done = ["Swagger atualizado para endpoint novo"]   # soma aos itens padrão
+
+[[workflow.commands]]
+code = "dotnet"
+suite = "make test"                                              # só a suíte muda; build e teste vêm da base
+```
+
+**Campos comuns:** `persistent_facts`, `activation_steps_prepend` e `activation_steps_append`, `on_complete`.
+
+**Campos próprios de cada skill:** lentes da revisão, comandos por stack, Definição de Pronto, template da story, padrão de branch, palavras-chave do Gherkin, prefixos de backlog, entre outros.
+
+**Regras de merge** (as do BMAD):
+- um valor simples é substituído;
+- uma tabela é mesclada;
+- uma lista com `id`/`code` é mesclada item a item;
+- as demais listas acumulam.
+
+Detalhes em `plugins/sdd/skills/sdd-setup/references/customizacao.md`.
+
+---
+
 ## Estrutura do Repositório
 
 Este repositório é um **marketplace de plugins** do Claude Code. Cada plugin agrupa as skills de uma fase ou stack:
@@ -347,6 +383,7 @@ plugins/
 ├── sdd/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
+│       ├── sdd-customize/            # grava overrides esparsos por projeto
 │       └── sdd-setup/
 │           ├── SKILL.md
 │           ├── modules/              # registro de cada plugin: versão, skills, perguntas e migrações
@@ -845,6 +882,7 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
 | Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
+| Customização das skills por projeto (BMAD) | Implementado | `sdd-customize`, `customize.toml` nas 8 skills do fluxo |
 | Entrega por stories (BMAD) | Implementado | `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` |
 | Pesquisa de mercado e concorrentes | Planejado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |

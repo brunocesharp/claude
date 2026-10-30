@@ -3,7 +3,7 @@
 - **Pedido:** "Quero adicionar a opção de customização" (linha 6)
 - **Tamanho:** G
 - **Depende de:** 02, 03
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -55,3 +55,47 @@ Permitir que o time e cada pessoa ajustem templates, convenções e passos das s
 ## Arquivos impactados
 
 `plugins/sdd/**`, `customize.toml` nas skills escolhidas, `README.md`, `CLAUDE.md` (padrões de design das skills).
+
+## Resultado (30/10/2026)
+
+**Arquivos:**
+- `customize.toml` na pasta de cada skill: a base, com os campos e os padrões comentados.
+- `docs/{projeto}/_custom/<skill>.toml`: o override do projeto. Atualizar o plugin nunca toca esse arquivo, o que atende ao critério "atualizar o plugin não altera os overrides".
+- O nível do override é **só o projeto**, como decidido.
+
+**Primeira leva (8 skills):** `spec-functional`, `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective` e `correct-course`. Campos comuns:
+- `persistent_facts` (texto ou `file:glob`);
+- `activation_steps_prepend` e `activation_steps_append`;
+- `on_complete`.
+
+Campos próprios de cada skill:
+
+| Skill | Campos |
+|-------|--------|
+| `spec-functional` | `gherkin_keywords`, `template`, `extra_rules` |
+| `plan-epics` | `max_stories_per_epic`, `max_size`, `checkpoint_rules`, `title_prefixes` |
+| `sprint-planning` | `situacao_format` |
+| `create-story` | `template`, `branch_pattern`, `extra_context_sections` |
+| `dev-story` | `commands` (por `code`), `definition_of_done`, `commit_message` |
+| `story-review` | `lenses` (por `id`; desligar com `enabled = false` ou acrescentar), `block_on` |
+| `retrospective` | `team_questions` |
+| `correct-course` | `approvers` |
+
+**Bloco de ativação** `## Customização (por projeto)` em cada uma das 8 skills, com a ordem: prepend → fatos → campos → append/on_complete. O bloco lista onde cada campo é usado e traz o caminho sem `uv`.
+
+**`customize.py`:**
+- Regras de merge do BMAD: um valor simples é substituído; uma tabela é mesclada em profundidade; uma lista de tabelas com `id`/`code` é mesclada item a item; as demais listas acumulam.
+- Chave desconhecida e tipo errado são ignorados, com aviso.
+- **Desvio do BMAD:** um item com o mesmo `id` é *mesclado*, em vez de substituído inteiro, para o override ser esparso.
+- Expande `file:glob` dos fatos e avisa quando o override não é esparso.
+- `--skill <nome>` localiza a skill instalada: pelo `installed_plugins.json` (respeitando `CLAUDE_CONFIG_DIR`), pelo `.claude/skills/` do Skills CLI ou pelo repositório local. O layout do cache foi conferido nesta máquina: `cache/<marketplace>/<plugin>/<versão>/skills/<skill>`.
+
+**Skill `sdd-customize`** (plugin `sdd`): mostra os campos, traduz o pedido em campos sem inventar campo, grava o override esparso e confere o resultado.
+
+**Fora desta leva:** personas (decisão: deixar de fora); as `architecture-*` (segunda leva); níveis de equipe e pessoal.
+
+**Critérios de aceite:**
+- `references/customizacao.md` com regras, precedência e exemplos: feito.
+- Testes de cada regra de merge, da localização e dos 8 `customize.toml` + bloco de ativação: 75 testes no total.
+- Ao menos 3 skills customizáveis: são 8.
+- README com a seção "Customizar as skills": feito.

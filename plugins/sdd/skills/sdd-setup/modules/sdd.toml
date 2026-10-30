@@ -7,7 +7,7 @@
 code = "sdd"
 plugin = "sdd"
 version = "1.0.0"
-skills = ["sdd-setup"]
+skills = ["sdd-setup", "sdd-customize"]
 
 [[module.config_questions]]
 key = "workspace.name"
