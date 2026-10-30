@@ -137,6 +137,7 @@ uv run _sdd/scripts/status.py --project docs/{projeto} set <id> <estado> [--forc
 uv run _sdd/scripts/status.py --project docs/{projeto} check         # coerência com os arquivos de story
 ```
 
+- `attach <id> stories/<id>.md` liga o arquivo da story (obrigatório antes de `ready-for-dev`; só enquanto a story não começou).
 - `set` valida a transição e a coerência, grava o arquivo e, para story, atualiza o `status:` no frontmatter do arquivo da story. Para a retrospectiva, use o id `epic-N-retrospective`.
 - `next` devolve a ação, nesta prioridade: retomar `in-progress` (`dev-story`) → revisar `review` (`story-review`) → implementar `ready-for-dev` (`dev-story`) → fechar o épico com todas as stories finalizadas (`retrospective`, opcional, ou `close-epic`) → criar o arquivo do primeiro `backlog` (`create-story`) → desbloquear (`unblock`).
 - `check` aponta: arquivo de story ausente, frontmatter diferente do sprint-status (vale o sprint-status) e erros de formato.

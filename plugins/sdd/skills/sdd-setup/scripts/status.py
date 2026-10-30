@@ -12,6 +12,8 @@ Uso (a partir da raiz do workspace):
   uv run _sdd/scripts/status.py --project docs/{projeto} set epic-1 done
   uv run _sdd/scripts/status.py --project docs/{projeto} set epic-1-retrospective done
   uv run _sdd/scripts/status.py --project docs/{projeto} check
+  uv run _sdd/scripts/status.py --project docs/{projeto} attach 1-2-cadastro stories/1-2-cadastro.md
+  uv run _sdd/scripts/status.py --project docs/{projeto} sync [--dry-run]
 
 Formato, estados e transições: sdd-setup/references/sprint-status.md.
 """
@@ -414,6 +416,21 @@ def set_state(project: Path, data: dict, item_id: str, new: str, force: bool) ->
     return result
 
 
+def attach(project: Path, data: dict, story_id: str, file: str) -> dict:
+    """Liga o arquivo da story (relativo a implementacao/) à story. Só antes da implementação começar."""
+    kind, story, _ = find(data, story_id)
+    if kind != "story":
+        raise SddError(f"{story_id} não é uma story")
+    if story["status"] not in ("backlog", "ready-for-dev", "blocked"):
+        raise SddError(f"{story_id} está em {story['status']}: o arquivo não pode mais ser trocado")
+    file = file.replace("\\", "/")
+    if not (project / "implementacao" / file).is_file():
+        raise SddError(f"implementacao/{file} não existe")
+    old = story.get("file")
+    story["file"] = file
+    return {"id": story_id, "file": file, "previous": old, "changed": old != file}
+
+
 def sync_story_file(project: Path, data: dict, result: dict) -> None:
     """Depois de salvar o sprint-status: leva o novo estado ao frontmatter do arquivo da story."""
     if result["kind"] != "story":
@@ -458,6 +475,9 @@ def main() -> None:
     sub.add_parser("check")
     syncp = sub.add_parser("sync", help="mescla implementacao/epicos/*.md no sprint-status.yaml")
     syncp.add_argument("--dry-run", action="store_true", help="mostra o que mudaria sem gravar")
+    attp = sub.add_parser("attach", help="liga o arquivo da story (relativo a implementacao/)")
+    attp.add_argument("id")
+    attp.add_argument("file")
     setp = sub.add_parser("set")
     setp.add_argument("id")
     setp.add_argument("state")
@@ -493,7 +513,12 @@ def main() -> None:
         errors = validate(data)
         if errors:
             raise SddError("sprint-status.yaml inválido:\n- " + "\n- ".join(errors))
-        if args.command == "show":
+        if args.command == "attach":
+            result = attach(project, data, args.id, args.file)
+            if result["changed"]:
+                save(path, data)
+            emit(result)
+        elif args.command == "show":
             emit(summary(data))
         elif args.command == "next":
             emit(next_action(data))

@@ -3,7 +3,7 @@
 - **Pedido:** "uma spec por story" (linha 8) e "Um arquivo por tarefa com contexto completo" (linha 12)
 - **Tamanho:** G
 - **Depende de:** 06, 07
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -69,3 +69,32 @@ Skill `create-story` que gera, para a próxima story, um arquivo autossuficiente
 ## Arquivos impactados
 
 `plugins/<delivery>/skills/create-story/**` (novo), `README.md`, `CLAUDE.md`, `0.0 - contexto-projeto-skills.md`.
+
+## Resultado (30/10/2026)
+
+- **Skill `create-story`** (plugin `delivery`), com sete passos:
+  1. Escolher a story (`next`, dependências, uma por vez).
+  2. Juntar o contexto em 8 fontes: épico, spec literal, arquitetura/ADRs, `business/`, repositórios/contratos, código (só leitura), skills de código e story anterior.
+  3. Escrever o arquivo.
+  4. Validar.
+  5. Confirmar com o usuário.
+  6. Passar para `ready-for-dev`.
+  7. Orientar a sessão nova para o `dev-story`.
+- **Template** em `create-story/references/template-story.md`.
+  - As seções `##` têm títulos fixos em português, porque são lidas por script.
+  - Os critérios seguem o formato `**CA-N**` e as tarefas citam `(CA-N)`.
+  - Há uma seção Repositórios, com contratos e ordem (tarefa 13), e branch `feat/{id}`.
+- **Scripts novos:**
+  - `epics.py spec`: texto literal de cenários e regras, para copiar sem reescrever.
+  - `story.py check`: seções, frontmatter, CA ↔ tarefas, `covers` nos critérios, referências `docs/...` existentes, coerência com o `sprint-status`; também conta as tarefas feitas.
+  - `status.py attach`: liga o arquivo à story; `ready-for-dev` exige `file`.
+
+**Decisões aplicadas:**
+- Um arquivo por story, com as tarefas como checklist.
+- Copiar critérios, cenários e decisões; referenciar o resto.
+- `[TASK]` no título quando `backlog.prefixes` = `sim`.
+
+**Critérios de aceite:**
+- Skill e checklist de validação feitos.
+- Transição de status via script, coberta por 42 testes.
+- O teste "abrir sessão nova e implementar lendo só a story" depende do `dev-story` (tarefa 09).

@@ -6,4 +6,4 @@
 code = "delivery"
 plugin = "delivery"
 version = "1.0.0"
-skills = ["sprint-planning"]
+skills = ["sprint-planning", "create-story"]

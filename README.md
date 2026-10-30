@@ -120,7 +120,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
-| `delivery` | `sprint-planning` (as demais skills do ciclo de stories estão em construção) |
+| `delivery` | `sprint-planning`, `create-story` (as demais skills do ciclo de stories estão em construção) |
 | `architecture-docs` | `arch-c4`, `arch-adr` |
 | `architecture-dotnet` | `architecture-init`, `architecture-entities`, `architecture-feature`, `architecture-repository`, `architecture-external-service`, `architecture-controller`, `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | `architecture-angular` | `angular-core-layer`, `angular-feature-layer`, `angular-shared-layer`, `angular-rxjs-transversal` |
@@ -312,6 +312,7 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 | Skill | Gatilho | Saída |
 |-------|---------|-------|
 | `sprint-planning` | "planejar o sprint", "gerar o sprint-status", "como está o sprint", "qual a próxima story", "bloquear story" | `implementacao/sprint-status.yaml` |
+| `create-story` | "criar story", "preparar a próxima story", "ready for dev" | `implementacao/stories/{id}.md` (story → `ready-for-dev`) |
 
 ### Fase: Deploy .NET
 
@@ -376,7 +377,8 @@ plugins/
 ├── delivery/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
-│       └── sprint-planning/          # quadro de épicos e stories (usa _sdd/scripts/status.py)
+│       ├── sprint-planning/          # quadro de épicos e stories (usa _sdd/scripts/status.py)
+│       └── create-story/             # arquivo da story com contexto completo (references/template-story.md)
 │
 ├── spec-plan/
 │   ├── .claude-plugin/plugin.json
@@ -669,6 +671,21 @@ Analisa a especificação funcional (e a arquitetura C4, se existir) e decompõe
 
 Caminho padrão de planejamento do fluxo de entrega (BMAD). Confere a prontidão (spec, escopo, arquitetura, repositórios) e propõe **épicos**, cada um um resultado para o usuário. Decide os pontos em aberto (resolver agora, spike ou decidir na story) e fatia cada épico em **stories verticais**: um comportamento testável de ponta a ponta que cabe numa sessão, com tamanho P/M/G, dependências, repositórios e checkpoints. Grava um arquivo por épico e confere por script que todo cenário da especificação tem story (`epics.py coverage`). Por fim, gera o quadro no `sprint-status.yaml`. Também converte um `execution-plan.md` antigo (migração opcional).
 
+### create-story
+
+Gera o arquivo da próxima story, `implementacao/stories/{id}.md`, que é a única fonte de verdade da implementação. O arquivo traz:
+
+- a história;
+- os critérios de aceite, com os cenários da spec copiados literalmente por script;
+- as tarefas ligadas aos critérios;
+- repositórios, branch e contratos;
+- arquitetura e ADRs;
+- os arquivos a criar ou alterar, lidos do código;
+- as skills de código a usar;
+- os aprendizados da story anterior.
+
+O `story.py check` confere a completude: toda story tem critério, todo critério tem tarefa e toda referência existe. Com a sua confirmação, a story vai para `ready-for-dev`, e a skill orienta a implementar numa sessão nova.
+
 ### sprint-planning
 
 Mantém o `docs/{projeto}/implementacao/sprint-status.yaml`, a fonte única do andamento da entrega, inspirado no BMAD. Cada story passa por `backlog → ready-for-dev → in-progress → review → done`, e também pode ficar `blocked` ou `dropped`. Gera e sincroniza o quadro a partir dos arquivos de épico, sempre com uma prévia antes de gravar. A sincronização nunca rebaixa nem remove estados: o que sumiu dos épicos aparece como órfão, para você decidir. A skill também mostra o quadro por épico e a próxima story, muda estados a pedido (com transições validadas pelo `status.py`) e atualiza o `project.md` e a Situação do `workspace.md`.
@@ -783,7 +800,7 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
 | Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
-| Entrega por stories (BMAD) | Em construção | `plan-epics` e `sprint-planning` prontos; `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` planejados |
+| Entrega por stories (BMAD) | Em construção | `plan-epics`, `sprint-planning` e `create-story` prontos; `dev-story`, `story-review`, `retrospective`, `correct-course` planejados |
 | Pesquisa de mercado e concorrentes | Planejado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |

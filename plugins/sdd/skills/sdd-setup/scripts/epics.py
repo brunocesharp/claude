@@ -8,6 +8,7 @@
 Uso (a partir da raiz do workspace):
   uv run _sdd/scripts/epics.py --project docs/{projeto} validate
   uv run _sdd/scripts/epics.py --project docs/{projeto} coverage --escopo {escopo}
+  uv run _sdd/scripts/epics.py --project docs/{projeto} spec --escopo {escopo} 1.1 RN-1.2
 
 Formato do frontmatter: sdd-setup/references/sprint-status.md (seção "Entrada: frontmatter dos épicos").
 """
@@ -121,6 +122,34 @@ def coverage(project: Path, escopo: str) -> dict:
     }
 
 
+HEADING = re.compile(r"^#{1,4}\s")
+
+
+def extract(project: Path, escopo: str, ids: list[str]) -> dict:
+    """Texto literal de cenários (N.M) e regras (RN-N.M) da spec, para copiar no arquivo da story."""
+    spec = project / "especificacao" / escopo / "spec-functional.md"
+    if not spec.is_file():
+        raise SddError(f"{spec} não existe")
+    lines = spec.read_text(encoding="utf-8").splitlines()
+    blocks: dict[str, str] = {}
+    for index, line in enumerate(lines):
+        match = SCENARIO.match(line.strip())
+        if match and match.group(1) in ids:
+            body = [line]
+            for following in lines[index + 1:]:
+                if HEADING.match(following) or following.strip() == "---":
+                    break
+                body.append(following)
+            blocks[match.group(1)] = "\n".join(body).strip()
+            continue
+        rule = RULE.search(line)
+        if rule and f"RN-{rule.group(1)}" in ids and f"RN-{rule.group(1)}" not in blocks:
+            blocks[f"RN-{rule.group(1)}"] = line.strip()
+    missing = [i for i in ids if i not in blocks]
+    return {"spec": str(spec), "blocks": [{"id": i, "text": blocks[i]} for i in ids if i in blocks],
+            "missing": missing}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--project", type=Path, required=True, help="pasta do projeto (docs/{projeto})")
@@ -128,14 +157,19 @@ def main() -> None:
     sub.add_parser("validate")
     cov = sub.add_parser("coverage")
     cov.add_argument("--escopo", required=True)
+    spec = sub.add_parser("spec", help="texto literal de cenários e regras, pelo id")
+    spec.add_argument("--escopo", required=True)
+    spec.add_argument("ids", nargs="+", help='ex.: 1.1 1.2 RN-1.1')
     args = parser.parse_args()
 
     project = args.project.resolve()
     try:
         if args.command == "validate":
             emit(validate(project))
-        else:
+        elif args.command == "coverage":
             emit(coverage(project, args.escopo))
+        else:
+            emit(extract(project, args.escopo, args.ids))
     except SddError as exc:
         fail(str(exc))
 
