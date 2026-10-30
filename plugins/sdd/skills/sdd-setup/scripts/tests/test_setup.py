@@ -67,7 +67,7 @@ def test_primeiro_setup_grava_config_scripts_e_versao(tmp_path):
     assert (tmp_path / "_sdd" / "scripts" / "config.py").is_file()
     assert not (tmp_path / "_sdd" / "scripts" / "setup.py").exists()
     versions = tomllib.loads((tmp_path / "_sdd" / "version.toml").read_text(encoding="utf-8"))
-    assert versions["modules"]["sdd"] == "1.0.0"
+    assert versions["modules"]["sdd"] == "1.0.1"
     _, status = setup(tmp_path, "--status")
     assert status["current"] is True
     assert status["next"] == "discovery-init"

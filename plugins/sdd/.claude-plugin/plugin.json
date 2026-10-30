@@ -1,7 +1,7 @@
 {
   "name": "sdd",
   "description": "Hub do workspace: setup e atualização da configuração (_sdd/), status da instalação e dos projetos e recomendação do próximo passo.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "brunocesharp"
   },
