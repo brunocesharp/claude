@@ -22,7 +22,7 @@ plugins/
             └── references/
 ```
 
-Plugins: `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`, `art-direction` (direção de arte). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
+Plugins: `sdd` (hub `sdd-setup`: setup, status e próximo passo), `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`, `art-direction` (direção de arte). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
 
 ## Frontmatter obrigatório no SKILL.md
 
@@ -47,6 +47,7 @@ O `name` é o identificador usado para invocar a skill e citado nas outras skill
 As skills de documentação rodam numa **pasta só de documentação** (workspace) que reúne vários projetos. O código de cada projeto fica no próprio repositório; o caminho local fica no `project.md`.
 
 ```
+_sdd/                                 # sdd-setup: config.toml (time), config.user.toml (pessoal), version.toml, scripts/
 docs/
 ├── workspace.md                      # projetos: pasta, repositório, código local, situação (discovery-init)
 ├── arquitetura/landscape.md          # visão de todos os sistemas (arch-c4, opcional)
@@ -68,6 +69,7 @@ docs/
 3. Sem `workspace.md` → procura `docs/*/project.md`.
 4. Projeto inexistente → oferece `discovery-init`.
 5. Lê `docs/{projeto}/project-config.json` (nome, stack, repositório); sem ele, usa o `project.md` e oferece criar o config.
+6. Lê a configuração do workspace em `_sdd/config.toml` + `_sdd/config.user.toml` (o pessoal vence): idioma da conversa e dos documentos, nome e nível do usuário, `paths.docs_root`. Sem `_sdd/`, usa os padrões e sugere o `sdd-setup` uma vez.
 
 Ao mudar esse passo, mude em todas as skills. Skills que avançam de fase atualizam o `project.md` e a coluna Situação do `workspace.md`.
 
@@ -75,9 +77,16 @@ Ao mudar esse passo, mude em todas as skills. Skills que avançam de fase atuali
 
 Nada fica guardado nos arquivos da skill por projeto: configuração específica de um projeto (ex.: mapa de áreas do `business-docs`) vai para `docs/{projeto}/`.
 
+## Configuração do workspace e scripts (`sdd-setup`)
+
+- Cada plugin que precisa de configuração declara as perguntas em `plugins/sdd/skills/sdd-setup/modules/<plugin>.toml` (`key`, `prompt`, `default`, `scope` team|user). A `version` do registro é igual à do `plugin.json`: ao subir uma, suba a outra (há teste). Chaves e uso em `sdd-setup/references/config-schema.md`.
+- Scripts em Python ≥ 3.11, executados com `uv run` (fallback `python`), só biblioteca padrão ou dependências inline (PEP 723). Imprimem JSON; em erro, `error: <mensagem>` e código 1. Os de runtime são copiados pelo setup para `_sdd/scripts/`, de onde as skills de qualquer plugin os chamam (`${CLAUDE_PLUGIN_ROOT}` só vale dentro do próprio plugin). Toda skill que usa script descreve o caminho sem `uv`.
+- Testes: `uv run --no-project --with pytest pytest plugins/sdd/skills/sdd-setup/scripts/tests`.
+
 ## Dependências entre skills
 
 ```
+sdd-setup (uma vez por workspace; recomendado, não obrigatório)
 discovery-init
   └── discovery-vision / opportunity / assumptions / stakeholders / metrics
         └── discovery-scoped

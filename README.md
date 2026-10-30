@@ -47,6 +47,7 @@ O Claude Code baixa o catálogo (`.claude-plugin/marketplace.json`) do GitHub e 
 Cada plugin é instalado com `/plugin install <plugin>@claude` (o `@claude` é o nome do marketplace registrado na etapa 1). Instale só os que fazem sentido para você:
 
 ```
+/plugin install sdd@claude
 /plugin install workspace@claude
 /plugin install discovery@claude
 /plugin install spec-plan@claude
@@ -92,6 +93,19 @@ claude plugin marketplace update claude   # para atualizar depois
 
 Por padrão a instalação vale para o seu usuário em qualquer pasta (`--scope user`). Com `--scope project`, ela fica registrada no `.claude/settings.json` do projeto.
 
+#### Alternativa: pelo Skills CLI
+
+Também dá para instalar as skills, sem o sistema de plugins, com o [Skills CLI](https://skills.sh) (precisa de Node.js e Git). Rode na pasta do workspace:
+
+```bash
+npx skills add brunocesharp/claude --skill '*'          # todas as skills
+npx skills add brunocesharp/claude                      # escolher as skills numa lista
+npx skills add brunocesharp/claude --skill sdd-setup --skill discovery-init
+npx skills update                                       # para atualizar depois
+```
+
+Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas cópias, o Claude pode usar a antiga. Inclua sempre a `sdd-setup`.
+
 #### Problemas comuns
 
 - **Plugin não encontrado** no `/plugin install`: a etapa 1 não foi feita, ou o nome está sem o marketplace (use `<plugin>@claude`).
@@ -101,6 +115,7 @@ Por padrão a instalação vale para o seu usuário em qualquer pasta (`--scope 
 
 | Plugin | Skills |
 |--------|--------|
+| `sdd` | `sdd-setup` |
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-execution` |
@@ -143,6 +158,26 @@ meu-workspace/            # ex.: um repositório "docs" do time
     ├── projeto-a/
     └── projeto-b/
 ```
+
+Na primeira vez, configure o workspace:
+
+```
+> sdd setup
+```
+
+A `sdd-setup` pergunta o nome do workspace, como te chamar, seu nível de experiência, o idioma da conversa e dos documentos e a pasta de documentação, e grava em `_sdd/` na raiz do workspace:
+
+```
+meu-workspace/
+├── _sdd/
+│   ├── config.toml        # do time (vai para o Git)
+│   ├── config.user.toml   # pessoal (fica no .gitignore)
+│   ├── version.toml       # versões do último setup
+│   └── scripts/           # scripts usados pelas skills
+└── docs/
+```
+
+Os scripts rodam com o [uv](https://docs.astral.sh/uv/) (ou Python 3.11+). Rode o `sdd setup` de novo depois de atualizar os plugins: ele só pergunta o que é novo e nunca altera uma resposta já gravada. Para saber o que está instalado, use `sdd status`. Para saber o próximo passo, pergunte "o que faço agora?".
 
 ### 3. Inicie um projeto
 
@@ -188,6 +223,7 @@ A `multi-repo` cria `docs/{projeto}/repositorios.md`, que as skills usam para sa
 
 | Skill | Gatilho | Saída |
 |-------|---------|-------|
+| `sdd-setup` | "sdd setup", "configurar o workspace", "sdd status", "o que faço agora", "por onde começo" | `_sdd/config.toml`, `_sdd/config.user.toml`, `_sdd/version.toml`, `_sdd/scripts/` |
 | `multi-repo` | "vários repositórios", "cadastrar repositório", "status dos repositórios", "criar branch em todos", "feature em mais de um repositório" | `repositorios.md`, `plano-execucao/{escopo}/mudanca-multi-repo.md` |
 
 ### Fase: Discovery
@@ -292,6 +328,17 @@ Este repositório é um **marketplace de plugins** do Claude Code. Cada plugin a
 └── marketplace.json              # catálogo dos plugins
 
 plugins/
+├── sdd/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       └── sdd-setup/
+│           ├── SKILL.md
+│           ├── modules/              # registro de cada plugin: versão, skills e perguntas do setup
+│           ├── references/
+│           │   ├── config-schema.md
+│           │   └── proximos-passos.md
+│           └── scripts/              # setup.py, config.py, sddlib.py (+ tests/)
+│
 ├── workspace/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
@@ -444,6 +491,7 @@ plugins/
 A pasta de documentação reúne vários projetos. Após usar as skills:
 
 ```
+_sdd/                                 # configuração do workspace (sdd-setup)
 docs/
 ├── workspace.md                      # projetos: pasta, repositório, código local, situação
 ├── arquitetura/
@@ -485,7 +533,7 @@ docs/
     └── ...
 ```
 
-Toda skill de documentação começa identificando o projeto: usa o que foi citado na conversa; senão lê `docs/workspace.md` (um projeto: usa esse; vários: pergunta).
+Toda skill de documentação começa identificando o projeto: usa o que foi citado na conversa; senão lê `docs/workspace.md` (um projeto: usa esse; vários: pergunta). Em seguida lê a configuração do workspace em `_sdd/` (idioma, nível de detalhe, pasta de documentação).
 
 E seu projeto .NET (no repositório de código) terá a estrutura Clean Architecture:
 
@@ -517,6 +565,10 @@ src/
 ---
 
 ## Como funciona cada skill
+
+### sdd-setup
+
+Hub do workspace, no papel do `bmad setup` do BMAD. No **setup**, faz só as perguntas ainda sem resposta (cada plugin declara as suas em `sdd-setup/modules/<plugin>.toml`) e grava em `_sdd/config.toml` (time) e `_sdd/config.user.toml` (pessoal), sem nunca alterar um valor existente. Também copia os scripts para `_sdd/scripts/` e registra as versões. O **status** mostra plugins e versões, perguntas pendentes, scripts desatualizados, proteção do `.gitignore` e os projetos. A **ajuda** lê o estado do projeto e recomenda a próxima skill. Não instala plugins nem faz commit.
 
 ### discovery-init
 
@@ -613,6 +665,9 @@ Igual ao homolog, com etapas extras: confirmação explícita do usuário, valid
 ## Fluxo Completo
 
 ```
+sdd-setup (uma vez por workspace)
+     │
+     ▼
 discovery-init
      │
      ▼

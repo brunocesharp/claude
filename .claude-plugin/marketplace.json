@@ -5,6 +5,11 @@
   },
   "plugins": [
     {
+      "name": "sdd",
+      "source": "./plugins/sdd",
+      "description": "Hub do workspace: setup e atualização da configuração (_sdd/), status da instalação e dos projetos e recomendação do próximo passo."
+    },
+    {
       "name": "workspace",
       "source": "./plugins/workspace",
       "description": "Organização do workspace de documentação: cadastro dos repositórios de cada projeto, panorama do Git em vários repositórios e coordenação de mudanças entre repositórios."

@@ -1,0 +1,12 @@
+# Registro do módulo (plugin) spec-plan. A versão acompanha plugins/spec-plan/.claude-plugin/plugin.json.
+
+[module]
+code = "spec-plan"
+plugin = "spec-plan"
+version = "1.0.0"
+skills = ["spec-functional", "plan-execution"]
+
+[[module.config_questions]]
+key = "backlog.prefixes"
+prompt = "Usar a nomenclatura de backlog ([FEATURE], [TASK], [HT], [BUG]...) nos títulos dos itens? (sim/nao)"
+default = "sim"

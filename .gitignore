@@ -1,3 +1,6 @@
 # Livros e PDFs de referência: material com direitos autorais, fica só na máquina local
 *.pdf
 dist/
+__pycache__/
+.pytest_cache/
+.venv/

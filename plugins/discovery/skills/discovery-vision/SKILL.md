@@ -26,6 +26,7 @@ A raiz de trabalho é uma pasta de documentação com vários projetos, cada um 
 3. Sem `docs/workspace.md`, procure `docs/*/project.md`.
 4. Se o projeto não existir, ofereça iniciá-lo com `discovery-init`.
 5. Leia `docs/{projeto}/project-config.json` (nome, stack, repositório; ver o schema em `discovery-init/references/project-config-schema.md`). Se não existir, use o `project.md` e ofereça criar o config a partir dele.
+6. Leia a configuração do workspace, se existir: `_sdd/config.toml` e `_sdd/config.user.toml` na raiz (o pessoal vence; chaves em `sdd-setup/references/config-schema.md`). Converse em `language.conversation`, escreva os documentos em `language.documents`, chame o usuário por `user.name` e ajuste as explicações a `user.skill_level`; se `paths.docs_root` não for `docs`, use-o no lugar de `docs/` em todos os caminhos. Sem `_sdd/`, use os padrões (pt-BR, nível intermediário, `docs/`) e sugira uma vez rodar o `sdd-setup`, sem bloquear.
 
 `{projeto}` é a pasta escolhida; todos os caminhos abaixo são relativos à raiz de trabalho.
 
@@ -39,6 +40,10 @@ Antes de iniciar, verifique se o arquivo `docs/{projeto}/project.md` existe.
 ## Fluxo de Execução
 
 Conduza a conversa em blocos temáticos, de forma natural e progressiva. Não faça todas as perguntas de uma vez — espere a resposta de cada uma antes de avançar.
+
+**Ajuste à configuração do workspace (Passo 0, item 6):**
+- `user.skill_level` = `iniciante`: antes de cada bloco, diga em uma frase para que ele serve (ex.: "a proposta de valor é o que muda para o usuário — ela guia as decisões de escopo") e dê um exemplo de resposta boa. `intermediario`: só a pergunta, com exemplo quando a resposta vier vaga. `experiente`: perguntas diretas, agrupando as de aprofundamento do mesmo bloco numa mensagem.
+- `language.documents` diferente de `pt-BR`: traduza os títulos de seção do template ao gravar o `vision.md`; as respostas do usuário ficam como ele escreveu.
 
 ### Bloco 1 — O Problema
 

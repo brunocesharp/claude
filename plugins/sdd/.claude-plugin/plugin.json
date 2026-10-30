@@ -1,0 +1,12 @@
+{
+  "name": "sdd",
+  "description": "Hub do workspace: setup e atualização da configuração (_sdd/), status da instalação e dos projetos e recomendação do próximo passo.",
+  "version": "1.0.0",
+  "author": {
+    "name": "brunocesharp"
+  },
+  "homepage": "https://github.com/brunocesharp/claude/tree/main/plugins/sdd",
+  "repository": "https://github.com/brunocesharp/claude",
+  "license": "MIT",
+  "keywords": ["setup", "config", "workspace", "status", "hub"]
+}

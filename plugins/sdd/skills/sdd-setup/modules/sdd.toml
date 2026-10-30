@@ -1,0 +1,43 @@
+# Registro do módulo (plugin) sdd: versão, skills e perguntas do setup.
+# A versão acompanha plugins/sdd/.claude-plugin/plugin.json.
+# scope "team" grava em _sdd/config.toml (versionado); "user" em _sdd/config.user.toml (pessoal).
+# Placeholders no default: {directory_name} = nome da pasta do workspace; {os_user} = usuário do sistema.
+
+[module]
+code = "sdd"
+plugin = "sdd"
+version = "1.0.0"
+skills = ["sdd-setup"]
+
+[[module.config_questions]]
+key = "workspace.name"
+prompt = "Qual é o nome deste workspace de documentação?"
+default = "{directory_name}"
+
+[[module.config_questions]]
+key = "user.name"
+prompt = "Como devo te chamar?"
+default = "{os_user}"
+scope = "user"
+
+[[module.config_questions]]
+key = "user.skill_level"
+prompt = "Qual é o seu nível de experiência: iniciante, intermediario ou experiente? (ajusta o nível das explicações)"
+default = "intermediario"
+scope = "user"
+
+[[module.config_questions]]
+key = "language.conversation"
+prompt = "Em que idioma devo conversar com você?"
+default = "pt-BR"
+scope = "user"
+
+[[module.config_questions]]
+key = "language.documents"
+prompt = "Em que idioma os documentos devem ser escritos?"
+default = "pt-BR"
+
+[[module.config_questions]]
+key = "paths.docs_root"
+prompt = "Qual é a pasta de documentação, relativa à raiz do workspace?"
+default = "docs"
