@@ -60,6 +60,7 @@ docs/
     ├── especificacao/{escopo}/spec-functional.md   # spec-functional
     ├── arquitetura/                  # arch-c4 (arquitetura.md, componentes/, dinamicos/) e arch-adr (decisoes/)
     ├── plano-execucao/{escopo}/execution-plan.md   # plan-execution
+    ├── implementacao/sprint-status.yaml            # estado de épicos e stories (status.py; formato em sdd-setup/references/sprint-status.md)
     └── business/                     # business-docs (areas.md + {area}.md)
 ```
 
@@ -81,7 +82,8 @@ Nada fica guardado nos arquivos da skill por projeto: configuração específica
 
 - Cada plugin que precisa de configuração declara as perguntas em `plugins/sdd/skills/sdd-setup/modules/<plugin>.toml` (`key`, `prompt`, `default`, `scope` team|user). A `version` do registro é igual à do `plugin.json`: ao subir uma, suba a outra (há teste). Chaves e uso em `sdd-setup/references/config-schema.md`.
 - Scripts em Python ≥ 3.11, executados com `uv run` (fallback `python`), só biblioteca padrão ou dependências inline (PEP 723). Imprimem JSON; em erro, `error: <mensagem>` e código 1. Os de runtime são copiados pelo setup para `_sdd/scripts/`, de onde as skills de qualquer plugin os chamam (`${CLAUDE_PLUGIN_ROOT}` só vale dentro do próprio plugin). Toda skill que usa script descreve o caminho sem `uv`.
-- Testes: `uv run --no-project --with pytest pytest plugins/sdd/skills/sdd-setup/scripts/tests`.
+- Runtime em `_sdd/scripts/`: `config.py` (configuração), `workspace.py` (projetos, fase, quadro do sprint) e `status.py` (estados do `sprint-status.yaml`, com as transições de `sdd-setup/references/sprint-status.md`). `setup.py` e `migrate.py` rodam da pasta da skill. O hook do plugin (`plugins/sdd/hooks/hooks.json`) valida o `sprint-status.yaml` a cada Write/Edit.
+- Testes: `uv run --no-project --with pytest --with pyyaml pytest plugins/sdd/skills/sdd-setup/scripts/tests`.
 
 ## Dependências entre skills
 

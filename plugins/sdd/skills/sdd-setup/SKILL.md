@@ -20,6 +20,19 @@ Ponto de entrada do workspace. Três ações, que podem vir juntas:
 Leia antes de executar:
 - `references/config-schema.md` — chaves de configuração, arquivos, precedência e como as skills leem.
 - `references/proximos-passos.md` — como recomendar o próximo passo (ação Ajuda).
+- `references/sprint-status.md` — formato, estados e transições do `sprint-status.yaml` (quadro de entrega de cada projeto).
+
+## Scripts
+
+| Script | Onde roda | Faz |
+|--------|-----------|-----|
+| `setup.py` | `${CLAUDE_SKILL_DIR}/scripts/` | Status da instalação, perguntas pendentes, grava `_sdd/` |
+| `migrate.py` | `${CLAUDE_SKILL_DIR}/scripts/` | Lista e registra migrações declaradas pelos módulos |
+| `config.py` | `_sdd/scripts/` (cópia) | Configuração resolvida, em JSON |
+| `workspace.py` | `_sdd/scripts/` (cópia) | Projetos: fase, situação, repositórios, quadro do sprint e próxima ação |
+| `status.py` | `_sdd/scripts/` (cópia) | Lê, valida e muda estados do `sprint-status.yaml` |
+
+Os de `_sdd/scripts/` são usados também pelas skills dos outros plugins. O plugin traz ainda um hook que valida o `sprint-status.yaml` sempre que o Claude grava ou edita esse arquivo (precisa do `uv`; sem ele, o hook não faz nada).
 
 ---
 
@@ -36,7 +49,7 @@ Leia antes de executar:
 uv run --no-cache "${CLAUDE_SKILL_DIR}/scripts/setup.py" --workspace-root "{workspace}" [--modules <códigos>] <modo>
 ```
 
-- Sem `uv`: use `python "${CLAUDE_SKILL_DIR}/scripts/setup.py" ...` (precisa de Python 3.11 ou mais novo; o script não tem dependências). Sem nenhum dos dois, diga isso, sugira instalar o `uv` (https://docs.astral.sh/uv/) e, se o usuário quiser seguir mesmo assim, grave os arquivos à mão seguindo `references/config-schema.md`.
+- Sem `uv`: use `python "${CLAUDE_SKILL_DIR}/scripts/setup.py" ...` (precisa de Python 3.11 ou mais novo; `setup.py`, `migrate.py` e `config.py` não têm dependências; `workspace.py` e `status.py` precisam do pacote `pyyaml`). Sem nenhum dos dois, diga isso, sugira instalar o `uv` (https://docs.astral.sh/uv/) e, se o usuário quiser seguir mesmo assim, faça à mão: grave a configuração seguindo `references/config-schema.md` e leia os arquivos do projeto (`project.md`, `workspace.md`, `sprint-status.yaml`) diretamente.
 - `--modules`: os módulos instalados, separados por vírgula. Um módulo está instalado quando ao menos uma das skills dele aparece na sua lista de skills disponíveis (com ou sem o prefixo do plugin, ex.: `spec-plan:spec-functional`). Os módulos e as skills de cada um estão no `--status` (campo `modules`); na primeira chamada, omita `--modules`.
 - Cada chamada imprime um JSON. Em erro, imprime `error: <mensagem>` e sai com código 1: mostre a mensagem e pare.
 
@@ -51,7 +64,8 @@ Rode com `--status`. Ele não grava nada. Mostre ao usuário:
 3. **Configuração**: `pending_questions` > 0 significa pergunta nova sem resposta.
 4. **Scripts** em `_sdd/scripts/`: `missing` ou `stale` pedem atualização.
 5. **Git**: `gitignore` = `unprotected` significa que o `config.user.toml` (pessoal) pode ir para o Git.
-6. **Projetos** do workspace (`projects`); `has_config: false` = projeto antigo sem `project-config.json` (o `discovery-init` resolve).
+6. **Projetos**: rode `uv run _sdd/scripts/workspace.py` (a partir de `{workspace}`; antes do primeiro setup, use os `projects` do `--status`). Para cada projeto: fase atual (`phases.current`), Situação do `workspace.md`, um ou vários repositórios e, se houver `sprint-status.yaml`, o quadro por épico (`done`/`total`) e a próxima ação (`sprint.next`). `has_config: false` = projeto antigo sem `project-config.json` (o `discovery-init` resolve); `sprint.valid: false` = mostre os `problems`.
+7. **Migrações**: rode `uv run "${CLAUDE_SKILL_DIR}/scripts/migrate.py" --workspace-root "{workspace}"`. Lista vazia = nada a migrar.
 
 Termine com o `next`: `setup` (nunca configurado), `update` (há o que atualizar), `discovery-init` (nenhum projeto) ou nada a fazer. Se o usuário pediu setup ou atualização, siga direto para a Ação 2 sem perguntar de novo.
 
@@ -69,7 +83,8 @@ Na ordem. Na primeira vez, faça tudo; numa atualização, só o que o status ap
 3. **Relatar** o JSON: `sdd` (`created`/`updated`), chaves gravadas em cada arquivo, scripts `created`/`updated`/`unchanged`, versões.
 4. **Git.** Se `gitignore` = `unprotected`, ofereça acrescentar `_sdd/*.user.toml` ao `.gitignore` do workspace; com o sim, rode com `--gitignore`. Nunca faça commit.
 5. **Respostas.** No primeiro setup, mostre todas as respostas (`answers`) com o arquivo de cada uma e ofereça mudar alguma.
-6. **Próximo passo.** Sem projetos: sugira `discovery-init`. Com projetos: siga a Ação 3.
+6. **Migrações.** Rode `migrate.py` (como no Status). Para cada migração listada, mostre `title` e as versões e pergunte se aplica. Com o sim, siga o guia (`guide`) passo a passo, com as confirmações que ele pedir, e ao terminar registre com `--mark-applied <id>`. Migrações `optional` (ex.: converter um formato antigo) só aparecem com `--all` ou quando o usuário pede.
+7. **Próximo passo.** Sem projetos: sugira `discovery-init`. Com projetos: siga a Ação 3.
 
 ### Mudar uma resposta
 
@@ -86,7 +101,7 @@ e depois rode a Ação 2 de novo (versões, perguntas novas e scripts).
 
 ## Ação 3 — Ajuda (próximo passo)
 
-Siga `references/proximos-passos.md`: leia o estado do projeto, recomende **uma** skill com o motivo e sugira rodá-la numa sessão nova (`/clear`) quando ela for longa. Ofereça rodar aqui. Responda só com skills instaladas; se a skill certa estiver num plugin não instalado, mostre o `/plugin install`.
+Siga `references/proximos-passos.md`: leia o estado do projeto (com `workspace.py`, quando houver `_sdd/`), recomende **uma** skill com o motivo e sugira rodá-la numa sessão nova (`/clear`) quando ela for longa. Ofereça rodar aqui. Responda só com skills instaladas; se a skill certa estiver num plugin não instalado, mostre o `/plugin install`.
 
 ---
 

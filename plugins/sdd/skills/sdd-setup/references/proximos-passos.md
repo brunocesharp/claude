@@ -15,6 +15,9 @@ Responda a partir dos arquivos do workspace, não de memória. Os arquivos são 
 | `arquitetura/arquitetura.md`, `arquitetura/decisoes/` | C4 e ADRs |
 | `plano-execucao/{escopo}/execution-plan.md` | Plano do escopo |
 | `repositorios.md` | Código em vários repositórios |
+| `implementacao/sprint-status.yaml` | Entrega por épicos e stories em andamento: use `sprint.next` do `workspace.py` (ou `status.py ... next`) |
+
+Com `_sdd/`, `uv run _sdd/scripts/workspace.py --project {projeto}` já traz fase, situação, repositórios e o quadro do sprint.
 
 Arquivo existir mostra que a skill rodou, não que o trabalho terminou. Na dúvida, pergunte.
 
@@ -33,6 +36,7 @@ Uma recomendação principal, com o motivo, e no máximo duas alternativas.
 | Especificação sem arquitetura | `arch-c4` (e `arch-adr` para decisões pendentes) |
 | Vários repositórios sem `repositorios.md` | `multi-repo` (Cadastrar) |
 | Arquitetura sem plano do escopo | `plan-execution` |
+| Sprint em andamento (`sprint-status.yaml`) | A ação de `sprint.next`: `dev-story` (retomar ou implementar), `story-review`, `retrospective` / fechar o épico, `create-story`, desbloquear. Se a skill indicada ainda não existir no workspace, diga qual é a próxima story e o que fazer com ela |
 | Plano pronto | Skills de código do item em andamento (`architecture-*`, `angular-*`); vários repositórios: `multi-repo` (Mudança coordenada) |
 | Entrega pronta | `deploy-dotnet-homolog`, depois `deploy-dotnet-prod` |
 

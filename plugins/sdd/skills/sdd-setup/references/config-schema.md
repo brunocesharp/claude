@@ -10,7 +10,7 @@ Criada e atualizada pela skill `sdd-setup`; lida por todas as skills de document
 │   ├── config.toml         # equipe — versionado no Git
 │   ├── config.user.toml    # pessoal — no .gitignore (_sdd/*.user.toml)
 │   ├── version.toml        # versões do último setup (gerado, não editar)
-│   └── scripts/            # cópia dos scripts de runtime (config.py, sddlib.py...)
+│   └── scripts/            # cópia dos scripts de runtime: config.py, workspace.py, status.py, sddlib.py
 └── docs/                   # (ou o valor de paths.docs_root)
 ```
 
@@ -63,6 +63,17 @@ key = "backlog.prefixes"      # única entre todos os módulos
 prompt = "Pergunta mostrada ao usuário"
 default = "sim"               # texto; aceita {directory_name} e {os_user}
 scope = "team"                # team (padrão) ou user
+```
+
+Migrações (ex.: renomear uma skill, converter um formato antigo) também são declaradas no registro e listadas pelo `migrate.py`; os passos ficam num guia em `references/migracoes/<id>.md`:
+
+```toml
+[[module.migrations]]
+id = "execution-plan-para-epicos"
+title = "Converter execution-plan.md em épicos e stories"
+kind = "optional"             # upgrade: pendente quando a versão gravada < to; optional: só a pedido
+to = "1.1.0"
+guide = "references/migracoes/execution-plan-para-epicos.md"
 ```
 
 Ao subir a versão de um plugin, suba também a do registro (o teste `test_versao_dos_registros_igual_ao_plugin_json` confere). Pergunta nova aparece no próximo `sdd-setup` de cada workspace; as já respondidas não são repetidas. Mecanismo adaptado do `bmad setup` (BMAD v7: `[[bmod.config_questions]]` com `key`, `prompt`, `default` e `scope`).

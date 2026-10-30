@@ -1,0 +1,34 @@
+version: 1
+project: loja
+updated_at: '2026-10-01'
+epics:
+  epic-1:
+    title: Cadastro de produtos
+    escopo: gestao-de-produtos
+    status: in-progress
+    retrospective: optional
+    stories:
+      1-1-criar-produto:
+        title: Criar produto
+        status: done
+        repositories: [loja-api, loja-web]
+        file: stories/1-1-criar-produto.md
+      1-2-listar-produtos:
+        title: Listar produtos
+        status: ready-for-dev
+        repositories: [loja-api, loja-web]
+        file: stories/1-2-listar-produtos.md
+      1-3-importar-planilha:
+        title: Importar planilha
+        status: backlog
+        repositories: [loja-api]
+  epic-2:
+    title: Estoque
+    escopo: gestao-de-produtos
+    status: backlog
+    retrospective: optional
+    stories:
+      2-1-movimentar-estoque:
+        title: Movimentar estoque
+        status: backlog
+        repositories: [loja-api]

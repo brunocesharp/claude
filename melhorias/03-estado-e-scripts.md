@@ -3,7 +3,7 @@
 - **Pedido:** "Estado / scripts quero seguir o mesmo do BMAD" (linha 5)
 - **Tamanho:** G
 - **Depende de:** 02
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -62,3 +62,28 @@ Ter uma pasta de runtime no workspace e um pequeno conjunto de scripts que leem/
 ## Arquivos impactados
 
 `plugins/sdd/scripts/**` (novo), `plugins/sdd/skills/sdd/**`, `.gitignore` do repositório (ignorar `__pycache__`, `.venv`).
+
+## Resultado (30/10/2026)
+
+Scripts em `plugins/sdd/skills/sdd-setup/scripts/`. Ficam na pasta da skill, e não do plugin, para funcionar também na instalação pelo Skills CLI.
+
+| Script | Onde roda | Situação |
+|--------|-----------|----------|
+| `config.py` | `_sdd/scripts/` | feito na tarefa 02 |
+| `status.py` | `_sdd/scripts/` | `show`, `next`, `set` (com `--force` só a pedido) e `check`. Valida o formato e as transições da tarefa 06 e sincroniza o `status:` do frontmatter da story depois de salvar |
+| `workspace.py` | `_sdd/scripts/` | projetos, fase (`project.md`), Situação (`workspace.md`), um ou vários repositórios, quadro do sprint e próxima ação |
+| `migrate.py` | pasta da skill | migrações declaradas em `modules/<plugin>.toml` (`upgrade` ou `optional`); lista e registra em `version.toml`, e os passos ficam num guia. Ainda não há migração declarada (a primeira vem com a tarefa 07) |
+| `hook_sprint_status.py` + `plugins/sdd/hooks/hooks.json` | pasta do plugin | PostToolUse em Write/Edit. O shell filtra pelo nome do arquivo antes de chamar o `uv`, e o hook não faz nada sem `uv`. Arquivo inválido sai com código 2 e a mensagem volta para o Claude |
+| `customize.py` | — | fica para a tarefa 04 |
+
+**Desvios da proposta:**
+- **Formato do `sprint-status.yaml` fechado já nesta tarefa,** porque o script valida o formato. A referência está em `sdd-setup/references/sprint-status.md`. Da tarefa 06 falta a skill `sprint-planning`, que gera o arquivo.
+- **Ordem do `next`:** fechar um épico com todas as stories finalizadas vem antes de criar stories do épico seguinte, igual ao BMAD.
+- **Hook:** não valida transições, porque não tem o estado anterior. Valida formato e coerência; as transições são validadas pelo `status.py set`.
+
+**Critérios de aceite:**
+- 28 testes passando. As fixtures ficaram em `scripts/tests/fixtures/`.
+- O `set` recusa transição inválida com a lista do que é permitido.
+- `sdd-setup` e `sprint-status.md` descrevem o caminho sem `uv`.
+- O setup é idempotente.
+- Testado pelo PowerShell e pelo bash, inclusive o comando exato do hook.

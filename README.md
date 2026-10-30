@@ -173,9 +173,11 @@ meu-workspace/
 │   ├── config.toml        # do time (vai para o Git)
 │   ├── config.user.toml   # pessoal (fica no .gitignore)
 │   ├── version.toml       # versões do último setup
-│   └── scripts/           # scripts usados pelas skills
+│   └── scripts/           # config.py, workspace.py, status.py: usados pelas skills
 └── docs/
 ```
+
+O plugin `sdd` também instala um hook que confere o `docs/{projeto}/implementacao/sprint-status.yaml` (o quadro de épicos e stories) sempre que o Claude grava ou edita esse arquivo, recusando estados e formatos inválidos.
 
 Os scripts rodam com o [uv](https://docs.astral.sh/uv/) (ou Python 3.11+). Rode o `sdd setup` de novo depois de atualizar os plugins: ele só pergunta o que é novo e nunca altera uma resposta já gravada. Para saber o que está instalado, use `sdd status`. Para saber o próximo passo, pergunte "o que faço agora?".
 
@@ -333,11 +335,13 @@ plugins/
 │   └── skills/
 │       └── sdd-setup/
 │           ├── SKILL.md
-│           ├── modules/              # registro de cada plugin: versão, skills e perguntas do setup
+│           ├── modules/              # registro de cada plugin: versão, skills, perguntas e migrações
 │           ├── references/
 │           │   ├── config-schema.md
-│           │   └── proximos-passos.md
-│           └── scripts/              # setup.py, config.py, sddlib.py (+ tests/)
+│           │   ├── proximos-passos.md
+│           │   └── sprint-status.md  # formato, estados e transições do sprint-status.yaml
+│           └── scripts/              # setup, migrate, config, workspace, status, hook (+ tests/)
+│   └── hooks/hooks.json              # valida o sprint-status.yaml a cada Write/Edit
 │
 ├── workspace/
 │   ├── .claude-plugin/plugin.json

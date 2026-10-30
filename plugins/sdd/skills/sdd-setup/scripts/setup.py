@@ -123,9 +123,13 @@ def pending_questions(root: Path, modules: list[Module]) -> list[Question]:
     return [q for m in modules for q in m.questions if q.key not in answered[q.scope]]
 
 
+NOT_RUNTIME = {"setup.py", "migrate.py", "hook_sprint_status.py"}
+
+
 def runtime_scripts() -> list[Path]:
-    """Scripts copiados para _sdd/scripts/. O setup.py fica de fora: depende de modules/ da skill."""
-    return [path for path in sorted(SCRIPTS_DIR.glob("*.py")) if path.name != "setup.py"]
+    """Scripts copiados para _sdd/scripts/. Ficam de fora os que dependem de modules/ da skill
+    (setup, migrate) e o do hook, que roda direto da pasta do plugin."""
+    return [path for path in sorted(SCRIPTS_DIR.glob("*.py")) if path.name not in NOT_RUNTIME]
 
 
 def scripts_state(root: Path) -> dict[str, str]:
@@ -257,7 +261,7 @@ def apply(root: Path, modules: list[Module], answers: dict[str, str]) -> dict[st
         f'updated_at = "{date.today().isoformat()}"',
     ]
     previous = read_toml(sdd / VERSION_FILE)
-    versions = {key: value for key, value in previous.items() if key.startswith("modules.")}
+    versions = {key: value for key, value in previous.items() if key.startswith(("modules.", "migrations."))}
     versions.update({f"modules.{m.code}": m.version for m in modules})
     lines += [f'{key} = "{value}"' for key, value in sorted(versions.items())]
     (sdd / VERSION_FILE).write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -266,7 +270,7 @@ def apply(root: Path, modules: list[Module], answers: dict[str, str]) -> dict[st
         "sdd": "created" if created else "updated",
         "written": written,
         "scripts": scripts,
-        "versions": {key.removeprefix("modules."): value for key, value in versions.items()},
+        "versions": {key.removeprefix("modules."): value for key, value in versions.items() if key.startswith("modules.")},
         "pending_questions": len(pending_questions(root, modules)),
         "gitignore": gitignore_state(root),
         "answers": {
