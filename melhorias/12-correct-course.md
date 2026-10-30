@@ -3,7 +3,7 @@
 - **Pedido:** "Verificação e fechamento quero seguir ... correct course" (linha 10)
 - **Tamanho:** M
 - **Depende de:** 06, 07, 08
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -46,3 +46,33 @@ Skill `correct-course` que analisa o impacto de uma mudança, propõe as altera�
 ## Arquivos impactados
 
 `plugins/<delivery>/skills/correct-course/**` (novo), `README.md`, `CLAUDE.md`, `0.0 - contexto-projeto-skills.md`.
+
+## Resultado (30/10/2026)
+
+**Skill `correct-course`** (plugin `delivery`). Etapas:
+1. **Gatilho:** se o prometido não muda, devolve para `dev-story`/`story-review`.
+2. **Impacto:** quadro, `epics.py impact`, artefatos e contratos/merges.
+3. **Classificar e propor:** opções com recomendação.
+4. **Proposta** em `mudancas/`, com `status: proposta`.
+5. **Aplicar só com `aprovada`:**
+   - **menor:** edita a story;
+   - **moderado:** épicos, `validate`/`coverage`, `sync`, transições e Histórico;
+   - **maior:** `encaminhada` às skills donas e depois a parte moderada.
+6. **Fechar:** `aplicada` e próximo passo.
+
+**Regras das stories:**
+- `done` nunca reabre; vira uma story de ajuste.
+- `in-progress`, `review` e `ready-for-dev` voltam para `backlog` e são regeneradas pelo `create-story`.
+- Canceladas viram `dropped`, sem apagar nada.
+
+**Script `epics.py impact`:** recebe os ids de cenários ou regras que mudaram e devolve as stories afetadas agrupadas por estado, mais os ids sem story (cenário novo). A `retrospective` lê as propostas de `mudancas/` pelo frontmatter (`scope`, `status`).
+
+**Template:** `references/template-proposta.md`, com proposta e tabela de classificação (menor, moderado ou maior; quem decide; o que muda).
+
+**Decisões aplicadas:** nome `correct-course`; mudanças maiores só encaminhadas às skills donas.
+
+**Critérios de aceite:**
+- Template e tabela de classificação: feitos.
+- O impacto de um cenário que afeta stories `done`, `in-progress` e `backlog` é coberto por teste no script (54 testes).
+- A redação da proposta é do modelo: verificar no primeiro uso.
+- Nada é alterado antes da aprovação: regra explícita, com o passo 5 condicionado a `status: aprovada`.

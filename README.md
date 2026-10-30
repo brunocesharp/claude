@@ -844,7 +844,7 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
 | Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
-| Entrega por stories (BMAD) | Em construção | `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review` e `retrospective` prontos; `dev-story`, `story-review`, `retrospective`, `correct-course` planejados |
+| Entrega por stories (BMAD) | Implementado | `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` |
 | Pesquisa de mercado e concorrentes | Planejado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |

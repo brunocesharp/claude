@@ -64,6 +64,7 @@ docs/
     ├── implementacao/epicos/epic-N-slug.md         # plan-epics (frontmatter lido por status.py sync e epics.py)
     ├── implementacao/stories/{id}.md               # create-story: única fonte de verdade da implementação (story.py check)
     ├── implementacao/retrospectivas/epic-N-{data}.md   # retrospective (veredito e itens de ação)
+    ├── implementacao/mudancas/{data}-{slug}.md     # correct-course (proposta de mudança de rumo)
     └── business/                     # business-docs (areas.md + {area}.md)
 ```
 
@@ -99,6 +100,7 @@ discovery-init
                     └── arch-c4  <->  arch-adr
                           └── plan-execution  ->  multi-repo (mudança coordenada, se houver vários repositórios)
                           └── plan-epics (épicos em implementacao/epicos/)  ->  sprint-planning  ->  create-story  ->  dev-story (sessão nova, uma story por vez)  ->  story-review (sessão separada)  ->  retrospective (opcional, por épico)
+                          correct-course: em qualquer ponto do ciclo, quando o plano muda
                                 └── architecture-entities / feature / repository / controller, angular-*
                                       └── deploy-dotnet-homolog
                                             └── deploy-dotnet-prod
