@@ -206,3 +206,67 @@ def test_migrate_versao(tmp_path):
     assert [m["id"] for m in migrate.listing(tmp_path, migrations, True)] == ["y"]
     (sdd / "version.toml").write_text('modules.sdd = "1.2.0"\n', encoding="utf-8")
     assert migrate.listing(tmp_path, migrations, False) == []
+
+
+def write_epic(project: Path, name: str, front: dict, body: str = "# Épico\n") -> None:
+    folder = project / "implementacao" / "epicos"
+    folder.mkdir(parents=True, exist_ok=True)
+    text = "---\n" + yaml.safe_dump(front, allow_unicode=True, sort_keys=False) + "---\n" + body
+    (folder / name).write_text(text, encoding="utf-8")
+
+
+EPIC_1 = {"id": "epic-1", "title": "Cadastro", "escopo": "produtos", "stories": [
+    {"id": "1-1-criar-produto", "title": "Criar produto", "repositories": ["loja-api"]},
+    {"id": "1-2-listar-produtos", "title": "Listar", "repositories": ["loja-api", "loja-web"]},
+]}
+
+
+def test_sync_cria_e_e_idempotente(tmp_path):
+    project = tmp_path / "docs" / "nova"
+    write_epic(project, "epic-1-cadastro.md", EPIC_1)
+    write_epic(project, "epic-2-estoque.md", {"id": "epic-2", "title": "Estoque", "escopo": "produtos",
+                                              "stories": [{"id": "2-1-movimentar", "title": "Movimentar"}]})
+    code, result = status(project, "sync", "--dry-run")
+    assert code == 0 and result["created"] and result["dry_run"]
+    assert not (project / "implementacao" / "sprint-status.yaml").exists()
+    code, result = status(project, "sync")
+    assert code == 0 and result["added_epics"] == ["epic-1", "epic-2"]
+    assert result["board"]["situacao"] == "Desenvolvimento — epic-1: 0/2 done"
+    data = current(project)
+    assert data["project"] == "nova"
+    assert data["epics"]["epic-1"]["stories"]["1-1-criar-produto"] == {
+        "title": "Criar produto", "status": "backlog", "repositories": ["loja-api"]}
+    code, result = status(project, "sync")
+    assert code == 0 and result["changed"] is False
+
+
+def test_sync_nao_rebaixa_estados_e_guarda_orfaos(project):
+    front = {"id": "epic-1", "title": "Cadastro de produtos (v2)", "escopo": "gestao-de-produtos", "stories": [
+        {"id": "1-2-listar-produtos", "title": "Listar produtos", "repositories": ["loja-api", "loja-web"]},
+        {"id": "1-1-criar-produto", "title": "Criar produto", "repositories": ["loja-api"]},
+        {"id": "1-4-exportar", "title": "Exportar"},
+    ]}
+    write_epic(project, "epic-1-cadastro.md", front)
+    code, result = status(project, "sync")
+    assert code == 0, result
+    assert result["added_stories"] == ["1-4-exportar"]
+    assert result["reordered"] == ["epic-1"]
+    assert set(result["orphans"]) == {"1-3-importar-planilha", "epic-2"}
+    assert "epic-1.title" in result["updated"] and "1-1-criar-produto.repositories" in result["updated"]
+    stories = current(project)["epics"]["epic-1"]["stories"]
+    assert list(stories) == ["1-2-listar-produtos", "1-1-criar-produto", "1-4-exportar", "1-3-importar-planilha"]
+    assert stories["1-1-criar-produto"]["status"] == "done"
+    assert stories["1-1-criar-produto"]["file"] == "stories/1-1-criar-produto.md"
+    assert stories["1-2-listar-produtos"]["status"] == "ready-for-dev"
+
+
+def test_sync_recusa_epico_mal_formado(tmp_path):
+    project = tmp_path / "docs" / "x"
+    write_epic(project, "epic-1-a.md", {"id": "epic-1", "title": "A", "stories": [{"id": "2-1-errada", "title": "e"}]})
+    code, message = status(project, "sync")
+    assert code == 1 and "2-1-errada: está no epic-1" in message
+    write_epic(project, "epic-1-a.md", {"id": "epico-1", "title": "A"})
+    code, message = status(project, "sync")
+    assert code == 1 and "id deve ser epic-N" in message
+    code, message = status(tmp_path / "docs" / "vazio", "sync")
+    assert code == 1 and "plan-epics" in message

@@ -22,7 +22,7 @@ plugins/
             └── references/
 ```
 
-Plugins: `sdd` (hub `sdd-setup`: setup, status e próximo passo), `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`, `art-direction` (direção de arte). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
+Plugins: `sdd` (hub `sdd-setup`: setup, status e próximo passo), `delivery` (ciclo de stories: `sprint-planning`...), `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`, `art-direction` (direção de arte). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
 
 ## Frontmatter obrigatório no SKILL.md
 
@@ -95,6 +95,7 @@ discovery-init
               └── spec-functional
                     └── arch-c4  <->  arch-adr
                           └── plan-execution  ->  multi-repo (mudança coordenada, se houver vários repositórios)
+                          └── (épicos em implementacao/epicos/)  ->  sprint-planning  ->  sprint-status.yaml
                                 └── architecture-entities / feature / repository / controller, angular-*
                                       └── deploy-dotnet-homolog
                                             └── deploy-dotnet-prod

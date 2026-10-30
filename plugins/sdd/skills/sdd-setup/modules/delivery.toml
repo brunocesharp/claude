@@ -1,0 +1,9 @@
+# Registro do módulo (plugin) delivery. A versão acompanha plugins/delivery/.claude-plugin/plugin.json.
+# As perguntas de revisão (delivery.review_depth) e de modo sem supervisão (delivery.auto_mode)
+# entram junto com as skills story-review e dev-story.
+
+[module]
+code = "delivery"
+plugin = "delivery"
+version = "1.0.0"
+skills = ["sprint-planning"]

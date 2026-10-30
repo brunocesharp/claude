@@ -3,7 +3,7 @@
 - **Pedido:** "quero implementar sprint-status.yaml, em que cada story passa por backlog, ready-for-dev, in-progress, review e done. Nas suas skills, a situação só existe no nível do escopo e como checkbox no project.md." (linha 11)
 - **Tamanho:** M
 - **Depende de:** 03 (scripts) — mas o formato pode ser fechado antes
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -90,3 +90,24 @@ Um arquivo de estado por projeto, legível por pessoa e por script, que é a **f
 ## Arquivos impactados
 
 `plugins/<delivery>/skills/sprint-planning/**` (novo), `plugins/sdd/scripts/status.py`, `CLAUDE.md` e `0.0 - contexto-projeto-skills.md` (estrutura `docs/{projeto}/implementacao/`).
+
+## Resultado (30/10/2026)
+
+- **Plugin `delivery`** criado e registrado no marketplace e em `sdd-setup/modules/delivery.toml`. Por enquanto o registro não tem perguntas: `review_depth` e `auto_mode` entram com as skills 09 e 10.
+- **Skill `sprint-planning`**, com três modos:
+  - **Sincronizar**: prévia com `--dry-run`, decisão sobre órfãos, gravação, conferência dos nomes de repositório com o `repositorios.md`, atualização do `project.md` e da Situação do `workspace.md`.
+  - **Quadro**: tabela por épico e próxima ação.
+  - **Mudar estado**: com confirmação; `--force` só a pedido explícito.
+  - Tem caminho sem `uv`.
+- **`status.py sync`** lê o frontmatter de `implementacao/epicos/epic-N-slug.md`, com `id`, `title`, `escopo` e `stories: [{id, title, repositories}]`. A tarefa 07 (`plan-epics`) precisa gravar esse formato, descrito em `sdd-setup/references/sprint-status.md`.
+  - Acrescenta itens novos em `backlog` e atualiza título, escopo, repositórios e ordem.
+  - Nunca mexe em `status`/`file` do que já existe e nunca remove: o que sumiu dos épicos vira `orphans`.
+  - Rodar de novo sem mudanças devolve `changed: false`.
+- **`show`** ganhou o campo `situacao` (ex.: `Desenvolvimento — epic-1: 0/2 done`), usado na coluna Situação do `workspace.md`.
+- **Decisões aplicadas:** formato aninhado validado pelo script, `blocked` e `dropped` incluídos, um arquivo por projeto, sem `tracking_system`/`external_id`.
+
+**Critérios de aceite:**
+- A referência existe.
+- O `status.py` valida e aplica as transições.
+- O `sync` é idempotente (31 testes).
+- O quadro por épico aparece no `sdd-setup` pelo `workspace.py`.

@@ -225,7 +225,114 @@ def summary(data: dict) -> dict:
             "done": counts["done"], "total": active, "counts": counts, "stories": stories,
         })
     return {"project": data.get("project"), "updated_at": str(data.get("updated_at")), "epics": epics_out,
-            "totals": totals}
+            "totals": totals, "situacao": situacao(epics_out)}
+
+
+def situacao(epics_out: list[dict]) -> str:
+    """Texto para a coluna Situação do workspace.md: o épico em andamento (ou o próximo) e as stories done."""
+    open_epics = [e for e in epics_out if e["status"] not in FINISHED]
+    if not epics_out:
+        return "Plano de Execução"
+    if not open_epics:
+        return "Desenvolvimento — épicos concluídos"
+    current = next((e for e in open_epics if e["status"] == "in-progress"), open_epics[0])
+    return f"Desenvolvimento — {current['id']}: {current['done']}/{current['total']} done"
+
+
+# ---------------------------------------------------------------- sync a partir dos épicos
+
+
+def read_frontmatter(path: Path) -> dict:
+    text = path.read_text(encoding="utf-8")
+    if not text.startswith("---"):
+        raise SddError(f"{path.name}: falta o frontmatter (--- ... ---) com id, title e stories")
+    end = text.find("\n---", 3)
+    if end == -1:
+        raise SddError(f"{path.name}: frontmatter sem o --- de fechamento")
+    try:
+        data = yaml.safe_load(text[3:end])
+    except yaml.YAMLError as exc:
+        raise SddError(f"{path.name}: frontmatter não é YAML válido: {exc}") from exc
+    return data if isinstance(data, dict) else {}
+
+
+def read_epic_files(project: Path) -> list[dict]:
+    """Lê implementacao/epicos/epic-*.md, na ordem do número do épico."""
+    folder = project / "implementacao" / "epicos"
+    epics = []
+    for path in folder.glob("epic-*.md"):
+        front = read_frontmatter(path)
+        epic_id = str(front.get("id", ""))
+        match = EPIC_ID.match(epic_id)
+        if not match:
+            raise SddError(f"{path.name}: id deve ser epic-N")
+        if not path.name.startswith(f"{epic_id}-") and path.name != f"{epic_id}.md":
+            raise SddError(f"{path.name}: o nome do arquivo deve começar com {epic_id}-")
+        stories = front.get("stories") or []
+        if not isinstance(stories, list) or not all(isinstance(s, dict) and s.get("id") for s in stories):
+            raise SddError(f"{path.name}: stories deve ser uma lista de {{id, title, repositories}}")
+        epics.append({**front, "number": int(match.group(1)), "source": f"epicos/{path.name}"})
+    numbers = [e["number"] for e in epics]
+    if len(numbers) != len(set(numbers)):
+        raise SddError("há dois arquivos de épico com o mesmo número")
+    return sorted(epics, key=lambda e: e["number"])
+
+
+def sync(project: Path, data: dict | None, epics_in: list[dict]) -> tuple[dict, dict]:
+    """Mescla os épicos no sprint-status. Acrescenta e atualiza títulos, escopo, repositórios e ordem;
+    nunca muda status nem file de algo que já existe, e nunca remove (o que sumiu vira 'orphans')."""
+    created = data is None
+    data = data or {"version": 1, "project": project.name, "updated_at": date.today().isoformat(), "epics": {}}
+    data.setdefault("epics", {})
+    old_epics = data["epics"] or {}
+    report: dict = {"created": created, "added_epics": [], "added_stories": [], "updated": [], "reordered": [],
+                    "orphans": []}
+
+    new_epics: dict = {}
+    for epic_in in epics_in:
+        epic_id = epic_in["id"]
+        old = old_epics.get(epic_id)
+        if old is None:
+            report["added_epics"].append(epic_id)
+            epic = {"title": epic_in.get("title"), "escopo": epic_in.get("escopo"), "status": "backlog",
+                    "retrospective": "optional", "stories": {}}
+        else:
+            epic = dict(old)
+            for field in ("title", "escopo"):
+                if epic_in.get(field) and epic.get(field) != epic_in[field]:
+                    report["updated"].append(f"{epic_id}.{field}")
+                    epic[field] = epic_in[field]
+        old_stories = epic.get("stories") or {}
+        stories: dict = {}
+        for story_in in epic_in.get("stories") or []:
+            story_id = str(story_in["id"])
+            repos = story_in.get("repositories") or []
+            story = dict(old_stories.get(story_id) or {})
+            if not story:
+                report["added_stories"].append(story_id)
+                story = {"title": story_in.get("title"), "status": "backlog", "repositories": repos}
+            else:
+                if story_in.get("title") and story.get("title") != story_in["title"]:
+                    report["updated"].append(f"{story_id}.title")
+                    story["title"] = story_in["title"]
+                if "repositories" in story_in and story.get("repositories") != repos:
+                    report["updated"].append(f"{story_id}.repositories")
+                    story["repositories"] = repos
+            stories[story_id] = story
+        for story_id, story in old_stories.items():
+            if story_id not in stories:
+                report["orphans"].append(story_id)
+                stories[story_id] = story
+        if old is not None and list(old_stories) != [s for s in stories if s in old_stories]:
+            report["reordered"].append(epic_id)
+        epic["stories"] = stories
+        new_epics[epic_id] = epic
+    for epic_id, epic in old_epics.items():
+        if epic_id not in new_epics:
+            report["orphans"].append(epic_id)
+            new_epics[epic_id] = epic
+    data["epics"] = new_epics
+    return data, report
 
 
 def next_action(data: dict) -> dict:
@@ -349,6 +456,8 @@ def main() -> None:
     sub.add_parser("show")
     sub.add_parser("next")
     sub.add_parser("check")
+    syncp = sub.add_parser("sync", help="mescla implementacao/epicos/*.md no sprint-status.yaml")
+    syncp.add_argument("--dry-run", action="store_true", help="mostra o que mudaria sem gravar")
     setp = sub.add_parser("set")
     setp.add_argument("id")
     setp.add_argument("state")
@@ -358,6 +467,25 @@ def main() -> None:
     project = args.project.resolve()
     path = status_path(project)
     try:
+        if args.command == "sync":
+            epics_in = read_epic_files(project)
+            if not epics_in:
+                raise SddError("nenhum épico em implementacao/epicos/: gere com a skill plan-epics")
+            existing = load(path) if path.is_file() else None
+            if existing is not None:
+                errors = validate(existing)
+                if errors:
+                    raise SddError("sprint-status.yaml inválido; corrija antes do sync:\n- " + "\n- ".join(errors))
+            data, report = sync(project, existing, epics_in)
+            errors = validate(data)
+            if errors:
+                raise SddError("o resultado do sync ficaria inválido:\n- " + "\n- ".join(errors))
+            changed = any(report[k] for k in ("created", "added_epics", "added_stories", "updated", "reordered"))
+            if changed and not args.dry_run:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                save(path, data)
+            emit({**report, "changed": changed, "dry_run": args.dry_run, "board": summary(data)})
+            return
         data = load(path)
         if args.command == "check":
             emit(check(project, data))

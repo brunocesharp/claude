@@ -36,6 +36,7 @@ Uma recomendação principal, com o motivo, e no máximo duas alternativas.
 | Especificação sem arquitetura | `arch-c4` (e `arch-adr` para decisões pendentes) |
 | Vários repositórios sem `repositorios.md` | `multi-repo` (Cadastrar) |
 | Arquitetura sem plano do escopo | `plan-execution` |
+| Épicos em `implementacao/epicos/` sem `sprint-status.yaml` (ou com épicos novos) | `sprint-planning` |
 | Sprint em andamento (`sprint-status.yaml`) | A ação de `sprint.next`: `dev-story` (retomar ou implementar), `story-review`, `retrospective` / fechar o épico, `create-story`, desbloquear. Se a skill indicada ainda não existir no workspace, diga qual é a próxima story e o que fazer com ela |
 | Plano pronto | Skills de código do item em andamento (`architecture-*`, `angular-*`); vários repositórios: `multi-repo` (Mudança coordenada) |
 | Entrega pronta | `deploy-dotnet-homolog`, depois `deploy-dotnet-prod` |

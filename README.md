@@ -51,6 +51,7 @@ Cada plugin é instalado com `/plugin install <plugin>@claude` (o `@claude` é o
 /plugin install workspace@claude
 /plugin install discovery@claude
 /plugin install spec-plan@claude
+/plugin install delivery@claude
 /plugin install architecture-docs@claude
 /plugin install architecture-dotnet@claude
 /plugin install architecture-angular@claude
@@ -119,6 +120,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-execution` |
+| `delivery` | `sprint-planning` (as demais skills do ciclo de stories estão em construção) |
 | `architecture-docs` | `arch-c4`, `arch-adr` |
 | `architecture-dotnet` | `architecture-init`, `architecture-entities`, `architecture-feature`, `architecture-repository`, `architecture-external-service`, `architecture-controller`, `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | `architecture-angular` | `angular-core-layer`, `angular-feature-layer`, `angular-shared-layer`, `angular-rxjs-transversal` |
@@ -304,6 +306,12 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 |-------|---------|-------|
 | `plan-execution` | "plano de execução", "dividir em tarefas", "como implementar" | `execution-plan.md` |
 
+### Fase: Entrega por stories
+
+| Skill | Gatilho | Saída |
+|-------|---------|-------|
+| `sprint-planning` | "planejar o sprint", "gerar o sprint-status", "como está o sprint", "qual a próxima story", "bloquear story" | `implementacao/sprint-status.yaml` |
+
 ### Fase: Deploy .NET
 
 | Skill | Gatilho | Ambiente | Saída |
@@ -363,6 +371,11 @@ plugins/
 │       ├── discovery-stakeholders/  # com references/
 │       ├── discovery-metrics/       # com references/
 │       └── discovery-scoped/        # com references/
+│
+├── delivery/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       └── sprint-planning/          # quadro de épicos e stories (usa _sdd/scripts/status.py)
 │
 ├── spec-plan/
 │   ├── .claude-plugin/plugin.json
@@ -530,6 +543,10 @@ docs/
 │   │   └── titulo-do-escopo/
 │   │       ├── execution-plan.md
 │   │       └── mudanca-multi-repo.md # branches, contratos e ordem de merge/deploy (multi-repo)
+│   ├── implementacao/
+│   │   ├── sprint-status.yaml        # quadro de épicos e stories (sprint-planning)
+│   │   ├── epicos/epic-N-slug.md     # épicos fatiados em stories
+│   │   └── stories/N-M-slug.md       # uma story por arquivo, com contexto completo
 │   └── business/
 │       ├── areas.md                  # mapa de áreas do código
 │       └── {area}.md
@@ -646,6 +663,10 @@ Gera testes unitários Java (JUnit 5) a partir dos cenários BDD da especificaç
 
 Analisa a especificação funcional (e a arquitetura C4, se existir) e decompõe em entregas incrementais com tarefas ordenadas por camada (Domain → Infrastructure → Application → Presentation). Usa os contêineres e tecnologias do C4 para escolher a skill correta para cada tarefa e respeita os ADRs aceitos. Inclui estimativas de esforço.
 
+### sprint-planning
+
+Mantém o `docs/{projeto}/implementacao/sprint-status.yaml`, a fonte única do andamento da entrega, inspirado no BMAD. Cada story passa por `backlog → ready-for-dev → in-progress → review → done`, e também pode ficar `blocked` ou `dropped`. Gera e sincroniza o quadro a partir dos arquivos de épico, sempre com uma prévia antes de gravar. A sincronização nunca rebaixa nem remove estados: o que sumiu dos épicos aparece como órfão, para você decidir. A skill também mostra o quadro por épico e a próxima story, muda estados a pedido (com transições validadas pelo `status.py`) e atualiza o `project.md` e a Situação do `workspace.md`.
+
 ### deploy-dotnet-homolog
 
 Executa pipeline sequencial: Restore → Build → Test → Docker Build → Deploy → Health Check. Interrompe imediatamente em caso de falha. Gera relatório com artefatos e status de cada etapa.
@@ -696,6 +717,7 @@ discovery-vision ──► discovery-opportunity ──► discovery-assumptions
                           │
                           ▼
                   plan-execution ──► multi-repo (vários repositórios)
+                  (ou épicos ──► sprint-planning: quadro de stories)
                           │
                           ▼
          ┌────────────────┼────────────────┐
@@ -754,6 +776,9 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Arquitetura Angular | Implementado | 4 skills |
 | Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
+| Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
+| Entrega por stories (BMAD) | Em construção | `sprint-planning` pronto; `plan-epics`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` planejados |
+| Pesquisa de mercado e concorrentes | Planejado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |
 | Especificação Não-Funcional | Planejado | `spec-nonfunctional` |

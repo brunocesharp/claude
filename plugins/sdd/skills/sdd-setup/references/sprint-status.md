@@ -83,12 +83,39 @@ epics:
 
 Fora da tabela, só com `--force` e **só quando o usuário pedir** explicitamente.
 
+## Entrada: frontmatter dos épicos
+
+O `sprint-status.yaml` nasce e é atualizado a partir dos arquivos de épico (`plan-epics` escreve; `sprint-planning` sincroniza). Cada `implementacao/epicos/epic-N-slug.md` começa com:
+
+```yaml
+---
+id: epic-1
+title: Cadastro de produtos
+escopo: gestao-de-produtos
+stories:                       # na ordem de build
+  - id: 1-1-criar-produto
+    title: Criar produto
+    repositories: [estoque-api, estoque-web]
+  - id: 1-2-listar-produtos
+    title: Listar produtos
+    repositories: [estoque-api, estoque-web]
+---
+```
+
+`status.py sync` mescla todos os épicos no `sprint-status.yaml`:
+- cria o arquivo se não existir;
+- acrescenta épicos e stories novos em `backlog`;
+- atualiza `title`, `escopo`, `repositories` e a **ordem** das stories conforme os épicos;
+- **nunca** muda `status` nem `file` do que já existe e **nunca** remove: o que sumiu dos épicos fica no arquivo e volta em `orphans` (decidir com o usuário: `dropped`, mover para outro épico ou devolver ao arquivo do épico);
+- `--dry-run` mostra o resultado sem gravar.
+
 ## Script (`_sdd/scripts/status.py`)
 
 Rode a partir da raiz do workspace (onde está `_sdd/`):
 
 ```
-uv run _sdd/scripts/status.py --project docs/{projeto} show          # quadro por épico
+uv run _sdd/scripts/status.py --project docs/{projeto} sync [--dry-run]   # mescla os épicos
+uv run _sdd/scripts/status.py --project docs/{projeto} show          # quadro por épico (+ texto da Situação)
 uv run _sdd/scripts/status.py --project docs/{projeto} next          # próxima ação
 uv run _sdd/scripts/status.py --project docs/{projeto} set <id> <estado> [--force]
 uv run _sdd/scripts/status.py --project docs/{projeto} check         # coerência com os arquivos de story
@@ -111,4 +138,4 @@ Edite o arquivo com a ferramenta Edit seguindo este documento:
 
 Ao mudar estados, a skill atualiza também:
 - `docs/{projeto}/project.md`: marca a fase **Plano de Execução** quando o sprint-status nasce; durante a entrega, a fase atual é Desenvolvimento.
-- Coluna **Situação** do `docs/workspace.md`: `Desenvolvimento — epic-1: 3/5 done` (épico em andamento e stories `done` sobre as não canceladas).
+- Coluna **Situação** do `docs/workspace.md`: o campo `situacao` do `show`, ex.: `Desenvolvimento — epic-1: 3/5 done` (épico em andamento, ou o próximo, e stories `done` sobre as não canceladas).

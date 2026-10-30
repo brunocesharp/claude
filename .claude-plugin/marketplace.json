@@ -25,6 +25,11 @@
       "description": "Skills de especificação funcional (BDD) e plano de execução para decompor escopos em tarefas."
     },
     {
+      "name": "delivery",
+      "source": "./plugins/delivery",
+      "description": "Ciclo de entrega por stories (inspirado no BMAD): quadro de épicos e stories no sprint-status.yaml, story com contexto completo, implementação em sessão nova, revisão adversarial, retrospectiva e correct course."
+    },
+    {
       "name": "architecture-docs",
       "source": "./plugins/architecture-docs",
       "description": "Skills de documentação de arquitetura: diagramas C4 (contexto, contêineres, componentes, deployment) em Mermaid e registro de decisões (ADR), por projeto."
