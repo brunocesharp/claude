@@ -4,5 +4,9 @@
   "version": "1.0.0",
   "author": {
     "name": "brunocesharp"
-  }
+  },
+  "homepage": "https://github.com/brunocesharp/claude/tree/main/plugins/business-docs",
+  "repository": "https://github.com/brunocesharp/claude",
+  "license": "MIT",
+  "keywords": ["documentation", "business-rules", "domain", "dotnet", "angular"]
 }

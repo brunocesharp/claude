@@ -1,0 +1,12 @@
+{
+  "name": "art-direction",
+  "description": "Skills de direção de arte: fundação visual, sistema cromático, tipografia, iconografia e validação de identidade visual para projetos digitais.",
+  "version": "1.0.0",
+  "author": {
+    "name": "brunocesharp"
+  },
+  "homepage": "https://github.com/brunocesharp/claude/tree/main/plugins/art-direction",
+  "repository": "https://github.com/brunocesharp/claude",
+  "license": "MIT",
+  "keywords": ["art-direction", "visual-identity", "design-system", "style-guide", "typography", "color", "ui-design"]
+}
