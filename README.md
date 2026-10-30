@@ -119,7 +119,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 | `sdd` | `sdd-setup` |
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
-| `spec-plan` | `spec-functional`, `plan-execution` |
+| `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
 | `delivery` | `sprint-planning` (as demais skills do ciclo de stories estão em construção) |
 | `architecture-docs` | `arch-c4`, `arch-adr` |
 | `architecture-dotnet` | `architecture-init`, `architecture-entities`, `architecture-feature`, `architecture-repository`, `architecture-external-service`, `architecture-controller`, `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
@@ -304,6 +304,7 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 
 | Skill | Gatilho | Saída |
 |-------|---------|-------|
+| `plan-epics` | "planejar épicos", "quebrar em stories", "fatiar em stories", "converter o plano em épicos" | `implementacao/epicos/epic-N-slug.md` + `sprint-status.yaml` |
 | `plan-execution` | "plano de execução", "dividir em tarefas", "como implementar" | `execution-plan.md` |
 
 ### Fase: Entrega por stories
@@ -380,6 +381,7 @@ plugins/
 ├── spec-plan/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
+│       ├── plan-epics/              # épicos e stories verticais (references: template, fatiamento, prontidão)
 │       ├── spec-functional/
 │       │   ├── SKILL.md
 │       │   └── References/
@@ -663,6 +665,10 @@ Gera testes unitários Java (JUnit 5) a partir dos cenários BDD da especificaç
 
 Analisa a especificação funcional (e a arquitetura C4, se existir) e decompõe em entregas incrementais com tarefas ordenadas por camada (Domain → Infrastructure → Application → Presentation). Usa os contêineres e tecnologias do C4 para escolher a skill correta para cada tarefa e respeita os ADRs aceitos. Inclui estimativas de esforço.
 
+### plan-epics
+
+Caminho padrão de planejamento do fluxo de entrega (BMAD). Confere a prontidão (spec, escopo, arquitetura, repositórios) e propõe **épicos**, cada um um resultado para o usuário. Decide os pontos em aberto (resolver agora, spike ou decidir na story) e fatia cada épico em **stories verticais**: um comportamento testável de ponta a ponta que cabe numa sessão, com tamanho P/M/G, dependências, repositórios e checkpoints. Grava um arquivo por épico e confere por script que todo cenário da especificação tem story (`epics.py coverage`). Por fim, gera o quadro no `sprint-status.yaml`. Também converte um `execution-plan.md` antigo (migração opcional).
+
 ### sprint-planning
 
 Mantém o `docs/{projeto}/implementacao/sprint-status.yaml`, a fonte única do andamento da entrega, inspirado no BMAD. Cada story passa por `backlog → ready-for-dev → in-progress → review → done`, e também pode ficar `blocked` ou `dropped`. Gera e sincroniza o quadro a partir dos arquivos de épico, sempre com uma prévia antes de gravar. A sincronização nunca rebaixa nem remove estados: o que sumiu dos épicos aparece como órfão, para você decidir. A skill também mostra o quadro por épico e a próxima story, muda estados a pedido (com transições validadas pelo `status.py`) e atualiza o `project.md` e a Situação do `workspace.md`.
@@ -717,7 +723,7 @@ discovery-vision ──► discovery-opportunity ──► discovery-assumptions
                           │
                           ▼
                   plan-execution ──► multi-repo (vários repositórios)
-                  (ou épicos ──► sprint-planning: quadro de stories)
+                  (ou plan-epics ──► sprint-planning: quadro de stories)
                           │
                           ▼
          ┌────────────────┼────────────────┐
@@ -777,7 +783,7 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
 | Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
-| Entrega por stories (BMAD) | Em construção | `sprint-planning` pronto; `plan-epics`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` planejados |
+| Entrega por stories (BMAD) | Em construção | `plan-epics` e `sprint-planning` prontos; `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` planejados |
 | Pesquisa de mercado e concorrentes | Planejado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |

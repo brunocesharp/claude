@@ -30,7 +30,8 @@ Leia antes de executar:
 | `migrate.py` | `${CLAUDE_SKILL_DIR}/scripts/` | Lista e registra migrações declaradas pelos módulos |
 | `config.py` | `_sdd/scripts/` (cópia) | Configuração resolvida, em JSON |
 | `workspace.py` | `_sdd/scripts/` (cópia) | Projetos: fase, situação, repositórios, quadro do sprint e próxima ação |
-| `status.py` | `_sdd/scripts/` (cópia) | Lê, valida e muda estados do `sprint-status.yaml` |
+| `status.py` | `_sdd/scripts/` (cópia) | Lê, valida e muda estados do `sprint-status.yaml`; `sync` com os épicos |
+| `epics.py` | `_sdd/scripts/` (cópia) | Valida os arquivos de épico e a cobertura cenário → story |
 
 Os de `_sdd/scripts/` são usados também pelas skills dos outros plugins. O plugin traz ainda um hook que valida o `sprint-status.yaml` sempre que o Claude grava ou edita esse arquivo (precisa do `uv`; sem ele, o hook não faz nada).
 

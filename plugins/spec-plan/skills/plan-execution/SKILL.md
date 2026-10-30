@@ -1,6 +1,6 @@
 ---
 name: plan-execution
-description: Gera plano de execução técnico fullstack (.NET + Angular) para implementação de features, dividindo em entregas incrementais com tarefas por camada. Use quando o usuário disser "plano de execução", "execution plan", "planejar implementação", "dividir em tarefas", "quebrar feature", "como implementar essa spec", "etapas de desenvolvimento", "decomposição técnica", "quero um plano para implementar". NÃO use para especificação funcional (use spec-functional), arquitetura (use arch-c4) ou discovery (use discovery-*).
+description: Gera plano de execução técnico fullstack (.NET + Angular) para implementação de features, dividindo em entregas incrementais com tarefas por camada. Use quando o usuário disser "plano de execução", "execution plan", "planejar implementação", "dividir em tarefas", "quebrar feature", "como implementar essa spec", "etapas de desenvolvimento", "decomposição técnica", "quero um plano para implementar". NÃO use para épicos e stories verticais, uma story por sessão (use plan-epics, o caminho padrão do fluxo de entrega), especificação funcional (use spec-functional), arquitetura (use arch-c4) ou discovery (use discovery-*).
 metadata:
   version: 2.2.0
   category: planning

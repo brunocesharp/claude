@@ -13,7 +13,8 @@ Responda a partir dos arquivos do workspace, não de memória. Os arquivos são 
 | `escopo/{escopo}/escopo.md` | Escopo fechado |
 | `especificacao/{escopo}/spec-functional.md` | Especificação do escopo |
 | `arquitetura/arquitetura.md`, `arquitetura/decisoes/` | C4 e ADRs |
-| `plano-execucao/{escopo}/execution-plan.md` | Plano do escopo |
+| `plano-execucao/{escopo}/execution-plan.md` | Plano do escopo por entregas (pode migrar para épicos: `plan-epics`, modo Migrar) |
+| `implementacao/epicos/*.md` | Épicos e stories planejados (`plan-epics`) |
 | `repositorios.md` | Código em vários repositórios |
 | `implementacao/sprint-status.yaml` | Entrega por épicos e stories em andamento: use `sprint.next` do `workspace.py` (ou `status.py ... next`) |
 
@@ -35,7 +36,7 @@ Uma recomendação principal, com o motivo, e no máximo duas alternativas.
 | Escopo sem especificação | `spec-functional` |
 | Especificação sem arquitetura | `arch-c4` (e `arch-adr` para decisões pendentes) |
 | Vários repositórios sem `repositorios.md` | `multi-repo` (Cadastrar) |
-| Arquitetura sem plano do escopo | `plan-execution` |
+| Arquitetura sem plano do escopo | `plan-epics` (padrão: épicos e stories, uma por sessão); `plan-execution` se o time trabalha com entregas e tarefas por camada |
 | Épicos em `implementacao/epicos/` sem `sprint-status.yaml` (ou com épicos novos) | `sprint-planning` |
 | Sprint em andamento (`sprint-status.yaml`) | A ação de `sprint.next`: `dev-story` (retomar ou implementar), `story-review`, `retrospective` / fechar o épico, `create-story`, desbloquear. Se a skill indicada ainda não existir no workspace, diga qual é a próxima story e o que fazer com ela |
 | Plano pronto | Skills de código do item em andamento (`architecture-*`, `angular-*`); vários repositórios: `multi-repo` (Mudança coordenada) |

@@ -61,6 +61,7 @@ docs/
     ├── arquitetura/                  # arch-c4 (arquitetura.md, componentes/, dinamicos/) e arch-adr (decisoes/)
     ├── plano-execucao/{escopo}/execution-plan.md   # plan-execution
     ├── implementacao/sprint-status.yaml            # estado de épicos e stories (status.py; formato em sdd-setup/references/sprint-status.md)
+    ├── implementacao/epicos/epic-N-slug.md         # plan-epics (frontmatter lido por status.py sync e epics.py)
     └── business/                     # business-docs (areas.md + {area}.md)
 ```
 
@@ -74,7 +75,7 @@ docs/
 
 Ao mudar esse passo, mude em todas as skills. Skills que avançam de fase atualizam o `project.md` e a coluna Situação do `workspace.md`.
 
-**Onde está o código:** projeto de um repositório usa `repository_url` e `code_path` do `project-config.json` (espelhados no `project.md`); com dois ou mais, a fonte única é `docs/{projeto}/repositorios.md` (skill `multi-repo`: papel, caminho, contêineres C4 e contratos de cada repositório). Skills que leem código (`arch-c4`, `business-docs`, `plan-execution`) consultam os dois. Nenhuma skill faz commit, push ou merge nos repositórios de código sem pedido explícito.
+**Onde está o código:** projeto de um repositório usa `repository_url` e `code_path` do `project-config.json` (espelhados no `project.md`); com dois ou mais, a fonte única é `docs/{projeto}/repositorios.md` (skill `multi-repo`: papel, caminho, contêineres C4 e contratos de cada repositório). Skills que leem código (`arch-c4`, `business-docs`, `plan-execution`, `plan-epics`) consultam os dois. Nenhuma skill faz commit, push ou merge nos repositórios de código sem pedido explícito.
 
 Nada fica guardado nos arquivos da skill por projeto: configuração específica de um projeto (ex.: mapa de áreas do `business-docs`) vai para `docs/{projeto}/`.
 
@@ -82,7 +83,7 @@ Nada fica guardado nos arquivos da skill por projeto: configuração específica
 
 - Cada plugin que precisa de configuração declara as perguntas em `plugins/sdd/skills/sdd-setup/modules/<plugin>.toml` (`key`, `prompt`, `default`, `scope` team|user). A `version` do registro é igual à do `plugin.json`: ao subir uma, suba a outra (há teste). Chaves e uso em `sdd-setup/references/config-schema.md`.
 - Scripts em Python ≥ 3.11, executados com `uv run` (fallback `python`), só biblioteca padrão ou dependências inline (PEP 723). Imprimem JSON; em erro, `error: <mensagem>` e código 1. Os de runtime são copiados pelo setup para `_sdd/scripts/`, de onde as skills de qualquer plugin os chamam (`${CLAUDE_PLUGIN_ROOT}` só vale dentro do próprio plugin). Toda skill que usa script descreve o caminho sem `uv`.
-- Runtime em `_sdd/scripts/`: `config.py` (configuração), `workspace.py` (projetos, fase, quadro do sprint) e `status.py` (estados do `sprint-status.yaml`, com as transições de `sdd-setup/references/sprint-status.md`). `setup.py` e `migrate.py` rodam da pasta da skill. O hook do plugin (`plugins/sdd/hooks/hooks.json`) valida o `sprint-status.yaml` a cada Write/Edit.
+- Runtime em `_sdd/scripts/`: `config.py` (configuração), `workspace.py` (projetos, fase, quadro do sprint), `epics.py` (validação dos épicos e cobertura cenário → story) e `status.py` (estados do `sprint-status.yaml`, com as transições de `sdd-setup/references/sprint-status.md`). `setup.py` e `migrate.py` rodam da pasta da skill. O hook do plugin (`plugins/sdd/hooks/hooks.json`) valida o `sprint-status.yaml` a cada Write/Edit.
 - Testes: `uv run --no-project --with pytest --with pyyaml pytest plugins/sdd/skills/sdd-setup/scripts/tests`.
 
 ## Dependências entre skills
@@ -95,7 +96,7 @@ discovery-init
               └── spec-functional
                     └── arch-c4  <->  arch-adr
                           └── plan-execution  ->  multi-repo (mudança coordenada, se houver vários repositórios)
-                          └── (épicos em implementacao/epicos/)  ->  sprint-planning  ->  sprint-status.yaml
+                          └── plan-epics (épicos em implementacao/epicos/)  ->  sprint-planning  ->  sprint-status.yaml
                                 └── architecture-entities / feature / repository / controller, angular-*
                                       └── deploy-dotnet-homolog
                                             └── deploy-dotnet-prod

@@ -3,7 +3,7 @@
 - **Pedido:** "Planos quero seguir Épicos fatiados em stories, uma spec por story e um arquivo de status" (linha 8)
 - **Tamanho:** G
 - **Depende de:** 06 (formato do status). A "spec por story" é a tarefa 08.
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -54,3 +54,27 @@ Transformar escopo + especificação + arquitetura em **épicos** e **stories ve
 ## Arquivos impactados
 
 `plugins/spec-plan/skills/plan-epics/**` (novo), `plugins/spec-plan/skills/plan-execution/SKILL.md` (descrição "quando NÃO usar"), `spec-functional` (IDs estáveis nos cenários, se ainda não tiver), `README.md`, `CLAUDE.md`, `0.0 - contexto-projeto-skills.md`.
+
+## Resultado (30/10/2026)
+
+- **Skill `plan-epics`** (plugin `spec-plan`, que subiu para a 1.1.0), com três modos: Planejar, Atualizar e Migrar.
+  - O fluxo segue a proposta: prontidão → épicos → pontos em aberto → stories → ordem e checkpoints → gravar → quadro.
+  - Referências: `template-epico.md`, `fatiamento-vertical.md` (exemplos bons e ruins, tamanho P/M/G, tipos `story`/`spike`/`enabler`, ordem com vários repositórios) e `checklist-prontidao.md`.
+- **Cobertura determinística:** `_sdd/scripts/epics.py`.
+  - `validate`: ids, tamanho, tipo, `covers`, `depends_on` só para trás, e o próximo número de épico.
+  - `coverage --escopo`: cruza os cabeçalhos `#### Cenário N.M` e as regras `**RN-N.M**` da spec com os `covers` das stories. Ignora itens `(removido)` e acusa referências que não existem.
+- **`spec-functional`:** ganhou a regra de numeração estável (não renumerar; item que deixou de valer fica marcado `(removido)`).
+- **Migração opcional:** `execution-plan-para-epicos`, declarada em `modules/spec-plan.toml`, com guia em `sdd-setup/references/migracoes/`. O `migrate.py --all` a lista.
+- **`plan-execution`:** continua existindo; a descrição agora aponta o `plan-epics` como caminho padrão.
+
+**Decisões aplicadas:**
+- Nome `plan-epics`.
+- Numeração global no projeto.
+- Tamanho relativo P/M/G em vez de horas.
+- Migração opcional.
+
+**Critérios de aceite:**
+- Referências e Passo 0: feitos.
+- O exemplo "Gestão de Produtos" virou fixture (spec + 2 épicos): `validate` sem problemas, cobertura completa, `sync` gerando o quadro (37 testes).
+- O fluxo conversacional da skill ainda não foi rodado numa sessão real: fazer isso no primeiro uso.
+- README, `CLAUDE.md` e contexto atualizados.

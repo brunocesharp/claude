@@ -184,9 +184,12 @@ def test_workspace_resume_projetos(project):
     assert info["sprint"]["valid"] and info["sprint"]["next"]["id"] == "1-2-listar-produtos"
 
 
-def test_migrate_sem_migracoes_declaradas(tmp_path):
+def test_migrate_com_os_registros_reais(tmp_path):
+    result = run("migrate.py", "--workspace-root", str(tmp_path))
+    assert result.returncode == 0 and out(result) == [], "opcional não aparece sem --all"
     result = run("migrate.py", "--workspace-root", str(tmp_path), "--all")
-    assert result.returncode == 0 and out(result) == []
+    assert [m["id"] for m in out(result)] == ["execution-plan-para-epicos"]
+    assert Path(out(result)[0]["guide"]).is_file()
     result = run("migrate.py", "--workspace-root", str(tmp_path), "--mark-applied", "nao-existe")
     assert result.returncode == 1
 

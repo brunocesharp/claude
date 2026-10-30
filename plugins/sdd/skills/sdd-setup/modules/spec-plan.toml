@@ -3,10 +3,17 @@
 [module]
 code = "spec-plan"
 plugin = "spec-plan"
-version = "1.0.0"
-skills = ["spec-functional", "plan-execution"]
+version = "1.1.0"
+skills = ["spec-functional", "plan-execution", "plan-epics"]
 
 [[module.config_questions]]
 key = "backlog.prefixes"
 prompt = "Usar a nomenclatura de backlog ([FEATURE], [TASK], [HT], [BUG]...) nos títulos dos itens? (sim/nao)"
 default = "sim"
+
+[[module.migrations]]
+id = "execution-plan-para-epicos"
+title = "Converter planos execution-plan.md em épicos e stories (plan-epics)"
+kind = "optional"
+to = "1.1.0"
+guide = "references/migracoes/execution-plan-para-epicos.md"

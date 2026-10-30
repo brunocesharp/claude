@@ -150,6 +150,8 @@ Use o template em `references/template-spec-functional.md` como base.
 
 Salve em: `docs/{projeto}/especificacao/{nome-do-escopo}/spec-functional.md`
 
+**Numeração estável.** Os cabeçalhos `#### Cenário N.M` e as regras `RN-N.M` são citados pelas stories (`plan-epics`, campo `covers`) e pela verificação de cobertura. Ao atualizar uma especificação existente, nunca renumere: cenário ou regra nova recebe o próximo número livre da feature; um item que deixou de valer fica com o mesmo número e o título marcado `(removido)`, com o motivo numa linha abaixo.
+
 ---
 
 ## Após Gerar o Documento
@@ -160,7 +162,7 @@ Salve em: `docs/{projeto}/especificacao/{nome-do-escopo}/spec-functional.md`
 
 Atualize `docs/{projeto}/project.md` (Especificação em andamento) e a coluna Situação do projeto em `docs/workspace.md`.
 
-Sugira os próximos passos com base no que foi levantado. Se a arquitetura do projeto ainda não estiver documentada (`docs/{projeto}/arquitetura/arquitetura.md`), ou se a especificação traz um sistema externo ou um contêiner novo, sugira a skill `arch-c4` antes do plano de execução.
+Sugira os próximos passos com base no que foi levantado. Se a arquitetura do projeto ainda não estiver documentada (`docs/{projeto}/arquitetura/arquitetura.md`), ou se a especificação traz um sistema externo ou um contêiner novo, sugira a skill `arch-c4` antes do planejamento. Para planejar, o caminho padrão é `plan-epics` (épicos e stories, uma por sessão); `plan-execution` (entregas com tarefas por camada) continua disponível.
 
 ---
 

@@ -96,11 +96,27 @@ stories:                       # na ordem de build
   - id: 1-1-criar-produto
     title: Criar produto
     repositories: [estoque-api, estoque-web]
+    size: M                    # P | M | G (tamanho relativo; G = no limite de uma sessão)
+    kind: story                # story | spike | enabler
+    covers: ["1.1", "1.2", "RN-1.1"]   # cenários (N.M) e regras (RN-N.M) da spec-functional
+    checkpoint: true           # pede atenção humana antes de seguir
   - id: 1-2-listar-produtos
     title: Listar produtos
     repositories: [estoque-api, estoque-web]
+    size: M
+    covers: ["1.3"]
+    depends_on: [1-1-criar-produto]     # só stories que vêm antes na ordem de build
 ---
 ```
+
+O `sync` usa só `id`, `title`, `escopo` e `repositories`. Os demais campos são do planejamento (`plan-epics`) e são conferidos pelo `epics.py`:
+
+```
+uv run _sdd/scripts/epics.py --project docs/{projeto} validate                       # formato, tamanhos, dependências
+uv run _sdd/scripts/epics.py --project docs/{projeto} coverage --escopo {escopo}     # cenário da spec → stories
+```
+
+`coverage` lê os cabeçalhos `#### Cenário N.M` e as regras `**RN-N.M**` da `especificacao/{escopo}/spec-functional.md`. Itens com `(removido)` no título não precisam de cobertura.
 
 `status.py sync` mescla todos os épicos no `sprint-status.yaml`:
 - cria o arquivo se não existir;
