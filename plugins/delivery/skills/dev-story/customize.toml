@@ -1,0 +1,47 @@
+# Campos customizáveis desta skill e seus valores padrão. NÃO edite este arquivo (o plugin o sobrescreve).
+# Para customizar num projeto, crie docs/{projeto}/_custom/{skill}.toml só com o que muda
+# (skill sdd-customize; regras em sdd-setup/references/customizacao.md).
+
+[workflow]
+# Fatos válidos durante toda a skill: texto literal ou "file:glob" relativo à raiz do workspace
+# (ex.: "file:docs/padroes/*.md").
+persistent_facts = []
+# Passos extras, em linguagem natural, antes do fluxo e depois dele.
+activation_steps_prepend = []
+activation_steps_append = []
+# O que fazer ao terminar com sucesso (ex.: "lembre de atualizar o card no Redmine"). Vazio = nada.
+on_complete = ""
+
+# Mensagem de commit oferecida no fim ({modulo}, {titulo}, {id}).
+commit_message = "feat({modulo}): {titulo} ({id})"
+# Itens da Definição de Pronto conferidos antes de mover para review (os extras se somam).
+definition_of_done = [
+  "Todas as tarefas marcadas, cada uma com teste passando",
+  "Suíte completa e build verdes em cada repositório tocado",
+  "Registro do desenvolvimento e Arquivos alterados preenchidos",
+]
+
+# Comandos por stack, usados antes de references/comandos-por-stack.md. Mescla por "code".
+[[workflow.commands]]
+code = "dotnet"
+build = "dotnet build"
+test = 'dotnet test --filter "FullyQualifiedName~{alvo}"'
+suite = "dotnet test"
+
+[[workflow.commands]]
+code = "angular"
+build = "npx ng build"
+test = 'npx ng test --watch=false --include="**/{alvo}.spec.ts"'
+suite = "npx ng test --watch=false"
+
+[[workflow.commands]]
+code = "node"
+build = "npm run build"
+test = "npx jest {alvo}"
+suite = "npm test"
+
+[[workflow.commands]]
+code = "java-maven"
+build = "mvn -q compile"
+test = "mvn -q test -Dtest={alvo}"
+suite = "mvn -q verify"

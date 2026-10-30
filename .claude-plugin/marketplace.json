@@ -5,6 +5,11 @@
   },
   "plugins": [
     {
+      "name": "sdd",
+      "source": "./plugins/sdd",
+      "description": "Hub do workspace: setup e atualização da configuração (_sdd/), status da instalação e dos projetos e recomendação do próximo passo."
+    },
+    {
       "name": "workspace",
       "source": "./plugins/workspace",
       "description": "Organização do workspace de documentação: cadastro dos repositórios de cada projeto, panorama do Git em vários repositórios e coordenação de mudanças entre repositórios."
@@ -18,6 +23,11 @@
       "name": "spec-plan",
       "source": "./plugins/spec-plan",
       "description": "Skills de especificação funcional (BDD) e plano de execução para decompor escopos em tarefas."
+    },
+    {
+      "name": "delivery",
+      "source": "./plugins/delivery",
+      "description": "Ciclo de entrega por stories (inspirado no BMAD): quadro de épicos e stories no sprint-status.yaml, story com contexto completo, implementação em sessão nova, revisão adversarial, retrospectiva e correct course."
     },
     {
       "name": "architecture-docs",

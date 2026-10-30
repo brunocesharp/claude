@@ -32,6 +32,7 @@ A raiz de trabalho é uma pasta de documentação com vários projetos, cada um 
 3. Sem `docs/workspace.md`, procure `docs/*/project.md`.
 4. Se o projeto não existir, ofereça iniciá-lo com `discovery-init`.
 5. Leia `docs/{projeto}/project-config.json` (nome, stack, repositório; ver o schema em `discovery-init/references/project-config-schema.md`). Se não existir, use o `project.md` e ofereça criar o config a partir dele.
+6. Leia a configuração do workspace, se existir: `_sdd/config.toml` e `_sdd/config.user.toml` na raiz (o pessoal vence; chaves em `sdd-setup/references/config-schema.md`). Converse em `language.conversation`, escreva os documentos em `language.documents`, chame o usuário por `user.name` e ajuste as explicações a `user.skill_level`; se `paths.docs_root` não for `docs`, use-o no lugar de `docs/` em todos os caminhos. Sem `_sdd/`, use os padrões (pt-BR, nível intermediário, `docs/`) e sugira uma vez rodar o `sdd-setup`, sem bloquear.
 
 `{projeto}` é a pasta escolhida; todos os caminhos abaixo são relativos à raiz de trabalho.
 
@@ -39,6 +40,25 @@ Verifique se existe `docs/{projeto}/escopo/{nome-do-escopo}/escopo.md`.
 
 - **Não existe:** informe o usuário e ofereça executar `discovery-scoped` agora.
 - **Existe:** leia o arquivo completamente e extraia: título, funcionalidades listadas, usuários afetados, hipóteses críticas e restrições. Não repita perguntas já respondidas.
+
+---
+
+## Customização (por projeto)
+
+Depois de identificar o projeto, resolva a customização desta skill:
+
+```
+uv run _sdd/scripts/customize.py --skill-dir "${CLAUDE_SKILL_DIR}" --project docs/{projeto}
+```
+
+Sem o script (ou sem `uv`/`python`): leia `${CLAUDE_SKILL_DIR}/customize.toml` e, se existir, `docs/{projeto}/_custom/spec-functional.toml`, e mescle pelas regras de `sdd-setup/references/customizacao.md`. Sem override, valem os padrões da skill.
+
+1. Execute os `workflow.activation_steps_prepend`, na ordem.
+2. Leia os arquivos de `facts` (e os textos literais): são fatos válidos durante toda a skill e vencem os padrões dela quando conflitarem.
+3. Use os valores de `resolved.workflow` onde esta skill os cita: `gherkin_keywords` (`pt` = Dado/Quando/Então/E/Mas; `en` = Given/When/Then/And/But) nos cenários; `template` no lugar de `references/template-spec-functional.md`; `extra_rules` somadas às regras de escrita.
+4. Ao terminar, execute os `workflow.activation_steps_append` e o `workflow.on_complete`.
+
+Mostre os `warnings` ao usuário uma vez (ex.: chave que não é customizável, override que repete a base).
 
 ---
 
@@ -149,6 +169,8 @@ Use o template em `references/template-spec-functional.md` como base.
 
 Salve em: `docs/{projeto}/especificacao/{nome-do-escopo}/spec-functional.md`
 
+**Numeração estável.** Os cabeçalhos `#### Cenário N.M` e as regras `RN-N.M` são citados pelas stories (`plan-epics`, campo `covers`) e pela verificação de cobertura. Ao atualizar uma especificação existente, nunca renumere: cenário ou regra nova recebe o próximo número livre da feature; um item que deixou de valer fica com o mesmo número e o título marcado `(removido)`, com o motivo numa linha abaixo.
+
 ---
 
 ## Após Gerar o Documento
@@ -159,7 +181,7 @@ Salve em: `docs/{projeto}/especificacao/{nome-do-escopo}/spec-functional.md`
 
 Atualize `docs/{projeto}/project.md` (Especificação em andamento) e a coluna Situação do projeto em `docs/workspace.md`.
 
-Sugira os próximos passos com base no que foi levantado. Se a arquitetura do projeto ainda não estiver documentada (`docs/{projeto}/arquitetura/arquitetura.md`), ou se a especificação traz um sistema externo ou um contêiner novo, sugira a skill `arch-c4` antes do plano de execução.
+Sugira os próximos passos com base no que foi levantado. Se a arquitetura do projeto ainda não estiver documentada (`docs/{projeto}/arquitetura/arquitetura.md`), ou se a especificação traz um sistema externo ou um contêiner novo, sugira a skill `arch-c4` antes do planejamento. Para planejar, o caminho padrão é `plan-epics` (épicos e stories, uma por sessão); `plan-execution` (entregas com tarefas por camada) continua disponível.
 
 ---
 

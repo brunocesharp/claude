@@ -47,9 +47,11 @@ O Claude Code baixa o catálogo (`.claude-plugin/marketplace.json`) do GitHub e 
 Cada plugin é instalado com `/plugin install <plugin>@claude` (o `@claude` é o nome do marketplace registrado na etapa 1). Instale só os que fazem sentido para você:
 
 ```
+/plugin install sdd@claude
 /plugin install workspace@claude
 /plugin install discovery@claude
 /plugin install spec-plan@claude
+/plugin install delivery@claude
 /plugin install architecture-docs@claude
 /plugin install architecture-dotnet@claude
 /plugin install architecture-angular@claude
@@ -92,6 +94,19 @@ claude plugin marketplace update claude   # para atualizar depois
 
 Por padrão a instalação vale para o seu usuário em qualquer pasta (`--scope user`). Com `--scope project`, ela fica registrada no `.claude/settings.json` do projeto.
 
+#### Alternativa: pelo Skills CLI
+
+Também dá para instalar as skills, sem o sistema de plugins, com o [Skills CLI](https://skills.sh) (precisa de Node.js e Git). Rode na pasta do workspace:
+
+```bash
+npx skills add brunocesharp/claude --skill '*'          # todas as skills
+npx skills add brunocesharp/claude                      # escolher as skills numa lista
+npx skills add brunocesharp/claude --skill sdd-setup --skill discovery-init
+npx skills update                                       # para atualizar depois
+```
+
+Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas cópias, o Claude pode usar a antiga. Inclua sempre a `sdd-setup`.
+
 #### Problemas comuns
 
 - **Plugin não encontrado** no `/plugin install`: a etapa 1 não foi feita, ou o nome está sem o marketplace (use `<plugin>@claude`).
@@ -101,9 +116,11 @@ Por padrão a instalação vale para o seu usuário em qualquer pasta (`--scope 
 
 | Plugin | Skills |
 |--------|--------|
+| `sdd` | `sdd-setup`, `sdd-customize` |
 | `workspace` | `multi-repo` |
-| `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
-| `spec-plan` | `spec-functional`, `plan-execution` |
+| `discovery` | `discovery-init`, `discovery-research`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
+| `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
+| `delivery` | `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` |
 | `architecture-docs` | `arch-c4`, `arch-adr` |
 | `architecture-dotnet` | `architecture-init`, `architecture-entities`, `architecture-feature`, `architecture-repository`, `architecture-external-service`, `architecture-controller`, `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | `architecture-angular` | `angular-core-layer`, `angular-feature-layer`, `angular-shared-layer`, `angular-rxjs-transversal` |
@@ -144,6 +161,28 @@ meu-workspace/            # ex.: um repositório "docs" do time
     └── projeto-b/
 ```
 
+Na primeira vez, configure o workspace:
+
+```
+> sdd setup
+```
+
+A `sdd-setup` pergunta o nome do workspace, como te chamar, seu nível de experiência, o idioma da conversa e dos documentos e a pasta de documentação, e grava em `_sdd/` na raiz do workspace:
+
+```
+meu-workspace/
+├── _sdd/
+│   ├── config.toml        # do time (vai para o Git)
+│   ├── config.user.toml   # pessoal (fica no .gitignore)
+│   ├── version.toml       # versões do último setup
+│   └── scripts/           # config.py, workspace.py, status.py: usados pelas skills
+└── docs/
+```
+
+O plugin `sdd` também instala um hook que confere o `docs/{projeto}/implementacao/sprint-status.yaml` (o quadro de épicos e stories) sempre que o Claude grava ou edita esse arquivo, recusando estados e formatos inválidos.
+
+Os scripts rodam com o [uv](https://docs.astral.sh/uv/) (ou Python 3.11+). Rode o `sdd setup` de novo depois de atualizar os plugins: ele só pergunta o que é novo e nunca altera uma resposta já gravada. Para saber o que está instalado, use `sdd status`. Para saber o próximo passo, pergunte "o que faço agora?".
+
 ### 3. Inicie um projeto
 
 ```
@@ -163,6 +202,7 @@ A `multi-repo` cria `docs/{projeto}/repositorios.md`, que as skills usam para sa
 ### 4. Siga o fluxo
 
 ```
+> pesquisar o mercado e os concorrentes
 > definir visão do projeto
 > mapear oportunidades
 > levantar hipóteses
@@ -188,6 +228,8 @@ A `multi-repo` cria `docs/{projeto}/repositorios.md`, que as skills usam para sa
 
 | Skill | Gatilho | Saída |
 |-------|---------|-------|
+| `sdd-customize` | "customizar a skill", "desligar uma lente", "padrões do time na skill" | `docs/{projeto}/_custom/{skill}.toml` |
+| `sdd-setup` | "sdd setup", "configurar o workspace", "sdd status", "o que faço agora", "por onde começo" | `_sdd/config.toml`, `_sdd/config.user.toml`, `_sdd/version.toml`, `_sdd/scripts/` |
 | `multi-repo` | "vários repositórios", "cadastrar repositório", "status dos repositórios", "criar branch em todos", "feature em mais de um repositório" | `repositorios.md`, `plano-execucao/{escopo}/mudanca-multi-repo.md` |
 
 ### Fase: Discovery
@@ -264,7 +306,19 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 
 | Skill | Gatilho | Saída |
 |-------|---------|-------|
+| `plan-epics` | "planejar épicos", "quebrar em stories", "fatiar em stories", "converter o plano em épicos" | `implementacao/epicos/epic-N-slug.md` + `sprint-status.yaml` |
 | `plan-execution` | "plano de execução", "dividir em tarefas", "como implementar" | `execution-plan.md` |
+
+### Fase: Entrega por stories
+
+| Skill | Gatilho | Saída |
+|-------|---------|-------|
+| `sprint-planning` | "planejar o sprint", "gerar o sprint-status", "como está o sprint", "qual a próxima story", "bloquear story" | `implementacao/sprint-status.yaml` |
+| `create-story` | "criar story", "preparar a próxima story", "ready for dev" | `implementacao/stories/{id}.md` (story → `ready-for-dev`) |
+| `dev-story` | "dev-story", "implementar a story", "retomar a story" | Código na branch `feat/{id}` + Registro e Arquivos alterados na story (story → `review`) |
+| `story-review` | "revisar a story", "story-review", "a story está pronta?" | Bloco na seção Revisão + correções `R{n}` (story → `done` ou `in-progress`) |
+| `retrospective` | "retrospectiva", "fechar o épico", "lições do épico" | `implementacao/retrospectivas/epic-N-{data}.md` (veredito; épico → `done`) |
+| `correct-course` | "mudou o requisito", "mudança de rumo", "a story não dá", "replanejar" | `implementacao/mudancas/{data}-{slug}.md` (proposta; aplicada após aprovação) |
 
 ### Fase: Deploy .NET
 
@@ -283,6 +337,41 @@ Todas as saídas de documentação ficam dentro de `docs/{projeto}/` (ver "Estru
 
 ---
 
+## Customizar as skills
+
+As skills do fluxo (`spec-functional`, `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective` e `correct-course`) podem ser ajustadas **por projeto**, sem editar o plugin. Cada uma traz um `customize.toml` com os campos customizáveis e os padrões. O override fica em `docs/{projeto}/_custom/<skill>.toml`, que atualizar o plugin nunca toca.
+
+```
+> customizar a story-review do projeto loja: desligar a lente de contratos e acrescentar uma de acessibilidade
+```
+
+A `sdd-customize` mostra os campos, grava só o que muda e confere o resultado (`_sdd/scripts/customize.py`). Exemplo de override:
+
+```toml
+# docs/loja/_custom/dev-story.toml
+[workflow]
+persistent_facts = ["file:docs/padroes/*.md"]                    # padrões do time lidos em toda execução
+definition_of_done = ["Swagger atualizado para endpoint novo"]   # soma aos itens padrão
+
+[[workflow.commands]]
+code = "dotnet"
+suite = "make test"                                              # só a suíte muda; build e teste vêm da base
+```
+
+**Campos comuns:** `persistent_facts`, `activation_steps_prepend` e `activation_steps_append`, `on_complete`.
+
+**Campos próprios de cada skill:** lentes da revisão, comandos por stack, Definição de Pronto, template da story, padrão de branch, palavras-chave do Gherkin, prefixos de backlog, entre outros.
+
+**Regras de merge** (as do BMAD):
+- um valor simples é substituído;
+- uma tabela é mesclada;
+- uma lista com `id`/`code` é mesclada item a item;
+- as demais listas acumulam.
+
+Detalhes em `plugins/sdd/skills/sdd-setup/references/customizacao.md`.
+
+---
+
 ## Estrutura do Repositório
 
 Este repositório é um **marketplace de plugins** do Claude Code. Cada plugin agrupa as skills de uma fase ou stack:
@@ -292,6 +381,20 @@ Este repositório é um **marketplace de plugins** do Claude Code. Cada plugin a
 └── marketplace.json              # catálogo dos plugins
 
 plugins/
+├── sdd/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       ├── sdd-customize/            # grava overrides esparsos por projeto
+│       └── sdd-setup/
+│           ├── SKILL.md
+│           ├── modules/              # registro de cada plugin: versão, skills, perguntas e migrações
+│           ├── references/
+│           │   ├── config-schema.md
+│           │   ├── proximos-passos.md
+│           │   └── sprint-status.md  # formato, estados e transições do sprint-status.yaml
+│           └── scripts/              # setup, migrate, config, workspace, status, hook (+ tests/)
+│   └── hooks/hooks.json              # valida o sprint-status.yaml a cada Write/Edit
+│
 ├── workspace/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
@@ -306,6 +409,7 @@ plugins/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
 │       ├── discovery-init/
+│       ├── discovery-research/      # mercado e concorrentes com fontes (references: templates, guia de fontes)
 │       ├── discovery-vision/
 │       ├── discovery-opportunity/   # com references/
 │       ├── discovery-assumptions/   # com references/
@@ -313,9 +417,20 @@ plugins/
 │       ├── discovery-metrics/       # com references/
 │       └── discovery-scoped/        # com references/
 │
+├── delivery/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       ├── sprint-planning/          # quadro de épicos e stories (usa _sdd/scripts/status.py)
+│       ├── create-story/             # arquivo da story com contexto completo (references/template-story.md)
+│       ├── dev-story/                # implementação em sessão nova (references/comandos-por-stack.md)
+│       ├── story-review/             # revisão adversarial (references: lentes, triagem, template-revisao)
+│       ├── retrospective/            # retrospectiva do épico por evidências (references/template-retrospectiva.md)
+│       └── correct-course/           # mudança de rumo (references/template-proposta.md)
+│
 ├── spec-plan/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
+│       ├── plan-epics/              # épicos e stories verticais (references: template, fatiamento, prontidão)
 │       ├── spec-functional/
 │       │   ├── SKILL.md
 │       │   └── References/
@@ -444,6 +559,7 @@ plugins/
 A pasta de documentação reúne vários projetos. Após usar as skills:
 
 ```
+_sdd/                                 # configuração do workspace (sdd-setup)
 docs/
 ├── workspace.md                      # projetos: pasta, repositório, código local, situação
 ├── arquitetura/
@@ -457,7 +573,8 @@ docs/
 │   │   ├── opportunity.md
 │   │   ├── assumptions.md
 │   │   ├── stakeholders.md
-│   │   └── success-metrics.md
+│   │   ├── success-metrics.md
+│   │   └── pesquisa/                 # mercado-{tema}.md e concorrentes.md (discovery-research)
 │   ├── escopo/
 │   │   └── titulo-do-escopo/
 │   │       ├── escopo.md
@@ -478,6 +595,11 @@ docs/
 │   │   └── titulo-do-escopo/
 │   │       ├── execution-plan.md
 │   │       └── mudanca-multi-repo.md # branches, contratos e ordem de merge/deploy (multi-repo)
+│   ├── implementacao/
+│   │   ├── sprint-status.yaml        # quadro de épicos e stories (sprint-planning)
+│   │   ├── epicos/epic-N-slug.md     # épicos fatiados em stories
+│   │   ├── stories/N-M-slug.md       # uma story por arquivo, com contexto completo
+│   │   └── multi-repo/N-M-slug.md    # execução da story em vários repositórios: branches, PRs, merge e deploy (multi-repo)
 │   └── business/
 │       ├── areas.md                  # mapa de áreas do código
 │       └── {area}.md
@@ -485,7 +607,7 @@ docs/
     └── ...
 ```
 
-Toda skill de documentação começa identificando o projeto: usa o que foi citado na conversa; senão lê `docs/workspace.md` (um projeto: usa esse; vários: pergunta).
+Toda skill de documentação começa identificando o projeto: usa o que foi citado na conversa; senão lê `docs/workspace.md` (um projeto: usa esse; vários: pergunta). Em seguida lê a configuração do workspace em `_sdd/` (idioma, nível de detalhe, pasta de documentação).
 
 E seu projeto .NET (no repositório de código) terá a estrutura Clean Architecture:
 
@@ -518,13 +640,26 @@ src/
 
 ## Como funciona cada skill
 
+### sdd-setup
+
+Hub do workspace, no papel do `bmad setup` do BMAD. No **setup**, faz só as perguntas ainda sem resposta (cada plugin declara as suas em `sdd-setup/modules/<plugin>.toml`) e grava em `_sdd/config.toml` (time) e `_sdd/config.user.toml` (pessoal), sem nunca alterar um valor existente. Também copia os scripts para `_sdd/scripts/` e registra as versões. O **status** mostra plugins e versões, perguntas pendentes, scripts desatualizados, proteção do `.gitignore` e os projetos. A **ajuda** lê o estado do projeto e recomenda a próxima skill. Não instala plugins nem faz commit.
+
 ### discovery-init
 
 Ponto de entrada. Coleta nome, descrição, URL do repositório, caminho local do código e tipo do projeto. Gera `docs/{projeto}/project.md`, cria a estrutura de pastas e registra o projeto em `docs/workspace.md`.
 
 ### multi-repo
 
-Para projetos com o código em vários repositórios. Cadastra os repositórios em `docs/{projeto}/repositorios.md` (URL, caminho local, papel, stack, contêineres C4 que implementa, contratos entre eles e deploy), detectando o que dá pelo Git. Mostra o panorama de todos (branch, alterações, atrás/à frente), clona os que faltam e coordena entregas que atravessam repositórios: repositórios afetados, contratos compatíveis ou não (expandir e contrair, versão nova, feature flag), ordem provedor antes do consumidor, mesma branch em todos. Nada que altere um repositório é feito sem confirmação, e commit, push e merge só a pedido.
+Para projetos com o código em vários repositórios. Cadastra os repositórios em `docs/{projeto}/repositorios.md` (URL, caminho local, papel, stack, contêineres C4 que implementa, contratos entre eles e deploy), detectando o que dá pelo Git. Mostra o panorama de todos (branch, alterações, atrás/à frente), clona os que faltam e coordena entregas que atravessam repositórios — um escopo do `plan-execution` ou uma story do fluxo de entrega (registro em `implementacao/multi-repo/{id}.md`, branch `feat/{id}`): repositórios afetados, contratos compatíveis ou não (expandir e contrair, versão nova, feature flag), ordem provedor antes do consumidor, mesma branch em todos. Nada que altere um repositório é feito sem confirmação, e commit, push e merge só a pedido.
+
+### discovery-research
+
+Pesquisa de **mercado** e de **concorrentes** com busca na web e **fontes citadas**. Toda afirmação traz `[n]` com link e data de acesso, ou é marcada como estimativa. O `research.py check` confere isso.
+
+- **Mercado:** tamanho (TAM/SAM/SOM quando há dado), segmentos, tendências, regulação e sinais de demanda.
+- **Concorrentes:** concorrentes diretos e indiretos, substitutos (o que as pessoas usam hoje no lugar), fichas dos concorrentes **fortes**, matriz comparativa, posicionamento e lacunas de diferenciação. O critério de concorrente forte é customizável por projeto.
+
+A pesquisa alimenta a visão, as oportunidades e as hipóteses. Os limites da pesquisa viram hipóteses a validar.
 
 ### discovery-vision / opportunity / assumptions / stakeholders / metrics
 
@@ -590,6 +725,65 @@ Gera testes unitários Java (JUnit 5) a partir dos cenários BDD da especificaç
 
 Analisa a especificação funcional (e a arquitetura C4, se existir) e decompõe em entregas incrementais com tarefas ordenadas por camada (Domain → Infrastructure → Application → Presentation). Usa os contêineres e tecnologias do C4 para escolher a skill correta para cada tarefa e respeita os ADRs aceitos. Inclui estimativas de esforço.
 
+### plan-epics
+
+Caminho padrão de planejamento do fluxo de entrega (BMAD). Confere a prontidão (spec, escopo, arquitetura, repositórios) e propõe **épicos**, cada um um resultado para o usuário. Decide os pontos em aberto (resolver agora, spike ou decidir na story) e fatia cada épico em **stories verticais**: um comportamento testável de ponta a ponta que cabe numa sessão, com tamanho P/M/G, dependências, repositórios e checkpoints. Grava um arquivo por épico e confere por script que todo cenário da especificação tem story (`epics.py coverage`). Por fim, gera o quadro no `sprint-status.yaml`. Também converte um `execution-plan.md` antigo (migração opcional).
+
+### create-story
+
+Gera o arquivo da próxima story, `implementacao/stories/{id}.md`, que é a única fonte de verdade da implementação. O arquivo traz:
+
+- a história;
+- os critérios de aceite, com os cenários da spec copiados literalmente por script;
+- as tarefas ligadas aos critérios;
+- repositórios, branch e contratos;
+- arquitetura e ADRs;
+- os arquivos a criar ou alterar, lidos do código;
+- as skills de código a usar;
+- os aprendizados da story anterior.
+
+O `story.py check` confere a completude: toda story tem critério, todo critério tem tarefa e toda referência existe. Com a sua confirmação, a story vai para `ready-for-dev`, e a skill orienta a implementar numa sessão nova.
+
+### dev-story
+
+Implementa uma story numa **sessão nova**, com o arquivo da story como única fonte de verdade. Antes de começar, a skill oferece abrir uma janela nova do terminal já com o Claude no repositório da story (`session.py`; Windows Terminal, Terminal do macOS ou terminal Linux). A janela só abre com a sua confirmação.
+
+Depois, a skill:
+
+- confere as pré-condições e cria a branch `feat/{id}` em cada repositório, com confirmação;
+- executa as tarefas na ordem, com o teste antes do código (`delivery.tdd`) e as skills de código indicadas na story;
+- marca cada tarefa só com o teste passando e roda a suíte completa;
+- preenche o Registro do desenvolvimento e os Arquivos alterados e move a story para `review`.
+
+Se a story estiver ambígua ou incompleta, a skill para e pergunta, ou sugere `correct-course`; nunca inventa o requisito. Respeita os checkpoints e o `delivery.auto_mode`. Nunca faz commit nem push sem pedido.
+
+### story-review
+
+Revisão adversarial da story, sempre numa sessão separada da implementação. Parte do princípio de que há defeitos, mas nunca inventa achado: lente sem achados registra o que checou.
+
+No modo completo (`delivery.review_depth`), cada lente roda num subagente, em paralelo. As lentes são aderência aos critérios, correção e casos de borda, segurança, testes (a revisão roda a suíte), arquitetura e contratos. Um script (`review.py`) gera o diff de todos os repositórios e confere se os Arquivos alterados declarados batem com o git.
+
+Na triagem, cada achado é verificado no código, recebe severidade e é encaminhado: **corrigir** (vira tarefa `R{n}`), **adiar** (só problema pré-existente; vira story nova) ou **decisão**. Os descartados ficam registrados com o motivo. A story vai para `done` com a sua confirmação, ou volta para `in-progress` com as correções. Só altera código com confirmação.
+
+### retrospective
+
+Retrospectiva **opcional** de um épico, a partir de evidências. O `retro.py` monta o inventário: rodadas de revisão e achados por severidade, correções abertas, adiados, desvios, pendências, mudanças de rumo e itens da retrospectiva anterior. O histórico do git entra só se você quiser.
+
+A skill confere o "Pronto quando" do épico item a item e registra o que funcionou, o que não funcionou e as surpresas, sempre com a fonte. Também propõe a reconciliação com a spec e a arquitetura, que é encaminhada às skills donas, e prepara o próximo épico. Fecha com um veredito (`accepted`, `accepted-with-open-items` ou `rejected`) e itens de ação. O épico vai para `done` só com a sua confirmação.
+
+### correct-course
+
+Mudança de rumo no meio da entrega: requisito novo ou errado, story ambígua que parou o `dev-story`, decisão da revisão que muda o prometido.
+
+- **Impacto:** analisa spec, escopo, arquitetura, épicos e contratos. O `epics.py impact` lista as stories que cobrem os cenários alterados, agrupadas por estado.
+- **Classificação:** menor, moderado ou maior, com opções e uma recomendação.
+- **Proposta:** grava em `mudancas/` as edições antes → depois e o efeito no quadro.
+- **Aplicação:** só depois da sua aprovação. Story `done` nunca é reaberta (vira uma story de ajuste), e nada é apagado do quadro (o que sai vira `dropped`). Mudanças maiores são encaminhadas às skills donas (`spec-functional`, `arch-adr`, `arch-c4`).
+
+### sprint-planning
+
+Mantém o `docs/{projeto}/implementacao/sprint-status.yaml`, a fonte única do andamento da entrega, inspirado no BMAD. Cada story passa por `backlog → ready-for-dev → in-progress → review → done`, e também pode ficar `blocked` ou `dropped`. Gera e sincroniza o quadro a partir dos arquivos de épico, sempre com uma prévia antes de gravar. A sincronização nunca rebaixa nem remove estados: o que sumiu dos épicos aparece como órfão, para você decidir. A skill também mostra o quadro por épico e a próxima story, muda estados a pedido (com transições validadas pelo `status.py`) e atualiza o `project.md` e a Situação do `workspace.md`.
+
 ### deploy-dotnet-homolog
 
 Executa pipeline sequencial: Restore → Build → Test → Docker Build → Deploy → Health Check. Interrompe imediatamente em caso de falha. Gera relatório com artefatos e status de cada etapa.
@@ -613,7 +807,13 @@ Igual ao homolog, com etapas extras: confirmação explícita do usuário, valid
 ## Fluxo Completo
 
 ```
+sdd-setup (uma vez por workspace)
+     │
+     ▼
 discovery-init
+     │
+     ▼
+discovery-research (opcional: mercado e concorrentes)
      │
      ▼
 discovery-vision ──► discovery-opportunity ──► discovery-assumptions
@@ -637,6 +837,7 @@ discovery-vision ──► discovery-opportunity ──► discovery-assumptions
                           │
                           ▼
                   plan-execution ──► multi-repo (vários repositórios)
+                  (ou plan-epics ──► sprint-planning: quadro de stories)
                           │
                           ▼
          ┌────────────────┼────────────────┐
@@ -695,6 +896,10 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Arquitetura Angular | Implementado | 4 skills |
 | Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
+| Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
+| Customização das skills por projeto (BMAD) | Implementado | `sdd-customize`, `customize.toml` nas 8 skills do fluxo |
+| Entrega por stories (BMAD) | Implementado | `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` |
+| Pesquisa de mercado e concorrentes | Implementado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |
 | Especificação Não-Funcional | Planejado | `spec-nonfunctional` |

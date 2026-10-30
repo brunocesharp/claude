@@ -1,0 +1,27 @@
+# Campos customizáveis desta skill e seus valores padrão. NÃO edite este arquivo (o plugin o sobrescreve).
+# Para customizar num projeto, crie docs/{projeto}/_custom/{skill}.toml só com o que muda
+# (skill sdd-customize; regras em sdd-setup/references/customizacao.md).
+
+[workflow]
+# Fatos válidos durante toda a skill: texto literal ou "file:glob" relativo à raiz do workspace
+# (ex.: "file:docs/padroes/*.md").
+persistent_facts = []
+# Passos extras, em linguagem natural, antes do fluxo e depois dele.
+activation_steps_prepend = []
+activation_steps_append = []
+# O que fazer ao terminar com sucesso (ex.: "lembre de atualizar o card no Redmine"). Vazio = nada.
+on_complete = ""
+
+# Limite de stories por épico antes de propor divisão.
+max_stories_per_epic = 8
+# Maior tamanho aceito para uma story (P, M ou G).
+max_size = "G"
+# Situações extras que pedem checkpoint, somadas às de fatiamento-vertical.md.
+checkpoint_rules = []
+
+# Prefixos de backlog no corpo do épico (valem quando backlog.prefixes = sim).
+[workflow.title_prefixes]
+epic = "[FEATURE]"
+story = "[TASK] Desenvolver"
+spike = "[TASK] Analisar e especificar"
+enabler = "[HT]"

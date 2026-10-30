@@ -1,0 +1,29 @@
+# Campos customizáveis desta skill e seus valores padrão. NÃO edite este arquivo (o plugin o sobrescreve).
+# Para customizar num projeto, crie docs/{projeto}/_custom/{skill}.toml só com o que muda
+# (skill sdd-customize; regras em sdd-setup/references/customizacao.md).
+
+[workflow]
+# Fatos válidos durante toda a skill: texto literal ou "file:glob" relativo à raiz do workspace
+# (ex.: "file:docs/padroes/*.md").
+persistent_facts = []
+# Passos extras, em linguagem natural, antes do fluxo e depois dele.
+activation_steps_prepend = []
+activation_steps_append = []
+# O que fazer ao terminar com sucesso (ex.: "lembre de atualizar o card no Redmine"). Vazio = nada.
+on_complete = ""
+
+# Região padrão da pesquisa quando o usuário não disser.
+default_region = "Brasil"
+# Quantos concorrentes fortes aprofundar (fichas e matriz).
+max_strong_competitors = 5
+# Concorrentes que sempre entram no panorama (nomes), somados aos encontrados na busca.
+known_competitors = []
+# Critérios de "concorrente forte": o concorrente é forte quando atende a pelo menos min_criteria deles.
+strong_competitor_criteria = [
+  "Atende o mesmo público-alvo e o mesmo problema principal (concorrente direto)",
+  "Tem base de clientes relevante no segmento (número declarado, avaliações em volume ou presença em listas do setor)",
+  "Recebeu investimento ou pertence a grupo com capacidade de investimento nos últimos 3 anos",
+  "Lidera ou aparece entre os primeiros em buscas, lojas de apps ou comparativos do segmento",
+  "Lançou funcionalidades ou expandiu para o segmento nos últimos 12 meses",
+]
+min_criteria = 2

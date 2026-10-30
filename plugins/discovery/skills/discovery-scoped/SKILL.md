@@ -32,6 +32,7 @@ A raiz de trabalho é uma pasta de documentação com vários projetos, cada um 
 3. Sem `docs/workspace.md`, procure `docs/*/project.md`.
 4. Se o projeto não existir, ofereça iniciá-lo com `discovery-init`.
 5. Leia `docs/{projeto}/project-config.json` (nome, stack, repositório; ver o schema em `discovery-init/references/project-config-schema.md`). Se não existir, use o `project.md` e ofereça criar o config a partir dele.
+6. Leia a configuração do workspace, se existir: `_sdd/config.toml` e `_sdd/config.user.toml` na raiz (o pessoal vence; chaves em `sdd-setup/references/config-schema.md`). Converse em `language.conversation`, escreva os documentos em `language.documents`, chame o usuário por `user.name` e ajuste as explicações a `user.skill_level`; se `paths.docs_root` não for `docs`, use-o no lugar de `docs/` em todos os caminhos. Sem `_sdd/`, use os padrões (pt-BR, nível intermediário, `docs/`) e sugira uma vez rodar o `sdd-setup`, sem bloquear.
 
 `{projeto}` é a pasta escolhida; todos os caminhos abaixo são relativos à raiz de trabalho.
 
@@ -59,6 +60,7 @@ Leia todos os arquivos em `docs/{projeto}/discovery/`:
 - `assumptions.md` — hipóteses críticas
 - `stakeholders.md` — envolvidos, interesses
 - `success-metrics.md` — métricas, critérios de sucesso
+- `pesquisa/` — mercado e concorrentes (`discovery-research`), se existir
 
 **Validação:**
 - Pelo menos `vision.md` OU `opportunity.md` deve existir
@@ -137,7 +139,8 @@ docs/{projeto}/escopo/{titulo-kebab}/
     ├── opportunity.md     (cópia, se relevante)
     ├── assumptions.md     (cópia, se relevante)
     ├── stakeholders.md    (cópia, se relevante)
-    └── success-metrics.md (cópia, se relevante)
+    ├── success-metrics.md (cópia, se relevante)
+    └── pesquisa/          (cópia da pasta, se relevante)
 ```
 
 **Validação:**

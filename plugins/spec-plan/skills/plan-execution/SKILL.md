@@ -1,6 +1,6 @@
 ---
 name: plan-execution
-description: Gera plano de execução técnico fullstack (.NET + Angular) para implementação de features, dividindo em entregas incrementais com tarefas por camada. Use quando o usuário disser "plano de execução", "execution plan", "planejar implementação", "dividir em tarefas", "quebrar feature", "como implementar essa spec", "etapas de desenvolvimento", "decomposição técnica", "quero um plano para implementar". NÃO use para especificação funcional (use spec-functional), arquitetura (use arch-c4) ou discovery (use discovery-*).
+description: Gera plano de execução técnico fullstack (.NET + Angular) para implementação de features, dividindo em entregas incrementais com tarefas por camada. Use quando o usuário disser "plano de execução", "execution plan", "planejar implementação", "dividir em tarefas", "quebrar feature", "como implementar essa spec", "etapas de desenvolvimento", "decomposição técnica", "quero um plano para implementar". NÃO use para épicos e stories verticais, uma story por sessão (use plan-epics, o caminho padrão do fluxo de entrega), especificação funcional (use spec-functional), arquitetura (use arch-c4) ou discovery (use discovery-*).
 metadata:
   version: 2.2.0
   category: planning
@@ -25,6 +25,8 @@ Gera planos de execução técnicos para features fullstack, com tarefas ordenad
 ### Passo 0: Identificar o projeto e as entradas
 
 A raiz de trabalho é uma pasta de documentação com vários projetos, cada um em `docs/{projeto}/`. Se o usuário citou o projeto, use-o; senão, leia `docs/workspace.md` (um projeto: use e avise; vários: pergunte). Se o projeto não existir, ofereça `discovery-init`.
+
+Leia a configuração do workspace, se existir: `_sdd/config.toml` e `_sdd/config.user.toml` na raiz (o pessoal vence; chaves em `sdd-setup/references/config-schema.md`). Converse em `language.conversation`, escreva o plano em `language.documents`, chame o usuário por `user.name` e ajuste as explicações a `user.skill_level`; se `paths.docs_root` não for `docs`, use-o no lugar de `docs/` em todos os caminhos. `backlog.prefixes` = `nao` dispensa o Passo 4 (títulos sem `[TASK]`, `[HT]`...). Sem `_sdd/`, use os padrões e sugira uma vez rodar o `sdd-setup`, sem bloquear.
 
 Leia, nesta ordem:
 1. `docs/{projeto}/especificacao/{escopo}/spec-functional.md` — o que construir (obrigatório; sem ele, ofereça `spec-functional` ou aceite uma especificação enviada na conversa).

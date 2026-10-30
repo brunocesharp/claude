@@ -19,10 +19,11 @@ Skill responsável por iniciar um projeto dentro da **pasta de documentação** 
 
 ### Passo 1 — Verificar o workspace
 
-1. Verifique se `docs/workspace.md` existe.
+1. Verifique se o workspace já passou pelo setup (`_sdd/config.toml` na raiz). Se não, diga que o `sdd-setup` grava as preferências do workspace (idioma, nome, nível de detalhe, pasta de documentação) e pergunte se quer rodá-lo antes. Não bloqueie: sem setup, siga com os padrões. Com setup, leia a configuração como no item 6 do Passo 0 das outras skills (`paths.docs_root` substitui `docs/` em todos os caminhos abaixo).
+2. Verifique se `docs/workspace.md` existe.
    - **Não existe**: este é o primeiro projeto do workspace. O arquivo será criado no Passo 5.
    - **Existe**: leia a lista de projetos.
-2. Se o projeto que o usuário descreve já estiver na lista (ou já existir `docs/{projeto}/project.md`): **não sobrescreva**. Leia o arquivo, mostre os campos e pergunte se deseja atualizar algum.
+3. Se o projeto que o usuário descreve já estiver na lista (ou já existir `docs/{projeto}/project.md`): **não sobrescreva**. Leia o arquivo, mostre os campos e pergunte se deseja atualizar algum.
 
 ---
 

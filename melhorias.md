@@ -1,0 +1,13 @@
+O que quero implementar no meu sdd-full
+- quero copiar alguns fluxos que o BMAD (https://docs.bmad-method.org/plan/choose-a-planning-path/#run-the-path) usa 
+	- Instalação da v7, quero seguir o mesmo conceito do BMAD
+	- Configuração quero seguir Perguntas do bmad setup 
+	- Estado / scripts quero seguir o mesmo do BMAD
+	- Quero adicionar a opção de customização
+	- para Ideia / pesquisa quero implementar no meu pesquisa de mercado, concorrentes fortes
+	- Planos quero seguir Épicos fatiados em stories, uma spec por story e um arquivo de status
+	- Implementação quero seguir Uma sessão nova por story, com a spec como única fonte de verdade
+	- Verificação e fechamento quero seguir revisão adversarial, retrospectiva, correct course
+	- quero implementar sprint-status.yaml, em que cada story passa por backlog, ready-for-dev, in-progress, review e done. Nas suas skills, a situação só existe no nível do escopo e como checkbox no project.md.
+	- Um arquivo por tarefa com contexto completo
+	- Manter a possibilidade de varios repositorios para um projeto

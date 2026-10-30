@@ -1,0 +1,27 @@
+# Registro do módulo (plugin) delivery. A versão acompanha plugins/delivery/.claude-plugin/plugin.json.
+
+[module]
+code = "delivery"
+plugin = "delivery"
+version = "1.0.0"
+skills = ["sprint-planning", "create-story", "dev-story", "story-review", "retrospective", "correct-course"]
+
+[[module.config_questions]]
+key = "delivery.tdd"
+prompt = "No dev-story, escrever o teste antes do código é obrigatorio ou recomendado?"
+default = "recomendado"
+
+[[module.config_questions]]
+key = "delivery.auto_mode"
+prompt = "Permitir que o dev-story rode sem supervisão (sem pausas para confirmar) em stories sem checkpoint? (sim/nao)"
+default = "nao"
+
+[[module.config_questions]]
+key = "delivery.review_depth"
+prompt = "Profundidade padrão da story-review: completa (várias lentes em paralelo) ou rapida (um revisor)?"
+default = "completa"
+
+[[module.config_questions]]
+key = "delivery.review_mode"
+prompt = "Depois do dev-story, a revisão roda numa sessao-nova (recomendado) ou num subagente da mesma sessão?"
+default = "sessao-nova"
