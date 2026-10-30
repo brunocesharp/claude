@@ -25,12 +25,28 @@ Este repositório contém **skills modulares** para o Claude Code que cobrem tod
 
 ## Quick Start
 
-### 1. Adicione este marketplace e instale os plugins
+### 1. Instale os plugins
 
-No Claude Code, dentro do seu projeto:
+As skills são distribuídas como **plugins** do Claude Code. A instalação tem duas etapas, nesta ordem:
+
+1. **Conectar o Claude Code a este repositório** (registrar o marketplace). Sem isso, o Claude Code não conhece os plugins e o `/plugin install` responde que o plugin não foi encontrado.
+2. **Instalar os plugins** que você quer usar.
+
+Os comandos que começam com `/` são digitados **no prompt do Claude Code**, numa sessão aberta no seu computador (o `/plugin` não funciona por Remote Control). Se preferir o terminal do sistema, veja "Alternativa: pelo terminal" mais abaixo.
+
+#### Etapa 1 — Conectar ao repositório
 
 ```
 /plugin marketplace add brunocesharp/claude
+```
+
+O Claude Code baixa o catálogo (`.claude-plugin/marketplace.json`) do GitHub e registra o marketplace com o nome **`claude`**. A resposta esperada é `Successfully added marketplace: claude`. Isso é feito uma vez por máquina.
+
+#### Etapa 2 — Instalar os plugins
+
+Cada plugin é instalado com `/plugin install <plugin>@claude` (o `@claude` é o nome do marketplace registrado na etapa 1). Instale só os que fazem sentido para você:
+
+```
 /plugin install workspace@claude
 /plugin install discovery@claude
 /plugin install spec-plan@claude
@@ -42,12 +58,46 @@ No Claude Code, dentro do seu projeto:
 /plugin install art-direction@claude
 ```
 
-Instale apenas os plugins relevantes para o seu projeto. Quando houver plugins ou versões novas no repositório, atualize o catálogo e recarregue:
+Cada comando responde `Installed <plugin>. Plugin is now active.` Também dá para instalar pelo menu: digite `/plugin` e escolha os plugins do marketplace `claude`.
+
+#### Etapa 3 — Recarregar e conferir
+
+```
+/reload-plugins
+/plugin list
+```
+
+O `/reload-plugins` ativa as skills na sessão atual (ou abra uma sessão nova). O `/plugin list` mostra os plugins instalados, cada um como `<plugin>@claude ... enabled`.
+
+#### Atualizar quando sair versão nova
+
+O Claude Code guarda uma cópia do catálogo. Para buscar plugins e versões novas deste repositório:
 
 ```
 /plugin marketplace update claude
 /reload-plugins
 ```
+
+#### Alternativa: pelo terminal
+
+As mesmas etapas, sem abrir uma sessão (útil em script de configuração da máquina):
+
+```bash
+claude plugin marketplace add brunocesharp/claude
+claude plugin install discovery@claude
+claude plugin install architecture-docs@claude
+# ... um comando por plugin
+claude plugin marketplace update claude   # para atualizar depois
+```
+
+Por padrão a instalação vale para o seu usuário em qualquer pasta (`--scope user`). Com `--scope project`, ela fica registrada no `.claude/settings.json` do projeto.
+
+#### Problemas comuns
+
+- **Plugin não encontrado** no `/plugin install`: a etapa 1 não foi feita, ou o nome está sem o marketplace (use `<plugin>@claude`).
+- **`/plugin isn't available`**: a sessão está em Remote Control. Rode os comandos no Claude Code aberto no computador ou use a alternativa pelo terminal.
+- **A skill não aparece**: rode `/reload-plugins` ou abra uma sessão nova.
+- **Skill duplicada ou com comportamento antigo**: se você tinha copiado skills à mão para `~/.claude/skills/` (ou subido como skill no claude.ai), remova essas cópias. Com as duas versões, o Claude pode escolher a antiga.
 
 | Plugin | Skills |
 |--------|--------|
@@ -61,7 +111,9 @@ Instale apenas os plugins relevantes para o seu projeto. Quando houver plugins o
 | `business-docs` | `business-docs` |
 | `art-direction` | `direcao-arte-fundacao` |
 
-Para padronizar o time sem que cada dev digite os comandos, declare o marketplace e os plugins no `.claude/settings.json` do projeto:
+#### Para o time: instalação pelo projeto
+
+Para que cada pessoa não precise digitar os comandos, declare o marketplace e os plugins no `.claude/settings.json` do repositório do time (o workspace de documentação, por exemplo). Quando a pessoa abre o Claude Code nessa pasta e aceita a pergunta de confiança da pasta, o Claude Code registra o marketplace e ativa os plugins listados (em pasta não confiável a configuração é ignorada):
 
 ```json
 {
