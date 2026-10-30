@@ -1,11 +1,11 @@
 ---
 name: multi-repo
-description: Organiza projetos cujo código está em vários repositórios (backend, frontend, mobile, infraestrutura, bibliotecas), a partir da pasta de documentação. Cadastra os repositórios de cada projeto em docs/{projeto}/repositorios.md, mostra o panorama do Git em todos eles (branch, alterações, atrás/à frente), clona os que faltam, indica em qual repositório cada tarefa roda e coordena mudanças que atravessam repositórios (mesma branch, ordem de merge e de deploy, compatibilidade de contratos). Use quando o usuário mencionar "vários repositórios", "multi repo", "multirepo", "repositórios do projeto", "cadastrar repositório", "adicionar repositório", "status dos repositórios", "como estão os repositórios", "clonar os repositórios", "preparar o ambiente", "criar branch em todos", "feature em mais de um repositório", "em qual repositório fica", "ordem de deploy entre repositórios". NÃO use para iniciar um projeto (use discovery-init), documentar a arquitetura (use arch-c4), planejar as tarefas (use plan-execution) ou gerar código (use architecture-* ou angular-*).
+description: Organiza projetos cujo código está em vários repositórios (backend, frontend, mobile, infraestrutura, bibliotecas), a partir da pasta de documentação. Cadastra os repositórios de cada projeto em docs/{projeto}/repositorios.md, mostra o panorama do Git em todos eles (branch, alterações, atrás/à frente), clona os que faltam, indica em qual repositório cada tarefa roda e coordena mudanças que atravessam repositórios (mesma branch, ordem de merge e de deploy, compatibilidade de contratos). Use quando o usuário mencionar "vários repositórios", "multi repo", "multirepo", "repositórios do projeto", "cadastrar repositório", "adicionar repositório", "status dos repositórios", "como estão os repositórios", "clonar os repositórios", "preparar o ambiente", "criar branch em todos", "feature em mais de um repositório", "story em vários repositórios", "preparar os repositórios da story", "em qual repositório fica", "ordem de deploy entre repositórios". NÃO use para iniciar um projeto (use discovery-init), documentar a arquitetura (use arch-c4), planejar as tarefas (use plan-execution) ou gerar código (use architecture-* ou angular-*).
 metadata:
   version: 1.0.0
   category: workspace
   depends-on: discovery-init
-  output: docs/{projeto}/repositorios.md, docs/{projeto}/plano-execucao/{escopo}/mudanca-multi-repo.md
+  output: docs/{projeto}/repositorios.md, docs/{projeto}/plano-execucao/{escopo}/mudanca-multi-repo.md, docs/{projeto}/implementacao/multi-repo/{id}.md
 ---
 
 # Multi-repo
@@ -13,7 +13,7 @@ metadata:
 Mantém o mapa **projeto → repositórios** dentro da pasta de documentação e ajuda a trabalhar com o código espalhado por vários repositórios: saber onde está cada parte, ver a situação de todos de uma vez e fazer uma mudança que atravessa repositórios sem quebrar a integração entre eles.
 
 Leia antes de executar:
-- `references/template-repositorios.md` — template do `repositorios.md` e do `mudanca-multi-repo.md`
+- `references/template-repositorios.md` — template do `repositorios.md`, do `mudanca-multi-repo.md` (por escopo) e do `implementacao/multi-repo/{id}.md` (por story)
 - `references/comandos-git.md` — comandos de detecção e de panorama (somente leitura) e os comandos que alteram algo, com as pré-condições
 - `references/coordenacao-mudancas.md` — ordem entre repositórios, compatibilidade de contratos e checklist de mudança coordenada
 
@@ -112,7 +112,9 @@ Somente leitura. Para cada repositório do projeto (ou do workspace):
 
 ### Operação 4 — Mudança coordenada
 
-Para uma entrega (escopo, item do plano de execução ou pedido avulso) que mexe em mais de um repositório. Siga `references/coordenacao-mudancas.md`.
+Para uma entrega (escopo, item do plano de execução, **story** do fluxo de entrega ou pedido avulso) que mexe em mais de um repositório. Siga `references/coordenacao-mudancas.md`.
+
+**Entrada = story** (`implementacao/stories/{id}.md`, citada pelo usuário ou chamada pelo `dev-story`): o plano já está na story. Os passos 1 a 4 viram leitura e conferência da seção **Repositórios** (ordem, o que muda em cada um) e da tabela **Contratos** da story — se algo estiver faltando ou errado (repositório sem caminho, contrato incompatível sem estratégia), pare e sugira corrigir com `create-story` ou `correct-course`. Branch = `feat/{id}` (a do frontmatter `branch`). Registro = `docs/{projeto}/implementacao/multi-repo/{id}.md` pela seção 3 do template (um por story). Ao rodar de novo para a mesma story, atualize esse arquivo (PRs, merges, ambientes publicados).
 
 1. **Entradas**: leia `docs/{projeto}/plano-execucao/{escopo}/execution-plan.md` (se existir), `docs/{projeto}/arquitetura/arquitetura.md` e o `repositorios.md`. Sem plano, pergunte o que a entrega muda.
 2. **Repositórios afetados**: cruze os contêineres que a entrega toca com a coluna Contêineres C4 do cadastro. Mostre a lista e o motivo de cada um.
@@ -122,7 +124,7 @@ Para uma entrega (escopo, item do plano de execução ou pedido avulso) que mexe
 6. **Registro**: grave `docs/{projeto}/plano-execucao/{escopo}/mudanca-multi-repo.md` pelo template (repositórios, branch, contratos, ordem de merge e de deploy, PRs a preencher, checklist). Se a entrega for avulsa, use `{escopo}` = nome curto da mudança em kebab-case.
 7. **Execução das tarefas**: para cada tarefa do plano, diga em qual repositório ela roda e qual skill de código usar. As skills de código (`architecture-*`, `angular-*`) rodam dentro do repositório certo.
 
-Rodando de novo para a mesma entrega, atualize o `mudanca-multi-repo.md` (PRs abertos, mergeados, ambientes publicados) em vez de criar outro.
+Rodando de novo para a mesma entrega (escopo ou avulsa), atualize o `mudanca-multi-repo.md` (PRs abertos, mergeados, ambientes publicados) em vez de criar outro.
 
 ---
 
@@ -186,6 +188,9 @@ Funciona como projeto de um repositório. Só crie o `repositorios.md` quando o 
 
 **Usuário:** "Como estão os repositórios de todos os projetos?"
 **Ação:** Panorama do workspace inteiro, agrupado por projeto, com os pontos de atenção.
+
+**Usuário:** "Prepara os repositórios da story 2-3-agenda-de-eventos"
+**Ação:** Mudança coordenada com entrada = story. Lê as seções Repositórios e Contratos da story, confere caminhos e estratégias, propõe `feat/2-3-agenda-de-eventos` em cada repositório (provedor primeiro), cria após confirmação e grava `implementacao/multi-repo/2-3-agenda-de-eventos.md`.
 
 **Usuário:** "Vamos implementar o escopo de eventos, prepara os repositórios"
 **Ação:** Mudança coordenada. Lê o plano e a arquitetura, lista os repositórios afetados, contratos e ordem, propõe `feat/eventos` em cada um, cria após confirmação e grava `mudanca-multi-repo.md`.

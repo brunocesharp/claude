@@ -83,6 +83,10 @@ Monte o documento pelo template: Evidências, Pronto quando (item a item, com ev
 
 ---
 
+## Vários repositórios
+
+Com o git incluído, passe um `--repo` por repositório do projeto. Leia os `implementacao/multi-repo/{id}.md` das stories do épico: a ordem de merge e deploy (provedor antes do consumidor) foi cumprida? Ficou contração pendente (expansão sem a story de contração)? Checklists abertos viram achados com a fonte; contração não agendada vira item de ação.
+
 ## Regras importantes
 
 - Evidência, não opinião: todo achado cita a fonte; percepção do time é registrada como tal.

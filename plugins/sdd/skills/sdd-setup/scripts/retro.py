@@ -29,8 +29,22 @@ R_TASK = re.compile(r"^\s*-\s*\[( |x|X)\]\s*\*\*R\d+\*\*", re.MULTILINE)
 ACTION_ITEM = re.compile(r"^\s*-\s*\[( |x|X)\]\s*(.+)$", re.MULTILINE)
 
 
+def multi_repo_evidence(project: Path, story_id: str) -> dict | None:
+    """Registro da mudança coordenada da story (skill multi-repo), se existir."""
+    path = project / "implementacao" / "multi-repo" / f"{story_id}.md"
+    if not path.is_file():
+        return None
+    boxes = ACTION_ITEM.findall(sections(path.read_text(encoding="utf-8")).get("Checklist", ""))
+    return {"file": f"multi-repo/{story_id}.md", "situacao": read_frontmatter(path).get("situacao"),
+            "checklist_open": [text.strip() for box, text in boxes if box == " "],
+            "checklist_done": sum(1 for box, _ in boxes if box.lower() == "x")}
+
+
 def story_evidence(project: Path, story_id: str, node: dict) -> dict:
     row: dict = {"id": story_id, "title": node.get("title"), "status": node["status"], "file": node.get("file")}
+    coordinated = multi_repo_evidence(project, story_id)
+    if coordinated:
+        row["multi_repo"] = coordinated
     if not node.get("file"):
         return row
     path = project / "implementacao" / node["file"]

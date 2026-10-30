@@ -141,6 +141,14 @@ Migração opcional, oferecida também pelo `sdd-setup` (guia `sdd-setup/referen
 - **coverage:** liste os cabeçalhos `#### Cenário N.M` da spec (ignorando os `(removido)`) e cruze com os `covers` de todas as stories do escopo.
 - **sync:** edite o `sprint-status.yaml` como descrito em `sdd-setup/references/sprint-status.md`.
 
+## Vários repositórios
+
+Com `docs/{projeto}/repositorios.md`:
+- cada story declara em `repositories` os repositórios que toca (nomes do cadastro); prefira stories de um repositório quando o fatiamento vertical permitir;
+- dentro da story, provedor antes do consumidor; entre stories, o contrato novo vem antes de quem o consome (`depends_on`);
+- contrato incompatível vira story própria com a estratégia (expandir e depois contrair, versão nova, feature flag) — a contração também vira story — ou ponto em aberto para `arch-adr`;
+- a prontidão confere se cada contêiner tocado tem um repositório responsável.
+
 ## Regras importantes
 
 - Épico = resultado para o usuário; story = fatia vertical que cabe numa sessão. Nunca fatie por camada.

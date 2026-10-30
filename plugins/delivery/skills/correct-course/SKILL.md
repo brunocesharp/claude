@@ -89,6 +89,10 @@ Marque `status: aplicada` (ou `encaminhada` enquanto faltar a skill dona), atual
 
 ---
 
+## Vários repositórios
+
+No impacto, leia os `implementacao/multi-repo/{id}.md` das stories afetadas: o que já foi mergeado e publicado em cada repositório e ambiente. Contrato já publicado não pode ser removido nem mudado de forma incompatível sem estratégia (expandir e depois contrair, versão nova, feature flag) e sem os consumidores migrarem — registre a estratégia na proposta e crie as stories de expansão e de contração. Mudança que exige repositório novo ou troca de responsabilidade entre repositórios é **maior**: encaminhe para `multi-repo` (Cadastrar) e `arch-adr`.
+
 ## Regras importantes
 
 - Nada muda antes da aprovação; a proposta fica registrada mesmo quando rejeitada.

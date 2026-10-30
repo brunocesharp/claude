@@ -112,6 +112,14 @@ Nesses casos: registre a dúvida no Registro do desenvolvimento (o que, onde, op
 
 ---
 
+## Vários repositórios
+
+- A sessão abre no primeiro repositório da ordem, com o workspace e os demais por `--add-dir` (o `session.py` monta isso).
+- As branches seguem a operação **Mudança coordenada** da `multi-repo` com entrada = story: mesmo nome `feat/{id}` em todos, pré-condições de cada repositório e registro em `implementacao/multi-repo/{id}.md` (crie no primeiro uso, atualize ao retomar).
+- Implemente provedor antes do consumidor e confira o contrato na tabela Contratos antes de usá-lo no consumidor.
+- "Arquivos alterados" agrupado por repositório; suíte e build de cada repositório tocado.
+- Ao fechar, ofereça a mensagem de commit por repositório e lembre a ordem de merge (provedor primeiro) registrada no arquivo da `multi-repo`. Nunca faça merge.
+
 ## Regras importantes
 
 - **Fonte única:** o arquivo da story. Nada de reabrir spec, escopo ou arquitetura por conta própria, nem completar requisito por suposição.

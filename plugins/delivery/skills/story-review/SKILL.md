@@ -84,6 +84,10 @@ Use `status.py next`: próxima story (`create-story`), retomar correções (`dev
 
 ---
 
+## Vários repositórios
+
+O `review.py diff` e o `integrity` recebem um `--repo` por repositório da story. A lente 7 (Contratos) roda sempre que a story tiver mais de um repositório ou contrato: provedor e consumidor batem, estratégia aplicada para incompatíveis, ordem de merge e deploy registrada em `implementacao/multi-repo/{id}.md`. A suíte é rodada em cada repositório. A story não vai para `done` com contrato quebrado entre os repositórios.
+
 ## Regras importantes
 
 - Adversarial, não inventiva: todo achado tem local e consequência verificados; lente sem achados registra o que checou.

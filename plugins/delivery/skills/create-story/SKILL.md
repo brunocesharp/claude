@@ -116,6 +116,10 @@ Se o `dev-story` não estiver instalado, diga que a story pode ser implementada 
 - **Validação:** confira as regras de `references/template-story.md` (seções, CA ↔ tarefas, covers nos critérios, referências existentes).
 - **Transição:** edite o `sprint-status.yaml` (`file` e `status: ready-for-dev`, épico para `in-progress` se estava em `backlog`, `updated_at`) e o frontmatter da story.
 
+## Vários repositórios
+
+A seção **Repositórios** da story é o plano da mudança coordenada: caminho local de cada repositório, branch `feat/{id}` (a mesma em todos), o que muda em cada um, a **ordem** (provedor antes do consumidor) e a tabela **Contratos** (compatível ou não, e a estratégia). Tarefas do provedor vêm antes das do consumidor. Contrato incompatível sem estratégia: não marque `ready-for-dev` — decida com o usuário (ou `arch-adr`). Ao fechar, diga em qual repositório abrir a sessão do `dev-story` (o primeiro da ordem) e quais entram com `--add-dir`.
+
 ## Regras importantes
 
 - Uma story por vez, na ordem do quadro, salvo pedido explícito.

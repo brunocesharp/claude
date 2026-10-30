@@ -3,7 +3,7 @@
 - **Pedido:** "Manter a possibilidade de varios repositorios para um projeto" (linha 13)
 - **Tamanho:** M
 - **Depende de:** atravessa 03 e 06–12 — usar como checklist em cada uma
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -45,3 +45,27 @@ Garantir que o fluxo épico → story → implementação → revisão funcione 
 ## Arquivos impactados
 
 `plugins/workspace/skills/multi-repo/SKILL.md` e `references/coordenacao-mudancas.md`, `references/template-repositorios.md`; todas as skills novas das tarefas 06–12.
+
+## Resultado (30/10/2026)
+
+**Checklist aplicado ao longo das tarefas 03 a 12 e fechado aqui:**
+- **03:** `_sdd/` na raiz do workspace; `workspace.py` informa um ou vários repositórios.
+- **06:** `repositories` por story no quadro; o `sprint-planning` confere os nomes com o `repositorios.md`.
+- **07:** `repositories` por story no épico; provedor antes do consumidor; contrato incompatível vira story própria, com a story de contração.
+- **08:** seção Repositórios (caminho, branch, o que muda, ordem) e tabela Contratos na story; sem `ready-for-dev` com contrato incompatível sem estratégia.
+- **09:** sessão no primeiro repositório da ordem com `--add-dir` (`session.py`); branches via Mudança coordenada; Arquivos alterados por repositório.
+- **10:** `review.py diff`/`integrity` com um `--repo` por repositório; lente 7 de Contratos.
+- **11:** `retro.py` conta commits por repositório e lê o registro `multi-repo/{id}.md` (situação e checklist aberto).
+- **12:** o impacto lê o que já foi mergeado e publicado; contrato publicado exige estratégia.
+
+**`multi-repo`:** a operação Mudança coordenada aceita **story** como entrada. Ela lê o plano das seções Repositórios e Contratos da story, sem copiá-lo, usa a branch `feat/{id}` e grava o registro **por story** em `implementacao/multi-repo/{id}.md`. O template (seção 3 de `template-repositorios.md`) acompanha a execução: branches, PRs, merge, homologação, produção e checklist. O registro por escopo (`plano-execucao/{escopo}/mudanca-multi-repo.md`) continua valendo para o `plan-execution`.
+
+**Seção "Vários repositórios"** explícita em `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective` e `correct-course`.
+
+**Decisões aplicadas:** branch por story, igual em todos os repositórios; `mudanca-multi-repo` por story; `multi-repo` aceitando story.
+
+**Critérios de aceite:**
+- `multi-repo` aceita story: feito.
+- Seção em cada skill: feita.
+- Teste de ponta a ponta `api` + `web` (`test_multi_repo_flow.py`): épico, `sync`, story, `ready-for-dev`/`review`, branches `feat/{id}` nos dois repositórios Git, integridade da revisão consistente e retrospectiva com commits por repositório e checklist da mudança coordenada. Ao todo, 55 testes.
+- A parte conversacional (criação das branches pela skill, revisão de contrato pela lente) fica para o primeiro uso real.

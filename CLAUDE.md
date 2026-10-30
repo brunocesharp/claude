@@ -65,6 +65,7 @@ docs/
     ├── implementacao/stories/{id}.md               # create-story: única fonte de verdade da implementação (story.py check)
     ├── implementacao/retrospectivas/epic-N-{data}.md   # retrospective (veredito e itens de ação)
     ├── implementacao/mudancas/{data}-{slug}.md     # correct-course (proposta de mudança de rumo)
+    ├── implementacao/multi-repo/{id}.md            # multi-repo: execução coordenada da story (branches, PRs, merge, deploy)
     └── business/                     # business-docs (areas.md + {area}.md)
 ```
 
@@ -77,6 +78,8 @@ docs/
 6. Lê a configuração do workspace em `_sdd/config.toml` + `_sdd/config.user.toml` (o pessoal vence): idioma da conversa e dos documentos, nome e nível do usuário, `paths.docs_root`. Sem `_sdd/`, usa os padrões e sugere o `sdd-setup` uma vez.
 
 Ao mudar esse passo, mude em todas as skills. Skills que avançam de fase atualizam o `project.md` e a coluna Situação do `workspace.md`.
+
+**Vários repositórios no fluxo de stories:** cada story declara `repositories`; a seção Repositórios da story é o plano (ordem provedor → consumidor, contratos e estratégia) e `implementacao/multi-repo/{id}.md` acompanha a execução. Branch `feat/{id}`, a mesma em todos. As skills do fluxo têm uma seção "Vários repositórios".
 
 **Onde está o código:** projeto de um repositório usa `repository_url` e `code_path` do `project-config.json` (espelhados no `project.md`); com dois ou mais, a fonte única é `docs/{projeto}/repositorios.md` (skill `multi-repo`: papel, caminho, contêineres C4 e contratos de cada repositório). Skills que leem código (`arch-c4`, `business-docs`, `plan-execution`, `plan-epics`) consultam os dois. Nenhuma skill faz commit, push ou merge nos repositórios de código sem pedido explícito.
 

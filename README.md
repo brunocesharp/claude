@@ -558,7 +558,8 @@ docs/
 │   ├── implementacao/
 │   │   ├── sprint-status.yaml        # quadro de épicos e stories (sprint-planning)
 │   │   ├── epicos/epic-N-slug.md     # épicos fatiados em stories
-│   │   └── stories/N-M-slug.md       # uma story por arquivo, com contexto completo
+│   │   ├── stories/N-M-slug.md       # uma story por arquivo, com contexto completo
+│   │   └── multi-repo/N-M-slug.md    # execução da story em vários repositórios: branches, PRs, merge e deploy (multi-repo)
 │   └── business/
 │       ├── areas.md                  # mapa de áreas do código
 │       └── {area}.md
@@ -609,7 +610,7 @@ Ponto de entrada. Coleta nome, descrição, URL do repositório, caminho local d
 
 ### multi-repo
 
-Para projetos com o código em vários repositórios. Cadastra os repositórios em `docs/{projeto}/repositorios.md` (URL, caminho local, papel, stack, contêineres C4 que implementa, contratos entre eles e deploy), detectando o que dá pelo Git. Mostra o panorama de todos (branch, alterações, atrás/à frente), clona os que faltam e coordena entregas que atravessam repositórios: repositórios afetados, contratos compatíveis ou não (expandir e contrair, versão nova, feature flag), ordem provedor antes do consumidor, mesma branch em todos. Nada que altere um repositório é feito sem confirmação, e commit, push e merge só a pedido.
+Para projetos com o código em vários repositórios. Cadastra os repositórios em `docs/{projeto}/repositorios.md` (URL, caminho local, papel, stack, contêineres C4 que implementa, contratos entre eles e deploy), detectando o que dá pelo Git. Mostra o panorama de todos (branch, alterações, atrás/à frente), clona os que faltam e coordena entregas que atravessam repositórios — um escopo do `plan-execution` ou uma story do fluxo de entrega (registro em `implementacao/multi-repo/{id}.md`, branch `feat/{id}`): repositórios afetados, contratos compatíveis ou não (expandir e contrair, versão nova, feature flag), ordem provedor antes do consumidor, mesma branch em todos. Nada que altere um repositório é feito sem confirmação, e commit, push e merge só a pedido.
 
 ### discovery-vision / opportunity / assumptions / stakeholders / metrics
 

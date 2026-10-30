@@ -99,6 +99,10 @@ Faça à mão, seguindo `sdd-setup/references/sprint-status.md`:
 - **Sincronizar:** leia o frontmatter de cada épico e edite o `sprint-status.yaml` com as mesmas regras do `sync` (acrescentar em `backlog`, atualizar título/escopo/repositórios/ordem, nunca mudar `status`/`file`, nunca remover). Mostre a prévia antes de gravar.
 - **Mudar estado:** confira a transição na tabela da referência antes de editar; atualize `updated_at` e o `status:` do frontmatter da story.
 
+## Vários repositórios
+
+O quadro guarda `repositories` por story (vindo dos épicos). No Sincronizar, os nomes são conferidos com o `repositorios.md` (Modo Sincronizar, passo 5). No Quadro, mostre a coluna Repositórios. A execução coordenada de cada story (branches, PRs, merge, deploy) fica em `implementacao/multi-repo/{id}.md` (skill `multi-repo`), não no quadro.
+
 ## Regras importantes
 
 - O `sprint-status.yaml` é a fonte única do andamento: o `project.md` e o `workspace.md` só recebem o resumo.

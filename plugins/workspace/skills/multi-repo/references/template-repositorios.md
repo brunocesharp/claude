@@ -107,3 +107,48 @@ Os caminhos locais são os desta máquina; em outra máquina, ajuste a coluna C�
 |------|--------|
 | {DD/MM/YYYY} | Branches criadas |
 ```
+
+---
+
+## 3. `docs/{projeto}/implementacao/multi-repo/{id}.md` (story do fluxo de entrega)
+
+Quando a mudança coordenada nasce de uma **story** (`create-story` / `dev-story`), o registro é por story. O plano (repositórios, contratos, ordem) está na seção Repositórios do arquivo da story e não é copiado aqui: este arquivo acompanha a **execução** (branches, PRs, merge, deploy).
+
+```markdown
+---
+story: {id}
+branch: feat/{id}
+situacao: em-andamento | em-homologacao | em-producao | concluida
+---
+
+# Mudança em vários repositórios — Story {id}
+
+- Story: `docs/{projeto}/implementacao/stories/{id}.md` (plano: seção Repositórios e Contratos)
+- Branch: `feat/{id}` (mesmo nome em todos os repositórios)
+- Iniciada em: {DD/MM/YYYY}
+
+## Repositórios
+
+| Ordem | Repositório | Tarefas da story | Branch criada | PR | Merge | Homolog | Produção |
+|-------|-------------|------------------|---------------|----|-------|---------|----------|
+| 1 | {repo provedor} | T1, T2 | sim | {link ou "a abrir"} | — | — | — |
+| 2 | {repo consumidor} | T3, T4 | sim | {link ou "a abrir"} | — | — | — |
+
+## Contratos incompatíveis
+
+{Só os incompatíveis da tabela de Contratos da story, com o andamento da estratégia: "expansão publicada em homolog em DD/MM; contração agendada na story {id}". Ou "Nenhum".}
+
+## Checklist
+
+- [ ] Branch `feat/{id}` criada em todos os repositórios da story
+- [ ] Provedor mergeado e publicado antes do consumidor, em cada ambiente
+- [ ] PRs com link cruzado (cada PR cita os outros e a story)
+- [ ] Contração agendada como story (se houve expansão)
+- [ ] Arquitetura C4 atualizada, se mudou contêiner, integração ou componente (`arch-c4`)
+
+## Histórico
+
+| Data | Evento |
+|------|--------|
+| {DD/MM/YYYY} | Branches criadas (dev-story) |
+```
