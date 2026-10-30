@@ -2,7 +2,7 @@
 
 Use este template para gerar o documento de mapeamento de stakeholders.
 
-Salve em: `docs/discovery/stakeholders.md`
+Salve em: `docs/{projeto}/discovery/stakeholders.md`
 
 ---
 

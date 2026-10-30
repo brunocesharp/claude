@@ -1,6 +1,6 @@
 ---
-name: dotnet-external-service
-description: Gera integrações com APIs de terceiros usando padrão Adapter/Gateway. Use quando o usuário mencionar "integração com API", "API externa", "chamar API", "consumir API", "serviço externo", "third-party", "webhook", "REST client", "HTTP client", "adapter", "gateway", "integração com", "conectar com API", "cliente HTTP". Também dispara quando pedir para criar integrações com serviços como pagamento, envio de email, SMS, notificações push, CEP, ou qualquer serviço externo. NÃO use para APIs internas do próprio sistema (use dotnet-endpoint-generator).
+name: architecture-external-service
+description: Gera integrações com APIs de terceiros usando padrão Adapter/Gateway. Use quando o usuário mencionar "integração com API", "API externa", "chamar API", "consumir API", "serviço externo", "third-party", "webhook", "REST client", "HTTP client", "adapter", "gateway", "integração com", "conectar com API", "cliente HTTP". Também dispara quando pedir para criar integrações com serviços como pagamento, envio de email, SMS, notificações push, CEP, ou qualquer serviço externo. NÃO use para APIs internas do próprio sistema (use architecture-controller).
 ---
 
 # .NET External Service Integration

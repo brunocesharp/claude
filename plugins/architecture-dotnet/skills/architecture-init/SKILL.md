@@ -1,5 +1,5 @@
 ---
-name: dotnet-clean-architecture
+name: architecture-init
 description: Define a estrutura de camadas para aplicações .NET seguindo Clean Architecture. Use quando o usuário mencionar 'clean architecture', 'arquitetura limpa', 'camadas .NET', 'estrutura de projeto .NET', 'DDD layers', 'domain-driven design .NET', 'separação de responsabilidades', 'modularização .NET', 'criar projeto .NET estruturado', 'organização de solução .NET'. Também use quando for criar novos projetos .NET que precisem de arquitetura bem definida.
 ---
 

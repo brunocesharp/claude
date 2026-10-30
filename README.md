@@ -9,8 +9,9 @@ Este repositório contém **skills modulares** para o Claude Code que cobrem tod
 - **Discovery** — entender o problema antes de codar
 - **Escopo** — formalizar o que será construído
 - **Especificação** — detalhar regras de negócio com BDD
-- **Arquitetura** — gerar código .NET seguindo Clean Architecture e CQRS
+- **Arquitetura (documentação)** — descrever o sistema no modelo C4 e registrar decisões (ADR)
 - **Plano de Execução** — decompor features em tarefas ordenadas
+- **Arquitetura (código)** — gerar código .NET e Angular seguindo Clean Architecture e CQRS
 - **Deploy** — publicar em homologação e produção
 
 **Por que usar?**
@@ -29,8 +30,10 @@ No Claude Code, dentro do seu projeto:
 
 ```
 /plugin marketplace add brunocesharp/claude
+/plugin install workspace@claude
 /plugin install discovery@claude
 /plugin install spec-plan@claude
+/plugin install architecture-docs@claude
 /plugin install architecture-dotnet@claude
 /plugin install architecture-angular@claude
 /plugin install business-docs@claude
@@ -46,22 +49,44 @@ Instale apenas os plugins relevantes para o seu projeto. Para padronizar o time 
     }
   },
   "enabledPlugins": {
+    "workspace@claude": true,
     "discovery@claude": true,
     "spec-plan@claude": true,
+    "architecture-docs@claude": true,
     "architecture-dotnet@claude": true
   }
 }
 ```
 
-### 2. Inicie um novo projeto
+### 2. Prepare a pasta de documentação (workspace)
 
-No Claude Code, dentro do seu projeto:
+As skills de documentação trabalham numa **pasta só de documentação que reúne vários projetos**. Cada projeto fica em `docs/{projeto}/`, e o código de cada um continua no próprio repositório (o caminho fica registrado no `project.md`). Abra o Claude Code nessa pasta:
+
+```
+meu-workspace/            # ex.: um repositório "docs" do time
+└── docs/
+    ├── workspace.md      # lista dos projetos
+    ├── projeto-a/
+    └── projeto-b/
+```
+
+### 3. Inicie um projeto
 
 ```
 > iniciar projeto
 ```
 
-### 3. Siga o fluxo
+O `discovery-init` cria `docs/{projeto}/project.md` e registra o projeto em `docs/workspace.md`. Nas demais skills, cite o projeto ("visão do projeto-a") ou escolha na lista que a skill mostra.
+
+Se o código do projeto estiver em vários repositórios (ex.: backend e frontend separados), cadastre-os:
+
+```
+> cadastrar os repositórios do projeto-a
+```
+
+A `multi-repo` cria `docs/{projeto}/repositorios.md`, que as skills usam para saber onde está cada parte do código.
+
+### 4. Siga o fluxo
 
 ```
 > definir visão do projeto
@@ -71,6 +96,9 @@ No Claude Code, dentro do seu projeto:
 > definir métricas de sucesso
 > gerar escopo
 > especificação funcional
+> documentar a arquitetura (C4)
+> registrar decisão de arquitetura
+> plano de execução
 > criar entidade Pedido
 > criar command ProcessarPedido
 > criar endpoint POST /pedidos
@@ -81,11 +109,17 @@ No Claude Code, dentro do seu projeto:
 
 ## Skills Disponíveis
 
+### Workspace
+
+| Skill | Gatilho | Saída |
+|-------|---------|-------|
+| `multi-repo` | "vários repositórios", "cadastrar repositório", "status dos repositórios", "criar branch em todos", "feature em mais de um repositório" | `repositorios.md`, `plano-execucao/{escopo}/mudanca-multi-repo.md` |
+
 ### Fase: Discovery
 
 | Skill | Gatilho | Frameworks | Saída |
 |-------|---------|------------|-------|
-| `discovery-init` | "iniciar projeto", "novo projeto" | — | `project.md` |
+| `discovery-init` | "iniciar projeto", "novo projeto" | — | `project.md` + linha em `docs/workspace.md` |
 | `discovery-vision` | "visão do projeto", "proposta de valor" | Lean Canvas, Value Proposition Canvas | `vision.md` |
 | `discovery-opportunity` | "mapear oportunidades", "jobs to be done" | Opportunity Solution Tree, JTBD | `opportunity.md` |
 | `discovery-assumptions` | "hipóteses", "premissas" | Assumption Mapping, Lean Startup | `assumptions.md` |
@@ -103,6 +137,15 @@ No Claude Code, dentro do seu projeto:
 | Skill | Gatilho | Frameworks | Saída |
 |-------|---------|------------|-------|
 | `spec-functional` | "especificação funcional", "regras de negócio", "cenários BDD" | BDD, Given-When-Then, Feature Injection | `spec-functional.md` |
+
+### Fase: Arquitetura (documentação)
+
+Descreve a estrutura do sistema em níveis de abstração, seguindo *The C4 model for visualising software architecture* (Simon Brown). Diagramas em Mermaid C4, dentro do Markdown. Funciona para sistema novo (a partir do escopo e da especificação) e para sistema existente (lendo o código).
+
+| Skill | Gatilho | Frameworks | Saída |
+|-------|---------|------------|-------|
+| `arch-c4` | "arquitetura", "modelo C4", "diagrama de contexto/contêineres/componentes/deployment" | C4 model, Mermaid C4 | `arquitetura/arquitetura.md` (+ `componentes/`, `dinamicos/`) |
+| `arch-adr` | "ADR", "decisão de arquitetura", "por que escolhemos" | Architecture Decision Records (Nygard) | `arquitetura/decisoes/ADR-NNN-titulo.md` |
 
 ### Fase: Arquitetura .NET
 
@@ -134,7 +177,9 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 
 | Skill | Gatilho | Saída |
 |-------|---------|-------|
-| `business-docs` | "documentar regras de negócio", "gerar docs de negócio", "business docs", "documentar domínio" | `docs/business/{area}.md` |
+| `business-docs` | "documentar regras de negócio", "gerar docs de negócio", "business docs", "documentar domínio" | `business/{area}.md` |
+
+Todas as saídas de documentação ficam dentro de `docs/{projeto}/` (ver "Estrutura de pastas do workspace").
 
 ---
 
@@ -147,6 +192,16 @@ Este repositório é um **marketplace de plugins** do Claude Code. Cada plugin a
 └── marketplace.json              # catálogo dos plugins
 
 plugins/
+├── workspace/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       └── multi-repo/
+│           ├── SKILL.md
+│           └── references/
+│               ├── template-repositorios.md
+│               ├── comandos-git.md
+│               └── coordenacao-mudancas.md
+│
 ├── discovery/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
@@ -175,6 +230,25 @@ plugins/
 │               ├── task-breakdown.md
 │               ├── skill-mapping.md
 │               └── examples.md
+│
+├── architecture-docs/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       ├── arch-c4/
+│       │   ├── SKILL.md
+│       │   └── references/
+│       │       ├── vocabulario-c4.md
+│       │       ├── niveis-c4.md
+│       │       ├── notacao.md
+│       │       ├── mermaid-c4.md
+│       │       ├── diagramas-complementares.md
+│       │       ├── levantamento-codigo.md
+│       │       ├── template-arquitetura.md
+│       │       └── checklist.md
+│       └── arch-adr/
+│           ├── SKILL.md
+│           └── references/
+│               └── template-adr.md
 │
 ├── architecture-dotnet/
 │   ├── .claude-plugin/plugin.json
@@ -250,30 +324,52 @@ plugins/
 
 ---
 
-## Estrutura de Pastas Gerada no Projeto
+## Estrutura de pastas do workspace
 
-Após usar as skills, seu projeto de documentação terá:
+A pasta de documentação reúne vários projetos. Após usar as skills:
 
 ```
 docs/
-└── nome-do-projeto/
-    ├── project.md
-    ├── discovery/
-    │   ├── vision.md
-    │   ├── opportunity.md
-    │   ├── assumptions.md
-    │   ├── stakeholders.md
-    │   └── success-metrics.md
-    ├── escopo/
-    │   └── titulo-do-escopo/
-    │       ├── escopo.md
-    │       └── discovery/        # snapshot do discovery usado
-    └── especificacao/
-        └── titulo-do-escopo/
-            └── spec-functional.md
+├── workspace.md                      # projetos: pasta, repositório, código local, situação
+├── arquitetura/
+│   └── landscape.md                  # visão de todos os sistemas (arch-c4, opcional)
+├── projeto-a/
+│   ├── project.md
+│   ├── repositorios.md               # só com código em vários repositórios (multi-repo)
+│   ├── discovery/
+│   │   ├── vision.md
+│   │   ├── opportunity.md
+│   │   ├── assumptions.md
+│   │   ├── stakeholders.md
+│   │   └── success-metrics.md
+│   ├── escopo/
+│   │   └── titulo-do-escopo/
+│   │       ├── escopo.md
+│   │       └── discovery/            # snapshot do discovery usado
+│   ├── especificacao/
+│   │   └── titulo-do-escopo/
+│   │       └── spec-functional.md
+│   ├── arquitetura/
+│   │   ├── arquitetura.md            # contexto, contêineres, deployment, glossário
+│   │   ├── componentes/{conteiner}.md
+│   │   ├── dinamicos/{cenario}.md
+│   │   └── decisoes/
+│   │       ├── README.md             # índice dos ADRs
+│   │       └── ADR-001-titulo.md
+│   ├── plano-execucao/
+│   │   └── titulo-do-escopo/
+│   │       ├── execution-plan.md
+│   │       └── mudanca-multi-repo.md # branches, contratos e ordem de merge/deploy (multi-repo)
+│   └── business/
+│       ├── areas.md                  # mapa de áreas do código
+│       └── {area}.md
+└── projeto-b/
+    └── ...
 ```
 
-E seu projeto .NET terá a estrutura Clean Architecture:
+Toda skill de documentação começa identificando o projeto: usa o que foi citado na conversa; senão lê `docs/workspace.md` (um projeto: usa esse; vários: pergunta).
+
+E seu projeto .NET (no repositório de código) terá a estrutura Clean Architecture:
 
 ```
 src/
@@ -306,7 +402,11 @@ src/
 
 ### discovery-init
 
-Ponto de entrada. Coleta nome, descrição, URL do repositório e tipo do projeto. Gera `project.md` e cria a estrutura de pastas `discovery/` e `escopo/`.
+Ponto de entrada. Coleta nome, descrição, URL do repositório, caminho local do código e tipo do projeto. Gera `docs/{projeto}/project.md`, cria a estrutura de pastas e registra o projeto em `docs/workspace.md`.
+
+### multi-repo
+
+Para projetos com o código em vários repositórios. Cadastra os repositórios em `docs/{projeto}/repositorios.md` (URL, caminho local, papel, stack, contêineres C4 que implementa, contratos entre eles e deploy), detectando o que dá pelo Git. Mostra o panorama de todos (branch, alterações, atrás/à frente), clona os que faltam e coordena entregas que atravessam repositórios: repositórios afetados, contratos compatíveis ou não (expandir e contrair, versão nova, feature flag), ordem provedor antes do consumidor, mesma branch em todos. Nada que altere um repositório é feito sem confirmação, e commit, push e merge só a pedido.
 
 ### discovery-vision / opportunity / assumptions / stakeholders / metrics
 
@@ -319,6 +419,14 @@ Lê todos os arquivos de `discovery/`, verifica escopos já existentes (evita re
 ### spec-functional
 
 Baseada em **BDD** e **Feature Injection**. Para cada funcionalidade do escopo, define narrativa (`In order to / As / I want`) e levanta cenários `Given / When / Then`. Usa Esquema do Cenário para múltiplas combinações de dados. Requer que `escopo.md` exista.
+
+### arch-c4
+
+Baseada no **modelo C4** de Simon Brown. Conduz em blocos: vocabulário, contexto (obrigatório), contêineres (obrigatório), componentes (opcional, por contêiner, com mapeamento para o código), deployment por ambiente e complementares (dinâmico, landscape). Tem três modos: **Design** (sistema novo, a partir de discovery/escopo/spec), **Levantamento** (sistema existente, lendo `docker-compose`, `csproj`, `angular.json`, configs) e **Atualização** (altera só o que mudou). Cada diagrama tem título com o tipo e tabela de legenda (o Mermaid C4 não desenha legenda) e passa por um checklist antes de salvar.
+
+### arch-adr
+
+Registra uma decisão de arquitetura por arquivo (contexto, opções, decisão, consequências), numerada (`ADR-001`), com índice em `decisoes/README.md`. Decisão aceita não é editada: é substituída por outro ADR. Resolve os pontos em aberto do `arquitetura.md`.
 
 ### architecture-init
 
@@ -346,7 +454,7 @@ Gera endpoints ASP.NET Core (Controller ou Minimal API) com Request/Response mod
 
 ### plan-execution
 
-Analisa a especificação funcional e decompõe em entregas incrementais com tarefas ordenadas por camada (Domain → Infrastructure → Application → Presentation). Referencia a skill correta para cada tipo de tarefa. Inclui estimativas de esforço.
+Analisa a especificação funcional (e a arquitetura C4, se existir) e decompõe em entregas incrementais com tarefas ordenadas por camada (Domain → Infrastructure → Application → Presentation). Usa os contêineres e tecnologias do C4 para escolher a skill correta para cada tarefa e respeita os ADRs aceitos. Inclui estimativas de esforço.
 
 ### deploy-dotnet-homolog
 
@@ -387,7 +495,10 @@ discovery-vision ──► discovery-opportunity ──► discovery-assumptions
                   spec-functional
                           │
                           ▼
-                  plan-execution
+                arch-c4 ◄──► arch-adr
+                          │
+                          ▼
+                  plan-execution ──► multi-repo (vários repositórios)
                           │
                           ▼
          ┌────────────────┼────────────────┐
@@ -420,7 +531,13 @@ Os documentos são vivos. Rode as skills novamente quando tiver novas informaç�
 Um escopo pode cobrir só uma feature ou módulo. O plano de execução divide em entregas incrementais.
 
 **Skills de arquitetura são independentes**
-Podem ser usadas sem ter feito discovery — basta saber o que construir.
+As de código (`architecture-*`, `angular-*`) podem ser usadas sem ter feito discovery — basta saber o que construir. A `arch-c4` também: num sistema existente, ela levanta a arquitetura a partir do código.
+
+**Vários projetos**
+Cite o projeto no pedido ("gerar escopo do projeto-b") para pular a pergunta de qual projeto usar.
+
+**Vários repositórios**
+Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-dir`). Para gerar muito código num repositório, abra o Claude Code dentro dele: o `CLAUDE.md` daquele repositório passa a valer.
 
 ---
 
@@ -431,6 +548,9 @@ Podem ser usadas sem ter feito discovery — basta saber o que construir.
 | Discovery | Implementado (v2) | 6 skills |
 | Escopo | Implementado (v2) | 1 skill |
 | Especificação Funcional | Implementado | `spec-functional` |
+| Arquitetura (documentação C4 + ADR) | Implementado | `arch-c4`, `arch-adr` |
+| Workspace com vários projetos | Implementado | todas as skills de documentação |
+| Vários repositórios por projeto | Implementado | `multi-repo` |
 | Arquitetura .NET | Implementado | 6 skills |
 | Plano de Execução | Implementado | `plan-execution` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |

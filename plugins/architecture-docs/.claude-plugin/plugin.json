@@ -1,0 +1,8 @@
+{
+  "name": "architecture-docs",
+  "description": "Skills de documentação de arquitetura: diagramas C4 (contexto, contêineres, componentes, deployment) em Mermaid e registro de decisões (ADR), por projeto.",
+  "version": "1.0.0",
+  "author": {
+    "name": "brunocesharp"
+  }
+}

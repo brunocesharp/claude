@@ -5,12 +5,13 @@
 O plano de execução deve ser salvo em:
 ```
 docs/
-└── execution-plans/
-    └── {feature-name}/
-        ├── execution-plan.md      # Plano principal
-        ├── release-1.md           # Detalhamento entrega 1 (opcional)
-        ├── release-2.md           # Detalhamento entrega 2 (opcional)
-        └── risks.md               # Análise de riscos (opcional)
+└── {projeto}/
+    └── plano-execucao/
+        └── {escopo}/
+            ├── execution-plan.md      # Plano principal
+            ├── release-1.md           # Detalhamento entrega 1 (opcional)
+            ├── release-2.md           # Detalhamento entrega 2 (opcional)
+            └── risks.md               # Análise de riscos (opcional)
 ```
 
 ---
@@ -23,7 +24,8 @@ docs/
 ## Metadados
 | Campo | Valor |
 |-------|-------|
-| **Especificação** | `docs/specs/{feature}/spec-functional.md` |
+| **Especificação** | `docs/{projeto}/especificacao/{escopo}/spec-functional.md` |
+| **Arquitetura** | `docs/{projeto}/arquitetura/arquitetura.md` (ou "não documentada") |
 | **Autor** | {nome} |
 | **Data** | {YYYY-MM-DD} |
 | **Status** | Rascunho / Aprovado / Em Execução / Concluído |
@@ -79,29 +81,29 @@ docs/
 #### Domain Layer
 | ID | Tarefa | Tipo | Skill | Est. | Responsável |
 |----|--------|------|-------|------|-------------|
-| 1.1 | Criar entidade `{Entity}` | Entity | `dotnet-domain-entity` | 2h | - |
-| 1.2 | Criar Value Object `{VO}` | ValueObject | `dotnet-domain-entity` | 1h | - |
-| 1.3 | Criar interface `I{Entity}Repository` | Interface | `dotnet-domain-entity` | 0.5h | - |
+| 1.1 | Criar entidade `{Entity}` | Entity | `architecture-entities` | 2h | - |
+| 1.2 | Criar Value Object `{VO}` | ValueObject | `architecture-entities` | 1h | - |
+| 1.3 | Criar interface `I{Entity}Repository` | Interface | `architecture-entities` | 0.5h | - |
 
 #### Infrastructure Layer
 | ID | Tarefa | Tipo | Skill | Est. | Responsável |
 |----|--------|------|-------|------|-------------|
 | 1.4 | Criar `{Entity}Configuration` | EF Config | - | 1h | - |
-| 1.5 | Criar `{Entity}Repository` | Repository | `dotnet-infrastructure-repository` | 2h | - |
+| 1.5 | Criar `{Entity}Repository` | Repository | `architecture-repository` | 2h | - |
 | 1.6 | Criar migration | Migration | - | 0.5h | - |
 
 #### Application Layer
 | ID | Tarefa | Tipo | Skill | Est. | Responsável |
 |----|--------|------|-------|------|-------------|
-| 1.7 | Criar `{Entity}Dto` | DTO | `dotnet-application-feature` | 0.5h | - |
-| 1.8 | Criar `Create{Entity}Command` + Handler | Command | `dotnet-application-feature` | 3h | - |
-| 1.9 | Criar `Get{Entity}ByIdQuery` + Handler | Query | `dotnet-application-feature` | 2h | - |
+| 1.7 | Criar `{Entity}Dto` | DTO | `architecture-feature` | 0.5h | - |
+| 1.8 | Criar `Create{Entity}Command` + Handler | Command | `architecture-feature` | 3h | - |
+| 1.9 | Criar `Get{Entity}ByIdQuery` + Handler | Query | `architecture-feature` | 2h | - |
 
 #### Presentation Layer
 | ID | Tarefa | Tipo | Skill | Est. | Responsável |
 |----|--------|------|-------|------|-------------|
-| 1.10 | Criar `{Entity}Controller` | Controller | `dotnet-endpoint-generator` | 2h | - |
-| 1.11 | Criar validators de request | Validator | `dotnet-endpoint-generator` | 1h | - |
+| 1.10 | Criar `{Entity}Controller` | Controller | `architecture-controller` | 2h | - |
+| 1.11 | Criar validators de request | Validator | `architecture-controller` | 1h | - |
 
 #### Frontend — Core / Shared
 > Criado uma única vez por feature; reutilizado por todas as entregas subsequentes.
@@ -277,7 +279,8 @@ Uma **entrega** está "pronta" quando:
 ## Metadados
 | Campo | Valor |
 |-------|-------|
-| **Especificação** | `docs/specs/products/spec-functional.md` |
+| **Especificação** | `docs/loja-online/especificacao/gestao-de-produtos/spec-functional.md` |
+| **Arquitetura** | `docs/loja-online/arquitetura/arquitetura.md` |
 | **Autor** | João Silva |
 | **Data** | 2025-01-10 |
 | **Status** | Aprovado |
@@ -331,32 +334,32 @@ e interface Angular exibindo a lista e o formulário integrados com dados reais.
 #### Domain Layer
 | ID | Tarefa | Tipo | Skill | Est. |
 |----|--------|------|-------|------|
-| 1.1 | Criar Value Object `Money` | ValueObject | `dotnet-domain-entity` | 1h |
-| 1.2 | Criar entidade `Product` | Entity | `dotnet-domain-entity` | 2h |
-| 1.3 | Criar interface `IProductRepository` | Interface | `dotnet-domain-entity` | 0.5h |
+| 1.1 | Criar Value Object `Money` | ValueObject | `architecture-entities` | 1h |
+| 1.2 | Criar entidade `Product` | Entity | `architecture-entities` | 2h |
+| 1.3 | Criar interface `IProductRepository` | Interface | `architecture-entities` | 0.5h |
 
 #### Infrastructure Layer
 | ID | Tarefa | Tipo | Skill | Est. |
 |----|--------|------|-------|------|
 | 1.4 | Criar `ProductConfiguration` | EF Config | - | 1h |
-| 1.5 | Criar `ProductRepository` | Repository | `dotnet-infrastructure-repository` | 2h |
+| 1.5 | Criar `ProductRepository` | Repository | `architecture-repository` | 2h |
 | 1.6 | Criar migration inicial | Migration | - | 0.5h |
 
 #### Application Layer
 | ID | Tarefa | Tipo | Skill | Est. |
 |----|--------|------|-------|------|
-| 1.7 | Criar `ProductDto` | DTO | `dotnet-application-feature` | 0.5h |
-| 1.8 | Criar `CreateProductCommand` | Command | `dotnet-application-feature` | 2h |
-| 1.9 | Criar `UpdateProductCommand` | Command | `dotnet-application-feature` | 2h |
-| 1.10 | Criar `DeleteProductCommand` | Command | `dotnet-application-feature` | 1h |
-| 1.11 | Criar `GetProductByIdQuery` | Query | `dotnet-application-feature` | 1.5h |
-| 1.12 | Criar `GetProductListQuery` | Query | `dotnet-application-feature` | 1.5h |
+| 1.7 | Criar `ProductDto` | DTO | `architecture-feature` | 0.5h |
+| 1.8 | Criar `CreateProductCommand` | Command | `architecture-feature` | 2h |
+| 1.9 | Criar `UpdateProductCommand` | Command | `architecture-feature` | 2h |
+| 1.10 | Criar `DeleteProductCommand` | Command | `architecture-feature` | 1h |
+| 1.11 | Criar `GetProductByIdQuery` | Query | `architecture-feature` | 1.5h |
+| 1.12 | Criar `GetProductListQuery` | Query | `architecture-feature` | 1.5h |
 
 #### Presentation Layer
 | ID | Tarefa | Tipo | Skill | Est. |
 |----|--------|------|-------|------|
-| 1.13 | Criar `ProductsController` | Controller | `dotnet-endpoint-generator` | 3h |
-| 1.14 | Criar Request Validators | Validator | `dotnet-endpoint-generator` | 1h |
+| 1.13 | Criar `ProductsController` | Controller | `architecture-controller` | 3h |
+| 1.14 | Criar Request Validators | Validator | `architecture-controller` | 1h |
 
 #### Frontend — Core / Shared
 | ID | Tarefa | Tipo | Est. |

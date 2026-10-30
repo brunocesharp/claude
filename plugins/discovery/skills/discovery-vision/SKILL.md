@@ -6,7 +6,7 @@ metadata:
   version: 1.1.0
   category: discovery
   depends-on: discovery-init
-  output: docs/discovery/vision.md
+  output: docs/{projeto}/discovery/vision.md
 ---
 
 # Discovery Vision
@@ -17,7 +17,18 @@ Skill responsável por conduzir a conversa de visão do projeto e gerar o docume
 
 ## Pré-requisito
 
-Antes de iniciar, verifique se o arquivo `docs/project.md` existe.
+### Passo 0 — Identificar o projeto
+
+A raiz de trabalho é uma pasta de documentação com vários projetos, cada um em `docs/{projeto}/`.
+
+1. Se o usuário citou o projeto, use a pasta dele.
+2. Senão, leia `docs/workspace.md`: com um único projeto, use-o e avise; com vários, liste e pergunte qual.
+3. Sem `docs/workspace.md`, procure `docs/*/project.md`.
+4. Se o projeto não existir, ofereça iniciá-lo com `discovery-init`.
+
+`{projeto}` é a pasta escolhida; todos os caminhos abaixo são relativos à raiz de trabalho.
+
+Antes de iniciar, verifique se o arquivo `docs/{projeto}/project.md` existe.
 
 - **Se não existir**: informe o usuário que é necessário iniciar o projeto primeiro e pergunte: "Quer que eu inicie o projeto agora usando a skill discovery-init?"
 - **Se existir**: leia o arquivo para extrair o nome do projeto e contexto já registrado. Use essas informações para personalizar as perguntas.
@@ -95,7 +106,7 @@ Perguntas de aprofundamento:
 Após coletar as informações, gere o arquivo em:
 
 ```
-docs/discovery/vision.md
+docs/{projeto}/discovery/vision.md
 ```
 
 ### Template do Documento
@@ -191,13 +202,13 @@ Com base nesta visão, as próximas etapas recomendadas de discovery são:
 
 ## Após Gerar o Documento
 
-1. **Salve o arquivo** em `docs/discovery/vision.md`
+1. **Salve o arquivo** em `docs/{projeto}/discovery/vision.md`
 
 2. **Atualize o `project.md`** marcando o item Discovery como "em andamento"
 
 3. **Informe o usuário:**
 
-> "O documento `vision.md` foi salvo em `docs/discovery/`.
+> "O documento `vision.md` foi salvo em `docs/{projeto}/discovery/`.
 > 
 > Com base no que conversamos, as próximas etapas mais relevantes parecem ser:
 > 

@@ -2,7 +2,7 @@
 
 Use este template para gerar o documento de métricas de sucesso.
 
-Salve em: `docs/discovery/success-metrics.md`
+Salve em: `docs/{projeto}/discovery/success-metrics.md`
 
 ---
 

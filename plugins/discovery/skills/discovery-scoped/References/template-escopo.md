@@ -2,7 +2,7 @@
 
 Use este template para gerar o documento de escopo.
 
-Salve em: `docs/escopo/{titulo-kebab-case}/escopo.md`
+Salve em: `docs/{projeto}/escopo/{titulo-kebab-case}/escopo.md`
 
 ---
 

@@ -1,6 +1,6 @@
 # Template — Arquivo de Regras de Negócio
 
-Use este template ao criar ou atualizar qualquer arquivo em `docs/business/`.
+Use este template ao criar ou atualizar qualquer arquivo em `docs/{projeto}/business/`.
 
 ---
 
@@ -77,7 +77,7 @@ status: completo | parcial | rascunho
 ## Convenções de numeração
 
 - Regras são numeradas globalmente com 3 dígitos: `RN-001`, `RN-002`, ...
-- Consulte todos os arquivos em `docs/business/` antes de atribuir um número novo
+- Consulte todos os arquivos em `docs/{projeto}/business/` antes de atribuir um número novo
 - O próximo número disponível é o maior existente + 1
 - **Nunca reutilize um número** de uma regra removida
 
@@ -85,14 +85,14 @@ status: completo | parcial | rascunho
 
 | Área | Arquivo |
 |------|---------|
-| Sistema de Fila | `docs/business/fila.md` |
-| Participantes | `docs/business/participantes.md` |
-| Projetos e Autorias | `docs/business/projetos.md` |
-| Encontros | `docs/business/encontros.md` |
-| Apresentações | `docs/business/apresentacoes.md` |
-| Pontuação (detalhado) | `docs/business/pontuacao.md` |
-| Códigos Sequenciais | `docs/business/codigos-sequenciais.md` |
-| Autenticação e Acesso | `docs/business/auth.md` |
-| Validações de Formato | `docs/business/validacoes.md` |
+| Sistema de Fila | `docs/{projeto}/business/fila.md` |
+| Participantes | `docs/{projeto}/business/participantes.md` |
+| Projetos e Autorias | `docs/{projeto}/business/projetos.md` |
+| Encontros | `docs/{projeto}/business/encontros.md` |
+| Apresentações | `docs/{projeto}/business/apresentacoes.md` |
+| Pontuação (detalhado) | `docs/{projeto}/business/pontuacao.md` |
+| Códigos Sequenciais | `docs/{projeto}/business/codigos-sequenciais.md` |
+| Autenticação e Acesso | `docs/{projeto}/business/auth.md` |
+| Validações de Formato | `docs/{projeto}/business/validacoes.md` |
 
-Se uma área nova for identificada, use kebab-case: `docs/business/nome-da-area.md`.
+Se uma área nova for identificada, use kebab-case: `docs/{projeto}/business/nome-da-area.md`.

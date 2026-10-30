@@ -5,6 +5,11 @@
   },
   "plugins": [
     {
+      "name": "workspace",
+      "source": "./plugins/workspace",
+      "description": "Organização do workspace de documentação: cadastro dos repositórios de cada projeto, panorama do Git em vários repositórios e coordenação de mudanças entre repositórios."
+    },
+    {
       "name": "discovery",
       "source": "./plugins/discovery",
       "description": "Skills de discovery: visão, oportunidades, hipóteses, stakeholders, métricas e geração de escopo."
@@ -13,6 +18,11 @@
       "name": "spec-plan",
       "source": "./plugins/spec-plan",
       "description": "Skills de especificação funcional (BDD) e plano de execução para decompor escopos em tarefas."
+    },
+    {
+      "name": "architecture-docs",
+      "source": "./plugins/architecture-docs",
+      "description": "Skills de documentação de arquitetura: diagramas C4 (contexto, contêineres, componentes, deployment) em Mermaid e registro de decisões (ADR), por projeto."
     },
     {
       "name": "architecture-dotnet",

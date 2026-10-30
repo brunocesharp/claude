@@ -1,9 +1,12 @@
 ---
-name: dotnet-execution-plan
-description: Gera plano de execução técnico fullstack (.NET + Angular) para implementação de features, dividindo em entregas incrementais com tarefas por camada. Use quando o usuário disser "plano de execução", "execution plan", "planejar implementação", "dividir em tarefas", "quebrar feature", "como implementar essa spec", "etapas de desenvolvimento", "decomposição técnica", "quero um plano para implementar". NÃO use para especificação funcional (use spec-functional) ou discovery (use discovery-*).
+name: plan-execution
+description: Gera plano de execução técnico fullstack (.NET + Angular) para implementação de features, dividindo em entregas incrementais com tarefas por camada. Use quando o usuário disser "plano de execução", "execution plan", "planejar implementação", "dividir em tarefas", "quebrar feature", "como implementar essa spec", "etapas de desenvolvimento", "decomposição técnica", "quero um plano para implementar". NÃO use para especificação funcional (use spec-functional), arquitetura (use arch-c4) ou discovery (use discovery-*).
 metadata:
-  version: 2.0.0
+  version: 2.1.0
   category: planning
+  depends-on: spec-functional
+  recommended-after: arch-c4
+  output: docs/{projeto}/plano-execucao/{escopo}/execution-plan.md
   tags: [dotnet, angular, clean-architecture, execution-plan, fullstack]
 ---
 
@@ -18,6 +21,20 @@ Gera planos de execução técnicos para features fullstack, com tarefas ordenad
 1. Leia `references/plan-structure.md` — estrutura e template do documento
 2. Leia `references/task-breakdown.md` — decomposição de tarefas por camada
 3. Leia `references/skill-mapping.md` — mapeamento de skills por tipo de tarefa
+
+### Passo 0: Identificar o projeto e as entradas
+
+A raiz de trabalho é uma pasta de documentação com vários projetos, cada um em `docs/{projeto}/`. Se o usuário citou o projeto, use-o; senão, leia `docs/workspace.md` (um projeto: use e avise; vários: pergunte). Se o projeto não existir, ofereça `discovery-init`.
+
+Leia, nesta ordem:
+1. `docs/{projeto}/especificacao/{escopo}/spec-functional.md` — o que construir (obrigatório; sem ele, ofereça `spec-functional` ou aceite uma especificação enviada na conversa).
+2. `docs/{projeto}/arquitetura/arquitetura.md` — contêineres, tecnologias e componentes (C4). Use para:
+   - saber **quais contêineres** a entrega toca (API, SPA, banco, worker...) e escolher as skills de código pela tecnologia de cada um;
+   - respeitar as decisões registradas em `docs/{projeto}/arquitetura/decisoes/` (ADRs aceitas);
+   - prever tarefa de atualização do C4 quando a entrega cria contêiner, sistema externo ou componente novo.
+   Se não existir, avise que o plano vai supor a arquitetura e sugira `arch-c4`.
+3. `docs/{projeto}/project.md` — repositório e código local.
+4. `docs/{projeto}/repositorios.md` — se existir (código em vários repositórios): qual repositório implementa cada contêiner. Nesse caso, acrescente a coluna **Repositório** nas tabelas de tarefas, ordene as entregas com o provedor antes do consumidor (backend antes do frontend que usa o endpoint novo) e, ao final, sugira a skill `multi-repo` (Mudança coordenada) para criar as branches e registrar a ordem de merge e de deploy.
 
 ### Passo 1: Analisar a Especificação
 
@@ -61,7 +78,7 @@ Ordem obrigatória dentro de cada entrega:
 
 ### Passo 4: Gerar o Documento
 
-Salve como `execution-plan.md` seguindo o template em `references/plan-structure.md`.
+Salve em `docs/{projeto}/plano-execucao/{escopo}/execution-plan.md` seguindo o template em `references/plan-structure.md`. Atualize `docs/{projeto}/project.md` (Plano de Execução em andamento) e a coluna Situação em `docs/workspace.md`.
 
 ---
 
@@ -76,10 +93,10 @@ Salve como `execution-plan.md` seguindo o template em `references/plan-structure
 #### Backend
 | ID | Tarefa | Camada | Skill | Est. |
 |----|--------|--------|-------|------|
-| N.1 | Criar entidade `X` | Domain | dotnet-domain-entity | 2h |
-| N.2 | Criar repositório `X` | Infrastructure | dotnet-infrastructure-repository | 2h |
-| N.3 | Criar `CreateXCommand` | Application | dotnet-application-feature | 3h |
-| N.4 | Criar `XController` | Presentation | dotnet-endpoint-generator | 2h |
+| N.1 | Criar entidade `X` | Domain | architecture-entities | 2h |
+| N.2 | Criar repositório `X` | Infrastructure | architecture-repository | 2h |
+| N.3 | Criar `CreateXCommand` | Application | architecture-feature | 3h |
+| N.4 | Criar `XController` | Presentation | architecture-controller | 2h |
 
 #### Frontend (Angular)
 | ID | Tarefa | Camada | Tipo | Est. |
@@ -112,13 +129,13 @@ Salve como `execution-plan.md` seguindo o template em `references/plan-structure
 
 | Tipo de Tarefa | Skill |
 |----------------|-------|
-| Entidade, Value Object, Aggregate | `dotnet-domain-entity` |
-| Command, Query, Handler | `dotnet-application-feature` |
-| Repositório, DbContext | `dotnet-infrastructure-repository` |
-| Controller, Endpoint | `dotnet-endpoint-generator` |
-| API Externa, Integração | `dotnet-external-service` |
-| Deploy Homologação | `dotnet-deploy-homolog` |
-| Deploy Produção | `dotnet-deploy-prod` |
+| Entidade, Value Object, Aggregate | `architecture-entities` |
+| Command, Query, Handler | `architecture-feature` |
+| Repositório, DbContext | `architecture-repository` |
+| Controller, Endpoint | `architecture-controller` |
+| API Externa, Integração | `architecture-external-service` |
+| Deploy Homologação | `deploy-dotnet-homolog` |
+| Deploy Produção | `deploy-dotnet-prod` |
 
 ### Frontend (Angular)
 

@@ -14,7 +14,7 @@ Para descobrir a estrutura, use Glob:
 ```markdown
 ## Área: {Nome da Área}
 
-**Arquivo destino:** `docs/business/{nome-kebab}.md`
+**Arquivo destino:** `docs/{projeto}/business/{nome-kebab}.md`
 **Prioridade:** {1 = núcleo | 2 = entidade central | 3 = evento | 4 = cadastro | 5 = infraestrutura}
 
 **Backend (.NET):**
@@ -41,7 +41,7 @@ Para descobrir a estrutura, use Glob:
 
 ## Área: Sistema de Fila
 
-**Arquivo destino:** `docs/business/fila.md`
+**Arquivo destino:** `docs/{projeto}/business/fila.md`
 **Prioridade:** 1
 
 **Backend (.NET):**
@@ -66,7 +66,7 @@ Para descobrir a estrutura, use Glob:
 
 ## Área: Participantes
 
-**Arquivo destino:** `docs/business/participantes.md`
+**Arquivo destino:** `docs/{projeto}/business/participantes.md`
 **Prioridade:** 5
 
 **Backend (.NET):**
@@ -92,7 +92,7 @@ Para descobrir a estrutura, use Glob:
 
 ## Área: Projetos e Autorias
 
-**Arquivo destino:** `docs/business/projetos.md`
+**Arquivo destino:** `docs/{projeto}/business/projetos.md`
 **Prioridade:** 2
 
 **Backend (.NET):**
@@ -117,7 +117,7 @@ Para descobrir a estrutura, use Glob:
 
 ## Área: Encontros e Presença
 
-**Arquivo destino:** `docs/business/encontros.md`
+**Arquivo destino:** `docs/{projeto}/business/encontros.md`
 **Prioridade:** 3
 
 **Backend (.NET):**
@@ -142,7 +142,7 @@ Para descobrir a estrutura, use Glob:
 
 ## Área: Apresentações
 
-**Arquivo destino:** `docs/business/apresentacoes.md`
+**Arquivo destino:** `docs/{projeto}/business/apresentacoes.md`
 **Prioridade:** 4
 
 **Backend (.NET):**
@@ -163,7 +163,7 @@ Para descobrir a estrutura, use Glob:
 
 ## Área: Autenticação e Controle de Acesso
 
-**Arquivo destino:** `docs/business/auth.md`
+**Arquivo destino:** `docs/{projeto}/business/auth.md`
 **Prioridade:** 7
 
 **Backend (.NET):**
@@ -190,7 +190,7 @@ Para descobrir a estrutura, use Glob:
 
 ## Área: Códigos Sequenciais
 
-**Arquivo destino:** `docs/business/codigos-sequenciais.md`
+**Arquivo destino:** `docs/{projeto}/business/codigos-sequenciais.md`
 **Prioridade:** 6
 
 **Backend (.NET):**

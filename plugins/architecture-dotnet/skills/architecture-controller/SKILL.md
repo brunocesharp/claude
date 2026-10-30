@@ -1,5 +1,5 @@
 ---
-name: dotnet-endpoint-generator
+name: architecture-controller
 description: Gera endpoints ASP.NET Core seguindo Clean Architecture e padrões estabelecidos. Use quando o usuário mencionar "criar endpoint", "novo endpoint", "adicionar endpoint", "API endpoint", "controller", "minimal API", "rota", "HTTP GET/POST/PUT/DELETE", "CRUD endpoint", "endpoint para", "expor via API", "criar rota". Também dispara quando o usuário pedir para criar funcionalidades que precisam ser expostas via HTTP. NÃO use para lógica de domínio pura sem exposição HTTP.
 ---
 

@@ -1,6 +1,6 @@
 ---
-name: dotnet-infrastructure-repository
-description: Gera repositórios na camada Infrastructure seguindo Clean Architecture. Use quando o usuário mencionar "criar repositório", "novo repositório", "repository", "implementar repositório", "repositório de", "persistência", "acesso a dados", "data access", "criar repository", "implementação do repositório". Também dispara quando pedir para criar implementações de IRepository, acesso ao banco de dados ou operações CRUD de persistência. NÃO use para interfaces de repositório (use dotnet-domain-entity) ou configurações de entidade EF Core (use dotnet-ef-configuration).
+name: architecture-repository
+description: Gera repositórios na camada Infrastructure seguindo Clean Architecture. Use quando o usuário mencionar "criar repositório", "novo repositório", "repository", "implementar repositório", "repositório de", "persistência", "acesso a dados", "data access", "criar repository", "implementação do repositório". Também dispara quando pedir para criar implementações de IRepository, acesso ao banco de dados ou operações CRUD de persistência. NÃO use para interfaces de repositório (use architecture-entities) ou configurações de entidade EF Core (use dotnet-ef-configuration).
 ---
 
 # .NET Infrastructure Repository Generator
@@ -109,7 +109,7 @@ Novo repositório
        ▼
 Interface existe em Domain?
        │
-      Não ──► Criar interface primeiro (use dotnet-domain-entity)
+      Não ──► Criar interface primeiro (use architecture-entities)
        │
       Sim
        │

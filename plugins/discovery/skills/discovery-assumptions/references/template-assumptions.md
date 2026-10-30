@@ -2,7 +2,7 @@
 
 Use este template para gerar o documento de hipóteses e premissas.
 
-Salve em: `docs/discovery/assumptions.md`
+Salve em: `docs/{projeto}/discovery/assumptions.md`
 
 ---
 

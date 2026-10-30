@@ -22,54 +22,56 @@ plugins/
             └── references/
 ```
 
-Cada plugin reúne as skills de uma fase/stack (discovery, spec-plan, architecture-dotnet, architecture-angular, business-docs). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
+Plugins: `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `business-docs`. Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
 
 ## Frontmatter obrigatório no SKILL.md
 
 ```yaml
 ---
-name: nome-da-skill
+name: nome-da-skill            # IGUAL ao nome da pasta
 description: >
   Quando usar (gatilhos em linguagem natural).
-  Quando NÃO usar.
+  Quando NÃO usar (citando o nome real de outras skills).
 metadata:
   version: 1.0.0
-  category: discovery | scope | spec | architecture | plan | deploy
+  category: workspace | discovery | scope | spec | architecture-docs | architecture | plan | deploy
   depends-on: skill-anterior     # opcional
   output: docs/{projeto}/pasta/arquivo.md
 ---
 ```
 
-## Fluxo de saída dos documentos
+O `name` é o identificador usado para invocar a skill e citado nas outras skills: mantenha igual ao nome da pasta. Ao renomear uma skill, procure o nome antigo em todo o repositório.
 
-Quando as skills são executadas num projeto real, os artefatos são salvos em:
+## Workspace com vários projetos
 
-**Com repositório Git** (o repositório já é exclusivo do projeto):
+As skills de documentação rodam numa **pasta só de documentação** (workspace) que reúne vários projetos. O código de cada projeto fica no próprio repositório; o caminho local fica no `project.md`.
+
 ```
 docs/
-├── project.md                        # gerado por discovery-init
-├── discovery/
-│   ├── vision.md                     # discovery-vision
-│   ├── opportunity.md                # discovery-opportunity
-│   ├── assumptions.md                # discovery-assumptions
-│   ├── stakeholders.md               # discovery-stakeholders
-│   └── success-metrics.md            # discovery-metrics
-└── escopo/
-    └── {titulo-kebab-case}/
-        ├── escopo.md                 # discovery-scoped
-        └── discovery/               # snapshot dos docs de discovery usados
+├── workspace.md                      # projetos: pasta, repositório, código local, situação (discovery-init)
+├── arquitetura/landscape.md          # visão de todos os sistemas (arch-c4, opcional)
+└── {projeto}/
+    ├── project.md                    # discovery-init
+    ├── repositorios.md               # multi-repo (só com código em vários repositórios)
+    ├── discovery/                    # discovery-vision / opportunity / assumptions / stakeholders / metrics
+    ├── escopo/{titulo}/escopo.md     # discovery-scoped (+ discovery/ com o snapshot usado)
+    ├── especificacao/{escopo}/spec-functional.md   # spec-functional
+    ├── arquitetura/                  # arch-c4 (arquitetura.md, componentes/, dinamicos/) e arch-adr (decisoes/)
+    ├── plano-execucao/{escopo}/execution-plan.md   # plan-execution
+    └── business/                     # business-docs (areas.md + {area}.md)
 ```
 
-**Sem repositório Git** (criado localmente):
-```
-{nome-do-projeto}/
-└── docs/
-    ├── project.md
-    ├── discovery/
-    └── escopo/
-```
+**Toda skill de documentação começa com o "Passo 0 — Identificar o projeto"** (mesmo texto em todas):
+1. Projeto citado na conversa → usa a pasta dele.
+2. Senão, lê `docs/workspace.md`: um projeto → usa e avisa; vários → lista e pergunta.
+3. Sem `workspace.md` → procura `docs/*/project.md`.
+4. Projeto inexistente → oferece `discovery-init`.
 
-A skill `discovery-init` é sempre o ponto de entrada — ela cria o `project.md` e a estrutura de pastas. Todas as outras skills verificam se `project.md` existe antes de executar.
+Ao mudar esse passo, mude em todas as skills. Skills que avançam de fase atualizam o `project.md` e a coluna Situação do `workspace.md`.
+
+**Onde está o código:** projeto de um repositório usa URL e Código local do `project.md`; com dois ou mais, a fonte única é `docs/{projeto}/repositorios.md` (skill `multi-repo`: papel, caminho, contêineres C4 e contratos de cada repositório). Skills que leem código (`arch-c4`, `business-docs`, `plan-execution`) consultam os dois. Nenhuma skill faz commit, push ou merge nos repositórios de código sem pedido explícito.
+
+Nada fica guardado nos arquivos da skill por projeto: configuração específica de um projeto (ex.: mapa de áreas do `business-docs`) vai para `docs/{projeto}/`.
 
 ## Dependências entre skills
 
@@ -78,13 +80,14 @@ discovery-init
   └── discovery-vision / opportunity / assumptions / stakeholders / metrics
         └── discovery-scoped
               └── spec-functional
-                    └── plan-execution
-                          └── architecture-entities / feature / repository / controller
-                                └── deploy-dotnet-homolog
-                                      └── deploy-dotnet-prod
+                    └── arch-c4  <->  arch-adr
+                          └── plan-execution  ->  multi-repo (mudança coordenada, se houver vários repositórios)
+                                └── architecture-entities / feature / repository / controller, angular-*
+                                      └── deploy-dotnet-homolog
+                                            └── deploy-dotnet-prod
 ```
 
-Skills de arquitetura (`architecture-*`) são independentes entre si e podem ser usadas sem discovery prévio.
+Skills de código (`architecture-*`, `angular-*`) são independentes entre si e podem ser usadas sem discovery prévio. A `arch-c4` também roda sem discovery, no modo Levantamento (lê o código do projeto).
 
 ## Padrões de design das skills
 
@@ -92,8 +95,19 @@ Skills de arquitetura (`architecture-*`) são independentes entre si e podem ser
 - **Nunca sobrescrever sem confirmação**: verificar existência do arquivo antes de criar
 - **Nomes de pasta em kebab-case**: confirmar com o usuário antes de criar
 - **Registrar como "a definir"**: quando o usuário não souber uma informação, seguir normalmente
-- **Result Pattern**: skills de arquitetura geram código com `Result<T>` em vez de exceções
+- **Result Pattern**: skills de código .NET geram código com `Result<T>` em vez de exceções
 - **CQRS com MediatR**: commands (escrita) e queries (leitura) separados, handlers retornam `Result<T>`
+
+## Skills de documentação de arquitetura (C4)
+
+Baseadas em *The C4 model for visualising software architecture* (Simon Brown). Diagramas em **Mermaid C4** dentro do Markdown.
+
+| Skill | O que gera |
+|-------|------------|
+| `arch-c4` | `arquitetura.md` com contexto e contêineres (obrigatórios), componentes por contêiner (opcional), deployment por ambiente, dinâmicos e landscape (opcionais), glossário e pontos em aberto. Modos Design, Levantamento (código) e Atualização |
+| `arch-adr` | Um ADR por decisão (`decisoes/ADR-NNN-titulo.md`) + índice; decisão aceita é substituída, não editada |
+
+O Mermaid C4 é experimental: não desenha legenda (cada diagrama tem tabela de legenda abaixo) e o layout segue a ordem das declarações. Detalhes em `plugins/architecture-docs/skills/arch-c4/references/mermaid-c4.md`.
 
 ## Skills de arquitetura .NET
 
@@ -111,6 +125,10 @@ Geram código seguindo Clean Architecture + DDD + CQRS + Result Pattern:
 
 1. Escolher o plugin correto em `plugins/<plugin>/skills/` (ou criar um novo plugin com `.claude-plugin/plugin.json` e registrá-lo em `.claude-plugin/marketplace.json`)
 2. Criar a pasta `plugins/<plugin>/skills/nome-da-skill/`
-3. Criar `SKILL.md` com frontmatter válido e fluxo de execução detalhado
+3. Criar `SKILL.md` com frontmatter válido (`name` = nome da pasta) e fluxo de execução detalhado; skill de documentação começa com o Passo 0 e salva em `docs/{projeto}/`
 4. Adicionar arquivos de referência em `references/` (templates, exemplos, frameworks teóricos)
-5. Atualizar o `README.md` com a nova skill nas tabelas e no diagrama de fluxo
+5. Atualizar o `README.md` com a nova skill nas tabelas e no diagrama de fluxo, e o `0.0 - contexto-projeto-skills.md`
+
+## Arquivos que não vão para o Git
+
+Livros e PDFs de referência (ex.: o livro do C4) ficam só na máquina local: são material com direitos autorais e o repositório é público. O conteúdo necessário vai resumido nas `references/` das skills, citando a fonte.

@@ -1,6 +1,6 @@
 ---
-name: dotnet-domain-entity
-description: Gera entidades de domínio seguindo DDD e Clean Architecture. Use quando o usuário mencionar "criar entidade", "nova entidade", "entity", "aggregate", "aggregate root", "value object", "domain model", "modelo de domínio", "classe de domínio", "tabela", "criar tabela", "nova tabela", "definir entidade", "modelar entidade". Também dispara quando pedir para criar modelos que representam conceitos de negócio, objetos persistidos ou agregados. NÃO use para DTOs (use application-feature), endpoints (use endpoint-generator) ou configurações de banco (use infrastructure).
+name: architecture-entities
+description: Gera entidades de domínio seguindo DDD e Clean Architecture. Use quando o usuário mencionar "criar entidade", "nova entidade", "entity", "aggregate", "aggregate root", "value object", "domain model", "modelo de domínio", "classe de domínio", "tabela", "criar tabela", "nova tabela", "definir entidade", "modelar entidade". Também dispara quando pedir para criar modelos que representam conceitos de negócio, objetos persistidos ou agregados. NÃO use para DTOs (use architecture-feature), endpoints (use architecture-controller) ou configurações de banco (use architecture-repository).
 ---
 
 # .NET Domain Entity Generator

@@ -1,0 +1,8 @@
+{
+  "name": "workspace",
+  "description": "Skills de organização do workspace de documentação: cadastro dos repositórios de cada projeto, panorama do Git em vários repositórios e coordenação de mudanças que atravessam repositórios.",
+  "version": "1.0.0",
+  "author": {
+    "name": "brunocesharp"
+  }
+}
