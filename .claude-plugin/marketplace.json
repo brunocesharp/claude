@@ -43,6 +43,11 @@
       "name": "business-docs",
       "source": "./plugins/business-docs",
       "description": "Skill para documentação das regras de negócio do domínio."
+    },
+    {
+      "name": "art-direction",
+      "source": "./plugins/art-direction",
+      "description": "Skills de direção de arte: fundação visual, sistema cromático, tipografia, iconografia e validação de identidade visual para projetos digitais."
     }
   ]
 }
