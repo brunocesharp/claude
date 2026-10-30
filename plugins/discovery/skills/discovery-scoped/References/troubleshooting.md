@@ -7,7 +7,7 @@ Problemas comuns durante a geração de escopo e como resolvê-los.
 ## Problema: Discovery incompleto ou inexistente
 
 ### Sintoma
-- Faltam arquivos em `docs/discovery/`
+- Faltam arquivos em `docs/{projeto}/discovery/`
 - Arquivos existem mas estão superficiais
 - Usuário quer gerar escopo "do zero"
 

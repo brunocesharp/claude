@@ -1,5 +1,5 @@
 ---
-name: generating-java-unit-tests
+name: architecture-unit-test
 description: >
   Generates JUnit 5 unit test files in Java 25 from BDD documentation, following TDD
   (tests written before implementation), Spring Boot conventions, and Given-When-Then structure.
@@ -53,7 +53,7 @@ BDD is considered provided when the user shares at least one scenario in any of 
 
 ### Step 2 — Collect context
 
-If `docs/project-config.json` exists in the project root, read it to extract `name` and `docs_root` for context — but do not require it. The skill works without it.
+If the documentation workspace has `docs/{projeto}/project-config.json` for this project, read it to extract `name` and `docs_root` for context (the BDD specs are in `docs/{projeto}/especificacao/{escopo}/spec-functional.md`) — but do not require it. The skill works without it.
 
 Extract from the BDD and user's message. Ask **only** for the project root path if not provided.
 

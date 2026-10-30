@@ -2,7 +2,7 @@
 
 Use este template para gerar o documento de mapeamento de oportunidades.
 
-Salve em: `docs/discovery/opportunity.md`
+Salve em: `docs/{projeto}/discovery/opportunity.md`
 
 ---
 

@@ -1,13 +1,13 @@
 ---
-name: scope-generate
-description: Gera um documento de escopo consolidando os documentos de discovery existentes, criando a pasta escopo/{titulo}/escopo.md com cópias dos arquivos de discovery relevantes. Use quando o usuário mencionar "gerar escopo", "criar escopo", "montar escopo", "definir escopo", "escopo do projeto", "escopo da feature", "PRD", "documento de requisitos", "o que vamos construir", "formalizar o que será feito", "consolidar discovery", "fechar escopo", "escopo do módulo", "escopo da fase". Requer discovery-init e preferencialmente os documentos de discovery completos. NÃO use para conduzir discovery (use as skills discovery-*), especificação técnica (use spec-*) ou plano de execução (use plan-*). Esta skill CONSOLIDA o discovery em um documento formal, não coleta novas informações.
+name: discovery-scoped
+description: Gera um documento de escopo consolidando os documentos de discovery existentes, criando a pasta escopo/{titulo}/escopo.md com cópias dos arquivos de discovery relevantes. Use quando o usuário mencionar "gerar escopo", "criar escopo", "montar escopo", "definir escopo", "escopo do projeto", "escopo da feature", "PRD", "documento de requisitos", "o que vamos construir", "formalizar o que será feito", "consolidar discovery", "fechar escopo", "escopo do módulo", "escopo da fase". Requer discovery-init e preferencialmente os documentos de discovery completos. NÃO use para conduzir discovery (use as skills discovery-*), especificação funcional (use spec-functional), arquitetura (use arch-c4) ou plano de execução (use plan-execution). Esta skill CONSOLIDA o discovery em um documento formal, não coleta novas informações.
 metadata:
   author: Equipe de Discovery
   version: 1.1.0
   category: scope
   depends-on: discovery-init
   recommended-after: discovery-metrics
-  output: "{docs_root}/escopo/{titulo}/escopo.md"
+  output: docs/{projeto}/escopo/{titulo}/escopo.md
   consolidates: vision, opportunity, assumptions, stakeholders, success-metrics
 ---
 
@@ -23,12 +23,22 @@ Para o fluxo de aprovação e estados, consulte `references/situation-management
 
 ## Pré-requisito
 
-Leia `docs/project-config.json` para obter a configuração do projeto.
+### Passo 0 — Identificar o projeto
 
-- **Se não existir**: informe que é necessário executar `discovery-init` e ofereça criar agora.
-- **Se existir**: extraia `docs_root` (padrão: `"docs"`). Use esse valor como prefixo em todos os caminhos desta skill. Leia `{docs_root}/project.md` para obter nome e contexto geral.
+A raiz de trabalho é uma pasta de documentação com vários projetos, cada um em `docs/{projeto}/`.
 
-> Execute sempre as skills a partir da raiz do projeto (pasta que contém `docs/`).
+1. Se o usuário citou o projeto, use a pasta dele.
+2. Senão, leia `docs/workspace.md`: com um único projeto, use-o e avise; com vários, liste e pergunte qual.
+3. Sem `docs/workspace.md`, procure `docs/*/project.md`.
+4. Se o projeto não existir, ofereça iniciá-lo com `discovery-init`.
+5. Leia `docs/{projeto}/project-config.json` (nome, stack, repositório; ver o schema em `discovery-init/references/project-config-schema.md`). Se não existir, use o `project.md` e ofereça criar o config a partir dele.
+
+`{projeto}` é a pasta escolhida; todos os caminhos abaixo são relativos à raiz de trabalho.
+
+Verifique se `docs/{projeto}/project.md` existe.
+
+- **Se não existir**: informe que é necessário iniciar com `discovery-init`
+- **Se existir**: leia para obter nome do projeto e contexto geral
 
 ---
 
@@ -36,18 +46,13 @@ Leia `docs/project-config.json` para obter a configuração do projeto.
 
 ### Passo 1 — Identificar o projeto
 
-> "Para qual projeto vamos gerar o escopo?"
-
-Leia `{docs_root}/project.md` para confirmar o projeto.
-
-**Validação:**
-- Se não existir, ofereça criar com `discovery-init`
+Use o projeto identificado no Passo 0 e leia `docs/{projeto}/project.md`.
 
 ---
 
 ### Passo 2 — Ler os documentos de discovery
 
-Leia todos os arquivos em `{docs_root}/discovery/`:
+Leia todos os arquivos em `docs/{projeto}/discovery/`:
 
 - `vision.md` — visão, problema, público-alvo
 - `opportunity.md` — dores, jobs to be done
@@ -64,7 +69,7 @@ Leia todos os arquivos em `{docs_root}/discovery/`:
 
 ### Passo 3 — Ler escopos já existentes
 
-Leia todos os `escopo.md` em `{docs_root}/escopo/*/escopo.md`:
+Leia todos os `escopo.md` em `docs/{projeto}/escopo/*/`:
 
 Para cada escopo, extraia:
 - Título
@@ -123,10 +128,9 @@ Converta título para kebab-case:
 - "Módulo de Autenticação" → `modulo-de-autenticacao`
 - "Fase 1 — MVP" → `fase-1-mvp`
 
-Crie a estrutura em `{docs_root}/escopo/{titulo-kebab}/`:
-
+Crie:
 ```
-{docs_root}/escopo/{titulo-kebab}/
+docs/{projeto}/escopo/{titulo-kebab}/
 ├── escopo.md
 └── discovery/
     ├── vision.md          (cópia, se relevante)
@@ -161,8 +165,8 @@ Para checklist de qualidade, consulte `references/checklist.md`.
 
 > "Escopo **'{título}'** criado com sucesso!
 >
-> 📄 `{docs_root}/escopo/{titulo-kebab}/escopo.md`
-> 📁 Discovery copiado para `{docs_root}/escopo/{titulo-kebab}/discovery/`
+> 📄 `docs/{projeto}/escopo/{titulo-kebab}/escopo.md`
+> 📁 Discovery copiado para `docs/{projeto}/escopo/{titulo-kebab}/discovery/`
 >
 > **Situação:** Rascunho
 >

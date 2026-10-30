@@ -1,6 +1,6 @@
 ---
-name: dotnet-deploy-prod
-description: Executa deploy de aplicação .NET API no ambiente de Produção. Use quando o usuário mencionar "deploy produção", "deploy prod", "publicar em produção", "subir para prod", "deploy production", "fazer deploy prod", "atualizar produção", "release produção", "go live", "deploy prd". Também dispara quando pedir para fazer build e deploy da aplicação em ambiente de produção/live. NÃO use para deploy em homologação (use dotnet-deploy-homolog) ou desenvolvimento.
+name: deploy-dotnet-prod
+description: Executa deploy de aplicação .NET API no ambiente de Produção. Use quando o usuário mencionar "deploy produção", "deploy prod", "publicar em produção", "subir para prod", "deploy production", "fazer deploy prod", "atualizar produção", "release produção", "go live", "deploy prd". Também dispara quando pedir para fazer build e deploy da aplicação em ambiente de produção/live. NÃO use para deploy em homologação (use deploy-dotnet-homolog) ou desenvolvimento.
 ---
 
 # .NET Deploy Produção

@@ -1,27 +1,28 @@
 ---
 name: discovery-init
-description: Inicia o discovery de um novo projeto de software criando o project.md e a estrutura de pastas. Use quando o usuário disser "iniciar projeto", "novo projeto", "começar discovery", "criar projeto", "setup do projeto", "quero começar um projeto". NÃO use se o projeto já foi iniciado — nesses casos leia o project.md existente.
+description: Inicia um novo projeto na pasta de documentação (workspace com vários projetos), criando docs/{projeto}/project.md, a estrutura de pastas e o registro em docs/workspace.md. Use quando o usuário disser "iniciar projeto", "novo projeto", "começar discovery", "criar projeto", "setup do projeto", "quero começar um projeto", "adicionar projeto ao workspace". NÃO use se o projeto já foi iniciado — nesses casos leia o docs/{projeto}/project.md existente.
 metadata:
-  version: 2.1.0
+  version: 3.1.0
   category: discovery
+  output: docs/{projeto}/project-config.json, docs/{projeto}/project.md, docs/workspace.md
 ---
 
 # Discovery Init
 
-Skill responsável por inicializar um novo projeto, coletar informações básicas, criar o arquivo `project.md`, montar a estrutura de pastas de documentação e publicar tudo no repositório Git do projeto.
+Skill responsável por iniciar um projeto dentro da **pasta de documentação** (workspace), coletar as informações básicas, criar `docs/{projeto}/project-config.json` e `docs/{projeto}/project.md`, montar a estrutura de pastas e registrar o projeto em `docs/workspace.md`.
 
-> **Importante:** todos os arquivos e pastas criados por esta skill vão para o **repositório do projeto alvo** (informado pelo usuário), nunca para o repositório de skills onde esta skill está instalada.
+> **Workspace:** a raiz de trabalho é uma pasta só de documentação que reúne vários projetos. Cada projeto fica em `docs/{projeto}/` (kebab-case). O código de cada projeto continua no próprio repositório, registrado no `project.md`. Nunca crie esses arquivos no repositório de skills.
 
 ---
 
 ## Fluxo de execução
 
-### Passo 1 — Verificar se o projeto já existe
+### Passo 1 — Verificar o workspace
 
-Antes de qualquer pergunta, verifique se já existe um arquivo `docs/project.md` que corresponda ao que o usuário está descrevendo.
-
-- **Se existir**: não sobrescreva. Leia o arquivo, informe o usuário e pergunte se deseja atualizar algum campo.
-- **Se não existir**: siga para o Passo 2.
+1. Verifique se `docs/workspace.md` existe.
+   - **Não existe**: este é o primeiro projeto do workspace. O arquivo será criado no Passo 5.
+   - **Existe**: leia a lista de projetos.
+2. Se o projeto que o usuário descreve já estiver na lista (ou já existir `docs/{projeto}/project.md`): **não sobrescreva**. Leia o arquivo, mostre os campos e pergunte se deseja atualizar algum.
 
 ---
 
@@ -31,83 +32,50 @@ Faça as perguntas abaixo uma de cada vez, em tom conversacional:
 
 1. **Nome do projeto**
    - "Qual é o nome do projeto?"
-   - Adicione o nome do projeto no arquivo `project.md` e use-o para personalizar as próximas perguntas.
+   - Proponha a pasta em kebab-case, sem acentos (ex.: "Gestão de Estoque" → `gestao-de-estoque`), e confirme antes de criar.
 
 2. **Descrição resumida**
    - "Em uma frase, qual é a ideia central desse projeto?"
 
-3. **Repositório Git**
-   - "Qual é a URL do repositório Git? (ex: https://github.com/org/repo)"
-   - Se não tiver ainda, registre como `"a definir"` e siga para o Passo 3 sem executar nenhum comando git.
+3. **Repositório de código**
+   - "O código fica em um repositório só ou em vários (ex.: backend e frontend separados)?"
+   - **Um**: "Qual é a URL do repositório? (ex.: https://github.com/org/repo)" e "Ele está clonado nesta máquina? Em qual pasta?" — o caminho local é usado por skills que leem o código (`arch-c4` em sistema existente, `business-docs`).
+   - **Vários**: registre na seção Repositório o apontamento para `docs/{projeto}/repositorios.md` e, no Passo 6, ofereça cadastrar os repositórios com a skill `multi-repo`.
+   - Se ainda não existir, registre `a definir` e siga.
 
 4. **Tipo de projeto** *(opcional)*
-   - "Que tipo de sistema é esse? (ex: web app, API, mobile, integração, etc.)"
+   - "Que tipo de sistema é esse? (ex.: web app, API, mobile, integração)"
+
+5. **Stack principal** *(opcional)*
+   - "Qual é a tecnologia principal? (ex.: .NET, Angular, Java)" — ajuda as skills a escolher as skills de código.
+
+6. **Responsável** *(opcional)*
 
 ---
 
-### Passo 3 — Clonar o repositório alvo
+### Passo 3a — Gerar `docs/{projeto}/project-config.json`
 
-> **Execute apenas se uma URL de repositório válida foi informada. Pule este passo se a URL for "a definir".**
-
-Execute os comandos abaixo via Bash:
-
-```bash
-# Clona o repositório alvo em um diretório temporário
-git clone {url-do-repositorio} /tmp/{nome-do-projeto}
-```
-
-Se o clone falhar (repo privado, credenciais, URL inválida), informe o erro ao usuário e pergunte se deseja corrigir a URL ou continuar sem repositório (registrando como "a definir").
-
-Após o clone bem-sucedido, confirme a branch padrão:
-
-```bash
-cd /tmp/{nome-do-projeto} && git branch --show-current
-```
-
-Guarde o nome da branch para usar no push (Passo 6).
-
----
-
-### Passo 4 — Gerar `project-config.json` e `project.md` no repositório alvo
-
-O caminho base depende do setup:
-
-| Situação | Pasta base |
-|---|---|
-| Com repositório clonado | `/tmp/{nome-do-projeto}/docs/` |
-| Sem repositório (local) | `{nome-do-projeto}/docs/` |
-
-O repositório já é exclusivo do projeto — o nome do projeto está no nome do repositório, não na pasta `docs/`.
-
-> Consulte `references/project-config-schema.md` para a descrição completa de cada campo.
-
-#### 4a — Criar `project-config.json`
-
-Este arquivo é lido por todas as outras skills para resolver caminhos e obter contexto do projeto.
-
-Template (ajuste os valores com as respostas do usuário):
+Lido pelas outras skills no Passo 0. Descrição de cada campo em `references/project-config-schema.md`.
 
 ```json
 {
   "name": "{Nome do Projeto}",
-  "slug": "{nome-do-projeto}",
+  "slug": "{projeto}",
   "version": "1.0.0",
-  "setup": "git",
-  "docs_root": "docs",
+  "docs_root": "docs/{projeto}",
+  "repositories": "um",
   "repository_url": "{url ou a definir}",
+  "code_path": "{caminho local ou a definir}",
   "project_type": "{tipo do projeto ou a definir}",
-  "tech_stack": "a definir",
+  "tech_stack": "{stack ou a definir}",
   "responsible": "{responsável ou a definir}",
   "created_at": "{data atual no formato DD/MM/YYYY}"
 }
 ```
 
-- Use `"setup": "git"` se repositório foi clonado; `"setup": "local"` se sem repositório.
-- `docs_root` é sempre `"docs"` salvo se o usuário solicitar outro nome.
+Com vários repositórios: `"repositories": "varios"` e `repository_url`/`code_path` com `"ver repositorios.md"`.
 
-#### 4b — Criar `project.md`
-
-Template:
+### Passo 3b — Gerar `docs/{projeto}/project.md`
 
 ```markdown
 # {Nome do Projeto}
@@ -117,83 +85,94 @@ Template:
 
 ## Repositório
 - URL: {url ou "a definir"}
+- Código local: {caminho local ou "a definir"}
 - Tipo: {tipo do projeto ou "a definir"}
 
 ## Metadados
+- Pasta: `docs/{projeto}/`
 - Iniciado em: {data atual no formato DD/MM/YYYY}
-- Responsável: {perguntar ao usuário ou deixar "a definir"}
+- Responsável: {nome ou "a definir"}
 
 ## Estrutura de Documentação
-- Discovery: `docs/discovery/`
-- Escopo: `docs/escopo/`
-- Discovery: `docs/discovery/`
-- Escopo: `docs/escopo/`
+- Discovery: `docs/{projeto}/discovery/`
+- Escopo: `docs/{projeto}/escopo/`
+- Especificação: `docs/{projeto}/especificacao/`
+- Arquitetura: `docs/{projeto}/arquitetura/`
+- Plano de execução: `docs/{projeto}/plano-execucao/`
+- Regras de negócio: `docs/{projeto}/business/`
 
 ## Status das Fases
 - [ ] Discovery
 - [ ] Escopo
 - [ ] Especificação
-- [ ] Refinamento
+- [ ] Arquitetura
 - [ ] Plano de Execução
 - [ ] Homologação
 - [ ] Produção
 ```
 
+**Projeto com vários repositórios:** na seção Repositório, troque as linhas URL e Código local por `- Repositórios: vários, ver docs/{projeto}/repositorios.md`. O cadastro de cada repositório é feito pela skill `multi-repo`.
+
 ---
 
-### Passo 4 — Perguntar sobre estrutura de pastas
+### Passo 4 — Criar a estrutura de pastas
 
-Após salvar o `project.md`, pergunte:
+Pergunte:
 
 > "Deseja que eu crie agora a estrutura de pastas de documentação para este projeto?"
 
-**Se sim**, crie as pastas com `.gitkeep` para que o Git as versione:
+**Se sim**, crie as pastas com `.gitkeep`:
 ```
-docs/discovery/.gitkeep
-docs/escopo/.gitkeep
-```
-
-**Sem repositório** (local, pule o Passo 6):
-```bash
-mkdir -p {nome-do-projeto}/docs/discovery
-mkdir -p {nome-do-projeto}/docs/escopo
-touch {nome-do-projeto}/docs/discovery/.gitkeep
-touch {nome-do-projeto}/docs/escopo/.gitkeep
+docs/{projeto}/discovery/.gitkeep
+docs/{projeto}/escopo/.gitkeep
+docs/{projeto}/especificacao/.gitkeep
+docs/{projeto}/arquitetura/.gitkeep
+docs/{projeto}/plano-execucao/.gitkeep
 ```
 
-> **Setup local:** após a criação, informe o usuário: "Para usar as outras skills, execute-as **a partir da pasta `{nome-do-projeto}/`**, onde está a pasta `docs/`."
+**Se não**, informe que as pastas são criadas pelas próprias skills quando forem usadas.
 
 ---
 
-### Passo 6 — Commit e push no repositório alvo
+### Passo 5 — Registrar no `docs/workspace.md`
 
-> **Execute apenas se o clone foi realizado com sucesso no Passo 3.**
+Se o arquivo não existir, crie com o template abaixo. Se existir, acrescente uma linha na tabela (mantenha a ordem alfabética) sem alterar as demais.
 
-```bash
-cd /tmp/{nome-do-projeto}
-git add docs/
-git commit -m "docs: inicializa estrutura de documentação do projeto"
-git push origin {branch}
+```markdown
+# Workspace de Documentação
+
+Pasta de documentação que reúne vários projetos. Cada projeto fica em `docs/{projeto}/`.
+As skills identificam o projeto pelo nome citado na conversa ou por esta lista.
+
+## Projetos
+
+| Projeto | Pasta | Repositório | Código local | Situação |
+|---------|-------|-------------|--------------|----------|
+| {Nome} | `docs/{projeto}/` | {url ou "a definir"} | {caminho ou "a definir"} | Discovery |
+
+## Arquitetura do conjunto
+
+Visão de todos os sistemas e de como se relacionam (System Landscape): `docs/arquitetura/landscape.md`
+(gerado pela skill `arch-c4` quando houver mais de um sistema relacionado).
 ```
 
-Após o push, confirme ao usuário:
+Projeto com vários repositórios: nas colunas Repositório e Código local, registre `vários (ver docs/{projeto}/repositorios.md)`.
 
-> "Estrutura de documentação criada e publicada no repositório! Branch: `{branch}`
-> - `docs/project-config.json`
-> - `docs/project.md`
-> - `docs/discovery/`
-> - `docs/escopo/`"
+A coluna **Situação** acompanha a fase atual do projeto (Discovery, Escopo, Especificação, Arquitetura, Desenvolvimento, Produção). As outras skills atualizam essa coluna quando avançam de fase.
 
 ---
 
-### Passo 7 — Sugerir próximos passos
+### Passo 6 — Sugerir próximos passos
 
-> "O projeto **{nome}** foi iniciado! As próximas etapas do discovery são:
-> - **Visão do projeto** — definir o problema, público-alvo e proposta de valor
-> - **Mapeamento de oportunidades** — identificar dores e jobs to be done
-> - **Hipóteses e premissas** — levantar o que ainda precisa ser validado
-> - **Stakeholders** — mapear os envolvidos e seus interesses
-> - **Métricas de sucesso** — definir como vamos medir o sucesso
+> "O projeto **{nome}** foi iniciado em `docs/{projeto}/` e registrado no workspace. As próximas etapas do discovery são:
+> - **Visão do projeto** — problema, público-alvo e proposta de valor
+> - **Oportunidades** — dores e jobs to be done
+> - **Hipóteses e premissas** — o que ainda precisa ser validado
+> - **Stakeholders** — envolvidos e seus interesses
+> - **Métricas de sucesso** — como medir o sucesso
+>
+> Se for um sistema que já existe, também dá para começar pela **arquitetura (C4)** a partir do código.
+> {Se tiver vários repositórios:} Antes, vale cadastrar os repositórios (`multi-repo`), para as skills saberem onde está cada parte do código.
 >
 > Por onde quer começar?"
 
@@ -201,36 +180,36 @@ Após o push, confirme ao usuário:
 
 ## Regras importantes
 
-- Todos os arquivos vão para o **repositório alvo** — nunca para o repositório de skills.
-- **Com repositório**: a pasta `docs/` fica na raiz do repo — o nome do projeto está no nome do repositório, não dentro de `docs/`.
-- **Sem repositório**: crie a pasta `{nome-do-projeto}/` em kebab-case no diretório atual — confirme o nome com o usuário antes de criar. Informe que as outras skills devem ser executadas **de dentro dessa pasta**.
-- Crie sempre **`project-config.json` e `project.md`** — o config é lido pelas outras skills para resolver caminhos.
-- Nunca sobrescreva arquivos existentes sem confirmação explícita.
-- Se o usuário não souber responder algo, registre como `"a definir"` e siga.
-- O diretório temporário `/tmp/{nome-do-projeto}` pode ser descartado após o push — o usuário pode clonar o repo localmente depois.
+- Todos os arquivos vão para a **pasta de documentação (workspace)** — nunca para o repositório de skills nem para o repositório de código.
+- Todo projeto fica em `docs/{projeto}/`, mesmo que o workspace tenha um só projeto.
+- Nome de pasta em kebab-case, sem acentos, confirmado com o usuário.
+- Crie sempre os dois: `project-config.json` (lido pelas skills) e `project.md` (resumo para pessoas), coerentes entre si.
+- Nunca sobrescreva um `project.md` ou `project-config.json` existente sem confirmação explícita.
+- Nunca reescreva o `workspace.md` inteiro: só acrescente ou atualize a linha do projeto.
+- Se o usuário não souber responder algo, registre como `a definir` e siga.
+- Se o workspace for um repositório Git, não faça commit nem push sem o usuário pedir.
 
 ---
 
 ## Troubleshooting
 
 **`project.md` já existe para esse projeto**
-Não sobrescreva. Leia o conteúdo atual, apresente os campos existentes ao usuário e pergunte: "Deseja atualizar algum campo?"
+Não sobrescreva. Leia o conteúdo atual, apresente os campos e pergunte: "Deseja atualizar algum campo?"
 
-**Clone falha (repositório privado ou credenciais ausentes)**
-Informe o erro exato. Oriente o usuário a configurar autenticação (SSH key ou token) e tente novamente. Se não for possível resolver, registre a URL como "a definir" e continue sem git.
+**Projeto tem `project.md` mas não tem `project-config.json`**
+Projeto criado antes do config. Monte o config a partir dos campos do `project.md`, mostre e crie após confirmação.
 
-**Push rejeitado (sem permissão ou branch protegida)**
-Informe o erro. Pergunte se o usuário deseja usar outra branch:
-```bash
-git checkout -b docs/init-discovery
-git push origin docs/init-discovery
-```
+**Projeto existe em `docs/` mas não está no `workspace.md`**
+Acontece com projetos criados antes do workspace. Leia o `project.md` e acrescente a linha no `workspace.md`.
+
+**Documentos antigos em `docs/` sem pasta de projeto** (ex.: `docs/project.md`, `docs/discovery/`)
+Estrutura anterior, de um projeto por repositório (inclusive com `docs/project-config.json`). Proponha mover para `docs/{projeto}/` (com `git mv`, se for repositório Git) e só mova após confirmação.
+
+**Projeto de um repositório passou a ter vários**
+Use a skill `multi-repo` (Cadastrar): ela cria `docs/{projeto}/repositorios.md` com o repositório atual e os novos, e atualiza o `project.md` e o `workspace.md`.
 
 **Nome do projeto com caracteres especiais ou acentos**
-Normalize para kebab-case sem acentos (ex: "Gestão de Estoque" → `gestao-de-estoque`). Confirme com o usuário antes de usar.
-
-**Usuário não tem repositório Git ainda**
-Registre a URL como `"a definir"` no `project.md`. Crie os arquivos localmente. Não bloqueie o fluxo — o repositório pode ser adicionado depois atualizando o arquivo.
+Normalize para kebab-case sem acentos (ex.: "Gestão de Estoque" → `gestao-de-estoque`) e confirme.
 
 **Usuário quer iniciar mais de um projeto na mesma conversa**
-Execute o fluxo completo para cada projeto separadamente, um de cada vez. Use diretórios temporários diferentes (`/tmp/{nome-projeto-1}`, `/tmp/{nome-projeto-2}`).
+Execute o fluxo completo para cada projeto, um de cada vez; cada um ganha a própria pasta e a própria linha no `workspace.md`.

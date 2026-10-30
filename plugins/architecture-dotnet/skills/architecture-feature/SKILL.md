@@ -1,6 +1,6 @@
 ---
-name: dotnet-application-feature
-description: Gera Commands e Queries na camada Application seguindo CQRS e Clean Architecture. Use quando o usuário mencionar "criar command", "novo command", "criar query", "nova query", "feature application", "caso de uso", "use case", "handler", "criar handler", "command handler", "query handler", "adicionar command", "adicionar query", "operação de escrita", "operação de leitura", "CQRS". Também dispara quando pedir para criar funcionalidades que envolvam orquestração de casos de uso, busca de dados ou alteração de estado. NÃO use para lógica de domínio pura (use domain-layer) ou endpoints HTTP (use dotnet-endpoint-generator).
+name: architecture-feature
+description: Gera Commands e Queries na camada Application seguindo CQRS e Clean Architecture. Use quando o usuário mencionar "criar command", "novo command", "criar query", "nova query", "feature application", "caso de uso", "use case", "handler", "criar handler", "command handler", "query handler", "adicionar command", "adicionar query", "operação de escrita", "operação de leitura", "CQRS". Também dispara quando pedir para criar funcionalidades que envolvam orquestração de casos de uso, busca de dados ou alteração de estado. NÃO use para lógica de domínio pura (use architecture-entities) ou endpoints HTTP (use architecture-controller).
 ---
 
 # .NET Application Feature Generator

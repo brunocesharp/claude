@@ -5,8 +5,8 @@ metadata:
   author: Equipe de Especificação
   version: 1.1.0
   category: specification
-  depends-on: scope-generate
-  output: "{docs_root}/especificacao/{escopo}/spec-functional.md"
+  depends-on: discovery-scoped
+  output: docs/{projeto}/especificacao/{escopo}/spec-functional.md
 ---
 
 # Spec Functional
@@ -23,11 +23,21 @@ Antes de iniciar qualquer especificação, consulte os arquivos de referência:
 
 ## Pré-requisito
 
-Leia `docs/project-config.json` e extraia `docs_root` (padrão: `"docs"`).
+### Passo 0 — Identificar o projeto
 
-Verifique se existe `{docs_root}/escopo/{nome-do-escopo}/escopo.md`.
+A raiz de trabalho é uma pasta de documentação com vários projetos, cada um em `docs/{projeto}/`.
 
-- **Não existe:** informe o usuário e ofereça executar `scope-generate` agora.
+1. Se o usuário citou o projeto, use a pasta dele.
+2. Senão, leia `docs/workspace.md`: com um único projeto, use-o e avise; com vários, liste e pergunte qual.
+3. Sem `docs/workspace.md`, procure `docs/*/project.md`.
+4. Se o projeto não existir, ofereça iniciá-lo com `discovery-init`.
+5. Leia `docs/{projeto}/project-config.json` (nome, stack, repositório; ver o schema em `discovery-init/references/project-config-schema.md`). Se não existir, use o `project.md` e ofereça criar o config a partir dele.
+
+`{projeto}` é a pasta escolhida; todos os caminhos abaixo são relativos à raiz de trabalho.
+
+Verifique se existe `docs/{projeto}/escopo/{nome-do-escopo}/escopo.md`.
+
+- **Não existe:** informe o usuário e ofereça executar `discovery-scoped` agora.
 - **Existe:** leia o arquivo completamente e extraia: título, funcionalidades listadas, usuários afetados, hipóteses críticas e restrições. Não repita perguntas já respondidas.
 
 ---
@@ -137,17 +147,19 @@ Ao concluir todas as features:
 
 Use o template em `references/template-spec-functional.md` como base.
 
-Salve em `{docs_root}/especificacao/{nome-do-escopo}/spec-functional.md`.
+Salve em: `docs/{projeto}/especificacao/{nome-do-escopo}/spec-functional.md`
 
 ---
 
 ## Após Gerar o Documento
 
-> "Documento salvo em `{docs_root}/especificacao/{escopo}/spec-functional.md`.
+> "Documento salvo em `docs/{projeto}/especificacao/{escopo}/spec-functional.md`.
 > {N} features especificadas, {M} cenários no total.
 > {Se houver pontos em aberto}: {X} pontos precisam de resposta dos stakeholders."
 
-Sugira os próximos passos com base no que foi levantado.
+Atualize `docs/{projeto}/project.md` (Especificação em andamento) e a coluna Situação do projeto em `docs/workspace.md`.
+
+Sugira os próximos passos com base no que foi levantado. Se a arquitetura do projeto ainda não estiver documentada (`docs/{projeto}/arquitetura/arquitetura.md`), ou se a especificação traz um sistema externo ou um contêiner novo, sugira a skill `arch-c4` antes do plano de execução.
 
 ---
 

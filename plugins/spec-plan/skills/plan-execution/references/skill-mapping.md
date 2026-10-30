@@ -12,13 +12,13 @@ Este documento mapeia cada tipo de tarefa para a skill apropriada do ecossistema
 
 | Skill | Camada | Propósito |
 |-------|--------|-----------|
-| `dotnet-domain-entity` | Domain | Entidades, Value Objects, Aggregates, Interfaces |
-| `dotnet-infrastructure-repository` | Infrastructure | Repositórios, DbContext, Unit of Work |
-| `dotnet-application-feature` | Application | Commands, Queries, Handlers, DTOs |
-| `dotnet-endpoint-generator` | Presentation | Controllers, Endpoints, Validators |
-| `dotnet-external-service` | Infrastructure | Integrações com APIs externas |
-| `dotnet-deploy-homolog` | DevOps | Deploy em homologação |
-| `dotnet-deploy-prod` | DevOps | Deploy em produção |
+| `architecture-entities` | Domain | Entidades, Value Objects, Aggregates, Interfaces |
+| `architecture-repository` | Infrastructure | Repositórios, DbContext, Unit of Work |
+| `architecture-feature` | Application | Commands, Queries, Handlers, DTOs |
+| `architecture-controller` | Presentation | Controllers, Endpoints, Validators |
+| `architecture-external-service` | Infrastructure | Integrações com APIs externas |
+| `deploy-dotnet-homolog` | DevOps | Deploy em homologação |
+| `deploy-dotnet-prod` | DevOps | Deploy em produção |
 
 ### Frontend (Angular)
 
@@ -47,52 +47,52 @@ Este documento mapeia cada tipo de tarefa para a skill apropriada do ecossistema
 
 | Tarefa | Skill | Referência na Skill |
 |--------|-------|---------------------|
-| Criar Entity | `dotnet-domain-entity` | `references/entity-template.md` |
-| Criar Aggregate Root | `dotnet-domain-entity` | `references/entity-template.md` |
-| Criar Value Object | `dotnet-domain-entity` | `references/value-objects.md` |
-| Criar Enum | `dotnet-domain-entity` | `references/entity-template.md` |
-| Criar Domain Event | `dotnet-domain-entity` | `references/entity-template.md` |
-| Criar Domain Exception | `dotnet-domain-entity` | `references/entity-template.md` |
-| Criar Interface Repository | `dotnet-domain-entity` | `references/repository-interface.md` |
+| Criar Entity | `architecture-entities` | `references/entity-template.md` |
+| Criar Aggregate Root | `architecture-entities` | `references/entity-template.md` |
+| Criar Value Object | `architecture-entities` | `references/value-objects.md` |
+| Criar Enum | `architecture-entities` | `references/entity-template.md` |
+| Criar Domain Event | `architecture-entities` | `references/entity-template.md` |
+| Criar Domain Exception | `architecture-entities` | `references/entity-template.md` |
+| Criar Interface Repository | `architecture-entities` | `references/repository-interface.md` |
 
 ### Infrastructure Layer
 
 | Tarefa | Skill | Referência na Skill |
 |--------|-------|---------------------|
-| Criar RepositoryBase | `dotnet-infrastructure-repository` | `references/repository-base.md` |
-| Criar Repository | `dotnet-infrastructure-repository` | `references/repository-implementation.md` |
-| Configurar DbContext | `dotnet-infrastructure-repository` | `references/repository-base.md` |
-| Implementar Unit of Work | `dotnet-infrastructure-repository` | `references/unit-of-work.md` |
+| Criar RepositoryBase | `architecture-repository` | `references/repository-base.md` |
+| Criar Repository | `architecture-repository` | `references/repository-implementation.md` |
+| Configurar DbContext | `architecture-repository` | `references/repository-base.md` |
+| Implementar Unit of Work | `architecture-repository` | `references/unit-of-work.md` |
 | Criar Entity Configuration | Manual / EF Core | - |
 | Criar Migration | Manual / `dotnet ef` | - |
-| Criar Integração Externa | `dotnet-external-service` | `references/adapter-gateway.md` |
-| Configurar HttpClient (.NET) | `dotnet-external-service` | `references/http-client-base.md` |
-| Configurar Polly | `dotnet-external-service` | `references/resilience.md` |
-| Configurar OAuth2 | `dotnet-external-service` | `references/authentication.md` |
+| Criar Integração Externa | `architecture-external-service` | `references/adapter-gateway.md` |
+| Configurar HttpClient (.NET) | `architecture-external-service` | `references/http-client-base.md` |
+| Configurar Polly | `architecture-external-service` | `references/resilience.md` |
+| Configurar OAuth2 | `architecture-external-service` | `references/authentication.md` |
 
 ### Application Layer
 
 | Tarefa | Skill | Referência na Skill |
 |--------|-------|---------------------|
-| Criar DTO | `dotnet-application-feature` | `references/query-template.md` |
-| Criar Command | `dotnet-application-feature` | `references/command-template.md` |
-| Criar Command Handler | `dotnet-application-feature` | `references/command-template.md` |
-| Criar Command Validator | `dotnet-application-feature` | `references/command-template.md` |
-| Criar Query | `dotnet-application-feature` | `references/query-template.md` |
-| Criar Query Handler | `dotnet-application-feature` | `references/query-template.md` |
-| Criar Behavior | `dotnet-application-feature` | `references/behaviors.md` |
-| Criar Mapping Profile | `dotnet-application-feature` | - |
+| Criar DTO | `architecture-feature` | `references/query-template.md` |
+| Criar Command | `architecture-feature` | `references/command-template.md` |
+| Criar Command Handler | `architecture-feature` | `references/command-template.md` |
+| Criar Command Validator | `architecture-feature` | `references/command-template.md` |
+| Criar Query | `architecture-feature` | `references/query-template.md` |
+| Criar Query Handler | `architecture-feature` | `references/query-template.md` |
+| Criar Behavior | `architecture-feature` | `references/behaviors.md` |
+| Criar Mapping Profile | `architecture-feature` | - |
 
 ### Presentation Layer
 
 | Tarefa | Skill | Referência na Skill |
 |--------|-------|---------------------|
-| Criar Controller | `dotnet-endpoint-generator` | `references/examples.md` |
-| Criar Minimal API Endpoint | `dotnet-endpoint-generator` | `references/examples.md` |
-| Criar Request Model | `dotnet-endpoint-generator` | `references/structure.md` |
-| Criar Request Validator | `dotnet-endpoint-generator` | `references/patterns.md` |
-| Criar Response Model | `dotnet-endpoint-generator` | `references/structure.md` |
-| Configurar OpenAPI | `dotnet-endpoint-generator` | `references/patterns.md` |
+| Criar Controller | `architecture-controller` | `references/examples.md` |
+| Criar Minimal API Endpoint | `architecture-controller` | `references/examples.md` |
+| Criar Request Model | `architecture-controller` | `references/structure.md` |
+| Criar Request Validator | `architecture-controller` | `references/patterns.md` |
+| Criar Response Model | `architecture-controller` | `references/structure.md` |
+| Configurar OpenAPI | `architecture-controller` | `references/patterns.md` |
 
 ### Frontend — Core / Shared
 
@@ -123,10 +123,10 @@ Este documento mapeia cada tipo de tarefa para a skill apropriada do ecossistema
 
 | Tarefa | Skill | Referência na Skill |
 |--------|-------|---------------------|
-| Deploy Homologação | `dotnet-deploy-homolog` | `references/pipeline-steps.md` |
-| Health Check Homolog | `dotnet-deploy-homolog` | `references/health-check.md` |
-| Deploy Produção | `dotnet-deploy-prod` | `references/pipeline-steps.md` |
-| Rollback Produção | `dotnet-deploy-prod` | `references/rollback.md` |
+| Deploy Homologação | `deploy-dotnet-homolog` | `references/pipeline-steps.md` |
+| Health Check Homolog | `deploy-dotnet-homolog` | `references/health-check.md` |
+| Deploy Produção | `deploy-dotnet-prod` | `references/pipeline-steps.md` |
+| Rollback Produção | `deploy-dotnet-prod` | `references/rollback.md` |
 
 ---
 
@@ -183,38 +183,38 @@ external  infrastr
 Ao usar qualquer skill backend, **SEMPRE** ler as referências antes de gerar código:
 
 ```markdown
-### Ao usar `dotnet-domain-entity`:
+### Ao usar `architecture-entities`:
 1. Ler `references/entity-template.md`
 2. Ler `references/value-objects.md` (se criar VO)
 3. Ler `references/repository-interface.md` (se criar interface)
 
-### Ao usar `dotnet-infrastructure-repository`:
+### Ao usar `architecture-repository`:
 1. Ler `references/repository-base.md`
 2. Ler `references/repository-implementation.md`
 3. Ler `references/unit-of-work.md`
 
-### Ao usar `dotnet-application-feature`:
+### Ao usar `architecture-feature`:
 1. Ler `references/command-template.md` (se Command)
 2. Ler `references/query-template.md` (se Query)
 3. Ler `references/behaviors.md`
 
-### Ao usar `dotnet-endpoint-generator`:
+### Ao usar `architecture-controller`:
 1. Ler `references/patterns.md`
 2. Ler `references/structure.md`
 3. Ler `references/examples.md`
 
-### Ao usar `dotnet-external-service`:
+### Ao usar `architecture-external-service`:
 1. Ler `references/http-client-base.md`
 2. Ler `references/adapter-gateway.md`
 3. Ler `references/resilience.md`
 4. Ler `references/authentication.md`
 
-### Ao usar `dotnet-deploy-homolog`:
+### Ao usar `deploy-dotnet-homolog`:
 1. Ler `references/pipeline-steps.md`
 2. Ler `references/health-check.md`
 3. Ler `references/troubleshooting.md`
 
-### Ao usar `dotnet-deploy-prod`:
+### Ao usar `deploy-dotnet-prod`:
 1. Ler `references/pre-deploy-checklist.md`
 2. Ler `references/pipeline-steps.md`
 3. Ler `references/rollback.md`
@@ -235,18 +235,18 @@ Ao usar qualquer skill backend, **SEMPRE** ler as referências antes de gerar c�
 ### Backend
 | Tarefa | Skill |
 |--------|-------|
-| Criar VO `Email` | `dotnet-domain-entity` |
-| Criar VO `PhoneNumber` | `dotnet-domain-entity` |
-| Criar Entity `Customer` | `dotnet-domain-entity` |
-| Criar Interface `ICustomerRepository` | `dotnet-domain-entity` |
-| Criar `CustomerRepository` | `dotnet-infrastructure-repository` |
-| Criar `CustomerDto` | `dotnet-application-feature` |
-| Criar `CreateCustomerCommand` | `dotnet-application-feature` |
-| Criar `UpdateCustomerCommand` | `dotnet-application-feature` |
-| Criar `GetCustomerByIdQuery` | `dotnet-application-feature` |
-| Criar `GetCustomerListQuery` | `dotnet-application-feature` |
-| Criar `CustomersController` | `dotnet-endpoint-generator` |
-| Deploy Homologação | `dotnet-deploy-homolog` |
+| Criar VO `Email` | `architecture-entities` |
+| Criar VO `PhoneNumber` | `architecture-entities` |
+| Criar Entity `Customer` | `architecture-entities` |
+| Criar Interface `ICustomerRepository` | `architecture-entities` |
+| Criar `CustomerRepository` | `architecture-repository` |
+| Criar `CustomerDto` | `architecture-feature` |
+| Criar `CreateCustomerCommand` | `architecture-feature` |
+| Criar `UpdateCustomerCommand` | `architecture-feature` |
+| Criar `GetCustomerByIdQuery` | `architecture-feature` |
+| Criar `GetCustomerListQuery` | `architecture-feature` |
+| Criar `CustomersController` | `architecture-controller` |
+| Deploy Homologação | `deploy-dotnet-homolog` |
 
 ### Frontend
 | Tarefa | Referência |
@@ -268,20 +268,20 @@ Ao usar qualquer skill backend, **SEMPRE** ler as referências antes de gerar c�
 ### Backend
 | Tarefa | Skill |
 |--------|-------|
-| Criar VO `Money` | `dotnet-domain-entity` |
-| Criar Enum `PaymentStatus` | `dotnet-domain-entity` |
-| Criar Aggregate `Payment` | `dotnet-domain-entity` |
-| Criar Event `PaymentProcessedEvent` | `dotnet-domain-entity` |
-| Criar Interface `IPaymentRepository` | `dotnet-domain-entity` |
-| Criar `PaymentRepository` | `dotnet-infrastructure-repository` |
-| Criar `IStripeGateway` | `dotnet-external-service` |
-| Criar `StripeAdapter` | `dotnet-external-service` |
-| Criar `ProcessPaymentCommand` | `dotnet-application-feature` |
-| Criar `GetPaymentByIdQuery` | `dotnet-application-feature` |
-| Criar `PaymentsController` | `dotnet-endpoint-generator` |
-| Deploy Homologação | `dotnet-deploy-homolog` |
+| Criar VO `Money` | `architecture-entities` |
+| Criar Enum `PaymentStatus` | `architecture-entities` |
+| Criar Aggregate `Payment` | `architecture-entities` |
+| Criar Event `PaymentProcessedEvent` | `architecture-entities` |
+| Criar Interface `IPaymentRepository` | `architecture-entities` |
+| Criar `PaymentRepository` | `architecture-repository` |
+| Criar `IStripeGateway` | `architecture-external-service` |
+| Criar `StripeAdapter` | `architecture-external-service` |
+| Criar `ProcessPaymentCommand` | `architecture-feature` |
+| Criar `GetPaymentByIdQuery` | `architecture-feature` |
+| Criar `PaymentsController` | `architecture-controller` |
+| Deploy Homologação | `deploy-dotnet-homolog` |
 | Validar em Homolog | Manual |
-| Deploy Produção | `dotnet-deploy-prod` |
+| Deploy Produção | `deploy-dotnet-prod` |
 
 ### Frontend
 | Tarefa | Referência |
@@ -302,12 +302,12 @@ Ao usar qualquer skill backend, **SEMPRE** ler as referências antes de gerar c�
 ### Backend
 | Tarefa | Skill |
 |--------|-------|
-| Criar `SalesSummaryDto` | `dotnet-application-feature` |
-| Criar `TopProductDto` | `dotnet-application-feature` |
-| Criar `GetSalesSummaryQuery` | `dotnet-application-feature` |
-| Criar `GetTopProductsQuery` | `dotnet-application-feature` |
-| Criar `GetSalesByPeriodQuery` | `dotnet-application-feature` |
-| Criar `DashboardController` | `dotnet-endpoint-generator` |
+| Criar `SalesSummaryDto` | `architecture-feature` |
+| Criar `TopProductDto` | `architecture-feature` |
+| Criar `GetSalesSummaryQuery` | `architecture-feature` |
+| Criar `GetTopProductsQuery` | `architecture-feature` |
+| Criar `GetSalesByPeriodQuery` | `architecture-feature` |
+| Criar `DashboardController` | `architecture-controller` |
 
 ### Frontend
 | Tarefa | Referência |
@@ -328,31 +328,31 @@ Ao usar qualquer skill backend, **SEMPRE** ler as referências antes de gerar c�
 
 ```
 Backend:
-dotnet-domain-entity → dotnet-infrastructure-repository →
-dotnet-application-feature → dotnet-endpoint-generator
+architecture-entities → architecture-repository →
+architecture-feature → architecture-controller
 
 Frontend:
 Model TS → Service HttpClient → State Service →
 Feature Module (lazy) → Smart Component → Presentational Component
 
 Deploy:
-→ dotnet-deploy-homolog
+→ deploy-dotnet-homolog
 ```
 
 ### Entrega com Integração Externa
 
 ```
 Backend:
-dotnet-domain-entity → dotnet-infrastructure-repository →
-dotnet-external-service → dotnet-application-feature →
-dotnet-endpoint-generator
+architecture-entities → architecture-repository →
+architecture-external-service → architecture-feature →
+architecture-controller
 
 Frontend:
 Model TS → Service HttpClient → HTTP Interceptor →
 Feature Module (lazy) → Smart Component → Form Component
 
 Deploy:
-→ dotnet-deploy-homolog
+→ deploy-dotnet-homolog
 ```
 
 ### Entrega com Estado Global (NgRx)
@@ -368,7 +368,7 @@ Feature Module (lazy) → Smart Component (usa Store) →
 Presentational Component
 
 Deploy:
-→ dotnet-deploy-homolog
+→ deploy-dotnet-homolog
 ```
 
 ### Entrega de Produção
@@ -376,6 +376,6 @@ Deploy:
 ```
 [Todas as skills do backend] +
 [Todas as tarefas Angular da feature] →
-dotnet-deploy-homolog → [Validação manual + E2E] →
-dotnet-deploy-prod
+deploy-dotnet-homolog → [Validação manual + E2E] →
+deploy-dotnet-prod
 ```

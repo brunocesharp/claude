@@ -1,6 +1,6 @@
 ---
-name: dotnet-deploy-homolog
-description: Executa deploy de aplicação .NET API no ambiente de Homologação. Use quando o usuário mencionar "deploy homologação", "deploy homolog", "publicar em homologação", "subir para homolog", "deploy staging", "deploy hml", "fazer deploy homolog", "atualizar homologação", "deploy ambiente de teste", "publicar API homolog". Também dispara quando pedir para fazer build e deploy da aplicação em ambiente de teste/staging. NÃO use para deploy em produção (use dotnet-deploy-prod) ou para desenvolvimento local.
+name: deploy-dotnet-homolog
+description: Executa deploy de aplicação .NET API no ambiente de Homologação. Use quando o usuário mencionar "deploy homologação", "deploy homolog", "publicar em homologação", "subir para homolog", "deploy staging", "deploy hml", "fazer deploy homolog", "atualizar homologação", "deploy ambiente de teste", "publicar API homolog". Também dispara quando pedir para fazer build e deploy da aplicação em ambiente de teste/staging. NÃO use para deploy em produção (use deploy-dotnet-prod) ou para desenvolvimento local.
 ---
 
 # .NET Deploy Homologação

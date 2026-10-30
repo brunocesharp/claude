@@ -13,7 +13,7 @@ exemplos preenchidos para facilitar o entendimento do formato esperado.
 > Gerado em: {DD/MM/YYYY}
 > Versão: 1.0
 > Status: Rascunho
-> Referência: docs/escopo/{escopo}/escopo.md
+> Referência: docs/{projeto}/escopo/{escopo}/escopo.md
 
 ---
 
