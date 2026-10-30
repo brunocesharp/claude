@@ -120,7 +120,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
-| `delivery` | `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective` (as demais skills do ciclo de stories estão em construção) |
+| `delivery` | `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` |
 | `architecture-docs` | `arch-c4`, `arch-adr` |
 | `architecture-dotnet` | `architecture-init`, `architecture-entities`, `architecture-feature`, `architecture-repository`, `architecture-external-service`, `architecture-controller`, `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | `architecture-angular` | `angular-core-layer`, `angular-feature-layer`, `angular-shared-layer`, `angular-rxjs-transversal` |
@@ -316,6 +316,7 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 | `dev-story` | "dev-story", "implementar a story", "retomar a story" | Código na branch `feat/{id}` + Registro e Arquivos alterados na story (story → `review`) |
 | `story-review` | "revisar a story", "story-review", "a story está pronta?" | Bloco na seção Revisão + correções `R{n}` (story → `done` ou `in-progress`) |
 | `retrospective` | "retrospectiva", "fechar o épico", "lições do épico" | `implementacao/retrospectivas/epic-N-{data}.md` (veredito; épico → `done`) |
+| `correct-course` | "mudou o requisito", "mudança de rumo", "a story não dá", "replanejar" | `implementacao/mudancas/{data}-{slug}.md` (proposta; aplicada após aprovação) |
 
 ### Fase: Deploy .NET
 
@@ -384,7 +385,8 @@ plugins/
 │       ├── create-story/             # arquivo da story com contexto completo (references/template-story.md)
 │       ├── dev-story/                # implementação em sessão nova (references/comandos-por-stack.md)
 │       ├── story-review/             # revisão adversarial (references: lentes, triagem, template-revisao)
-│       └── retrospective/            # retrospectiva do épico por evidências (references/template-retrospectiva.md)
+│       ├── retrospective/            # retrospectiva do épico por evidências (references/template-retrospectiva.md)
+│       └── correct-course/           # mudança de rumo (references/template-proposta.md)
 │
 ├── spec-plan/
 │   ├── .claude-plugin/plugin.json
@@ -718,6 +720,15 @@ Na triagem, cada achado é verificado no código, recebe severidade e é encamin
 Retrospectiva **opcional** de um épico, a partir de evidências. O `retro.py` monta o inventário: rodadas de revisão e achados por severidade, correções abertas, adiados, desvios, pendências, mudanças de rumo e itens da retrospectiva anterior. O histórico do git entra só se você quiser.
 
 A skill confere o "Pronto quando" do épico item a item e registra o que funcionou, o que não funcionou e as surpresas, sempre com a fonte. Também propõe a reconciliação com a spec e a arquitetura, que é encaminhada às skills donas, e prepara o próximo épico. Fecha com um veredito (`accepted`, `accepted-with-open-items` ou `rejected`) e itens de ação. O épico vai para `done` só com a sua confirmação.
+
+### correct-course
+
+Mudança de rumo no meio da entrega: requisito novo ou errado, story ambígua que parou o `dev-story`, decisão da revisão que muda o prometido.
+
+- **Impacto:** analisa spec, escopo, arquitetura, épicos e contratos. O `epics.py impact` lista as stories que cobrem os cenários alterados, agrupadas por estado.
+- **Classificação:** menor, moderado ou maior, com opções e uma recomendação.
+- **Proposta:** grava em `mudancas/` as edições antes → depois e o efeito no quadro.
+- **Aplicação:** só depois da sua aprovação. Story `done` nunca é reaberta (vira uma story de ajuste), e nada é apagado do quadro (o que sai vira `dropped`). Mudanças maiores são encaminhadas às skills donas (`spec-functional`, `arch-adr`, `arch-c4`).
 
 ### sprint-planning
 
