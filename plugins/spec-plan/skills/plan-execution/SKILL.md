@@ -2,7 +2,7 @@
 name: plan-execution
 description: Gera plano de execução técnico fullstack (.NET + Angular) para implementação de features, dividindo em entregas incrementais com tarefas por camada. Use quando o usuário disser "plano de execução", "execution plan", "planejar implementação", "dividir em tarefas", "quebrar feature", "como implementar essa spec", "etapas de desenvolvimento", "decomposição técnica", "quero um plano para implementar". NÃO use para especificação funcional (use spec-functional), arquitetura (use arch-c4) ou discovery (use discovery-*).
 metadata:
-  version: 2.1.0
+  version: 2.2.0
   category: planning
   depends-on: spec-functional
   recommended-after: arch-c4
@@ -33,7 +33,7 @@ Leia, nesta ordem:
    - respeitar as decisões registradas em `docs/{projeto}/arquitetura/decisoes/` (ADRs aceitas);
    - prever tarefa de atualização do C4 quando a entrega cria contêiner, sistema externo ou componente novo.
    Se não existir, avise que o plano vai supor a arquitetura e sugira `arch-c4`.
-3. `docs/{projeto}/project.md` — repositório e código local.
+3. `docs/{projeto}/project-config.json` e `docs/{projeto}/project.md` — stack, repositório e código local.
 4. `docs/{projeto}/repositorios.md` — se existir (código em vários repositórios): qual repositório implementa cada contêiner. Nesse caso, acrescente a coluna **Repositório** nas tabelas de tarefas, ordene as entregas com o provedor antes do consumidor (backend antes do frontend que usa o endpoint novo) e, ao final, sugira a skill `multi-repo` (Mudança coordenada) para criar as branches e registrar a ordem de merge e de deploy.
 
 ### Passo 1: Analisar a Especificação
@@ -76,7 +76,30 @@ Ordem obrigatória dentro de cada entrega:
 6. Feature Module → Routing (lazy), Smart Components, Presentational Components, Forms
 7. State → BehaviorSubject ou NgRx (somente se necessário)
 
-### Passo 4: Gerar o Documento
+### Passo 4: Aplicar Nomenclatura de Backlog
+
+Antes de gerar o documento, aplique o padrão de nomenclatura da Tribo nas tarefas:
+
+| Tipo de item | Prefixo | Quando usar no plano |
+|---|---|---|
+| Tarefa de desenvolvimento | `[TASK] Desenvolver` | Implementação de código (entidade, command, componente…) |
+| Tarefa de análise | `[TASK] Analisar e especificar` | Levantamento técnico, spike, PoC |
+| Tarefa de testes | `[TASK] Testar` | Escrita e execução de testes |
+| Habilitador Técnico | `[HT]` | Migration, EF Config, Polly setup, refatoração técnica |
+| Feature | `[FEATURE]` | Título da feature no cabeçalho do plano |
+| Bug | `[BUG]` | Correção de comportamento incorreto identificado |
+| Fix | `[FIX]` | Ajuste técnico pontual sem quebra de requisito |
+| Requisição | `[REQ]` | Solicitação externa (Coordenadoria, time parceiro) |
+| Change | `[CHANGE]` | Alteração de requisito já implementado |
+
+**Formato de título da tarefa:**
+```
+[TASK] {Ação} - [{Módulo}] - {Descrição resumida}
+[HT] [{Módulo}] - {Ação técnica a ser realizada}
+[FEATURE] [{Módulo}] - {Ação esperada ou funcionalidade chave}
+```
+
+### Passo 5: Gerar o Documento
 
 Salve em `docs/{projeto}/plano-execucao/{escopo}/execution-plan.md` seguindo o template em `references/plan-structure.md`. Atualize `docs/{projeto}/project.md` (Plano de Execução em andamento) e a coluna Situação em `docs/workspace.md`.
 
@@ -91,28 +114,29 @@ Salve em `docs/{projeto}/plano-execucao/{escopo}/execution-plan.md` seguindo o t
 - **Dependências**: Nenhuma | Entrega N
 
 #### Backend
-| ID | Tarefa | Camada | Skill | Est. |
-|----|--------|--------|-------|------|
-| N.1 | Criar entidade `X` | Domain | architecture-entities | 2h |
-| N.2 | Criar repositório `X` | Infrastructure | architecture-repository | 2h |
-| N.3 | Criar `CreateXCommand` | Application | architecture-feature | 3h |
-| N.4 | Criar `XController` | Presentation | architecture-controller | 2h |
+| ID | Título do Item | Camada | Skill | Est. |
+|----|----------------|--------|-------|------|
+| N.1 | [TASK] Desenvolver - [{Módulo}] - Criar entidade `X` | Domain | architecture-entities | 2h |
+| N.2 | [TASK] Desenvolver - [{Módulo}] - Criar repositório `X` | Infrastructure | architecture-repository | 2h |
+| N.3 | [TASK] Desenvolver - [{Módulo}] - Criar `CreateXCommand` | Application | architecture-feature | 3h |
+| N.4 | [TASK] Desenvolver - [{Módulo}] - Criar `XController` | Presentation | architecture-controller | 2h |
+| N.5 | [HT] [{Módulo}] - Criar migration inicial | Infrastructure | - | 0.5h |
 
 #### Frontend (Angular)
-| ID | Tarefa | Camada | Tipo | Est. |
-|----|--------|--------|------|------|
-| N.5 | Criar model `X` | Core/Models | Interface | 0.5h |
-| N.6 | Criar `XService` (HttpClient) | Core/Services | Service | 2h |
-| N.7 | Criar `XListComponent` | Feature | Smart Component | 3h |
-| N.8 | Criar rota `/x` com lazy loading | Feature | Routing | 1h |
+| ID | Título do Item | Camada | Tipo | Est. |
+|----|----------------|--------|------|------|
+| N.6 | [TASK] Desenvolver - [{Módulo}] - Criar model `X` | Core/Models | Interface | 0.5h |
+| N.7 | [TASK] Desenvolver - [{Módulo}] - Criar `XService` (HttpClient) | Core/Services | Service | 2h |
+| N.8 | [TASK] Desenvolver - [{Módulo}] - Criar `XListComponent` | Feature | Smart Component | 3h |
+| N.9 | [TASK] Desenvolver - [{Módulo}] - Criar rota `/x` com lazy loading | Feature | Routing | 1h |
 
 #### Testes
-| ID | Tarefa | Tipo | Est. |
-|----|--------|------|------|
-| N.9 | Testes unitários Domain | Unit (.NET) | 2h |
-| N.10 | Testes unitários Handlers | Unit (.NET) | 2h |
-| N.11 | Testes unitários Service Angular | Unit (Angular) | 1h |
-| N.12 | Testes integração API | Integration | 2h |
+| ID | Título do Item | Tipo | Est. |
+|----|----------------|------|------|
+| N.10 | [TASK] Testar - [{Módulo}] - Testes unitários Domain | Unit (.NET) | 2h |
+| N.11 | [TASK] Testar - [{Módulo}] - Testes unitários Handlers | Unit (.NET) | 2h |
+| N.12 | [TASK] Testar - [{Módulo}] - Testes unitários Service Angular | Unit (Angular) | 1h |
+| N.13 | [TASK] Testar - [{Módulo}] - Testes de integração API | Integration | 2h |
 
 #### Critérios de Aceite
 - [ ] Endpoint POST /api/x funcional e testado via Swagger

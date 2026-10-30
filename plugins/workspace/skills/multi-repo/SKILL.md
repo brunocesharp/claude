@@ -29,6 +29,7 @@ A raiz de trabalho é uma pasta de documentação com vários projetos, cada um 
 2. Senão, leia `docs/workspace.md`: com um único projeto, use-o e avise; com vários, liste e pergunte qual.
 3. Sem `docs/workspace.md`, procure `docs/*/project.md`.
 4. Se o projeto não existir, ofereça iniciá-lo com `discovery-init`.
+5. Leia `docs/{projeto}/project-config.json` (nome, stack, repositório; ver o schema em `discovery-init/references/project-config-schema.md`). Se não existir, use o `project.md` e ofereça criar o config a partir dele.
 
 `{projeto}` é a pasta escolhida; todos os caminhos abaixo são relativos à raiz de trabalho.
 
@@ -40,7 +41,7 @@ A raiz de trabalho é uma pasta de documentação com vários projetos, cada um 
 
 | Situação do projeto | Onde está registrado |
 |---------------------|----------------------|
-| Um repositório | Seção **Repositório** do `docs/{projeto}/project.md` (URL e Código local) |
+| Um repositório | `repository_url` e `code_path` do `docs/{projeto}/project-config.json` e seção **Repositório** do `project.md` |
 | Dois ou mais | `docs/{projeto}/repositorios.md`; o `project.md` aponta para ele e o `workspace.md` mostra "vários" |
 
 Quando um projeto de um repositório ganha o segundo, esta skill cria o `repositorios.md` com os dois e troca a seção do `project.md` pelo apontamento (ver o template). O `repositorios.md` é a fonte única dali em diante: as outras skills (`arch-c4`, `business-docs`, `plan-execution`) leem os caminhos de lá.
@@ -75,7 +76,7 @@ Pela frase do usuário, escolha a operação. Se não estiver claro, pergunte:
    - **Contratos** que ele expõe ou consome (API HTTP com OpenAPI, pacote NuGet/npm, eventos/filas, schema de banco compartilhado);
    - **Deploy**: como e para onde publica (pipeline, ambiente), se o usuário souber.
 4. Mostre a tabela montada e peça confirmação antes de gravar.
-5. Grave `docs/{projeto}/repositorios.md` pelo template. Se era projeto de um repositório, atualize a seção Repositório do `project.md` para apontar para o arquivo. Atualize as colunas Repositório e Código local do `docs/workspace.md` para `vários (ver docs/{projeto}/repositorios.md)`.
+5. Grave `docs/{projeto}/repositorios.md` pelo template. Se era projeto de um repositório, atualize a seção Repositório do `project.md` para apontar para o arquivo e, no `project-config.json`, mude `repositories` para `"varios"` e `repository_url`/`code_path` para `"ver repositorios.md"`. Atualize as colunas Repositório e Código local do `docs/workspace.md` para `vários (ver docs/{projeto}/repositorios.md)`.
 6. Se algum repositório for usado por mais de um projeto do workspace (biblioteca, contratos), cadastre-o em cada projeto com a mesma URL e marque **Compartilhado com** {projetos}.
 
 ---

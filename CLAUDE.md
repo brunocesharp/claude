@@ -22,7 +22,7 @@ plugins/
             └── references/
 ```
 
-Plugins: `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `business-docs`. Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
+Plugins: `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`. Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
 
 ## Frontmatter obrigatório no SKILL.md
 
@@ -51,7 +51,8 @@ docs/
 ├── workspace.md                      # projetos: pasta, repositório, código local, situação (discovery-init)
 ├── arquitetura/landscape.md          # visão de todos os sistemas (arch-c4, opcional)
 └── {projeto}/
-    ├── project.md                    # discovery-init
+    ├── project-config.json           # discovery-init: configuração lida pelas skills (schema em discovery-init/references)
+    ├── project.md                    # discovery-init: resumo para pessoas
     ├── repositorios.md               # multi-repo (só com código em vários repositórios)
     ├── discovery/                    # discovery-vision / opportunity / assumptions / stakeholders / metrics
     ├── escopo/{titulo}/escopo.md     # discovery-scoped (+ discovery/ com o snapshot usado)
@@ -66,10 +67,11 @@ docs/
 2. Senão, lê `docs/workspace.md`: um projeto → usa e avisa; vários → lista e pergunta.
 3. Sem `workspace.md` → procura `docs/*/project.md`.
 4. Projeto inexistente → oferece `discovery-init`.
+5. Lê `docs/{projeto}/project-config.json` (nome, stack, repositório); sem ele, usa o `project.md` e oferece criar o config.
 
 Ao mudar esse passo, mude em todas as skills. Skills que avançam de fase atualizam o `project.md` e a coluna Situação do `workspace.md`.
 
-**Onde está o código:** projeto de um repositório usa URL e Código local do `project.md`; com dois ou mais, a fonte única é `docs/{projeto}/repositorios.md` (skill `multi-repo`: papel, caminho, contêineres C4 e contratos de cada repositório). Skills que leem código (`arch-c4`, `business-docs`, `plan-execution`) consultam os dois. Nenhuma skill faz commit, push ou merge nos repositórios de código sem pedido explícito.
+**Onde está o código:** projeto de um repositório usa `repository_url` e `code_path` do `project-config.json` (espelhados no `project.md`); com dois ou mais, a fonte única é `docs/{projeto}/repositorios.md` (skill `multi-repo`: papel, caminho, contêineres C4 e contratos de cada repositório). Skills que leem código (`arch-c4`, `business-docs`, `plan-execution`) consultam os dois. Nenhuma skill faz commit, push ou merge nos repositórios de código sem pedido explícito.
 
 Nada fica guardado nos arquivos da skill por projeto: configuração específica de um projeto (ex.: mapa de áreas do `business-docs`) vai para `docs/{projeto}/`.
 

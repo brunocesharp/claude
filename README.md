@@ -36,6 +36,7 @@ No Claude Code, dentro do seu projeto:
 /plugin install architecture-docs@claude
 /plugin install architecture-dotnet@claude
 /plugin install architecture-angular@claude
+/plugin install architecture-java@claude
 /plugin install business-docs@claude
 ```
 
@@ -76,7 +77,7 @@ meu-workspace/            # ex.: um repositório "docs" do time
 > iniciar projeto
 ```
 
-O `discovery-init` cria `docs/{projeto}/project.md` e registra o projeto em `docs/workspace.md`. Nas demais skills, cite o projeto ("visão do projeto-a") ou escolha na lista que a skill mostra.
+O `discovery-init` cria `docs/{projeto}/project-config.json` e `docs/{projeto}/project.md` e registra o projeto em `docs/workspace.md`. Nas demais skills, cite o projeto ("visão do projeto-a") ou escolha na lista que a skill mostra.
 
 Se o código do projeto estiver em vários repositórios (ex.: backend e frontend separados), cadastre-os:
 
@@ -146,6 +147,12 @@ Descreve a estrutura do sistema em níveis de abstração, seguindo *The C4 mode
 |-------|---------|------------|-------|
 | `arch-c4` | "arquitetura", "modelo C4", "diagrama de contexto/contêineres/componentes/deployment" | C4 model, Mermaid C4 | `arquitetura/arquitetura.md` (+ `componentes/`, `dinamicos/`) |
 | `arch-adr` | "ADR", "decisão de arquitetura", "por que escolhemos" | Architecture Decision Records (Nygard) | `arquitetura/decisoes/ADR-NNN-titulo.md` |
+
+### Fase: Arquitetura Java
+
+| Skill | Gatilho | Saída |
+|-------|---------|-------|
+| `architecture-unit-test` | "teste unitário", "TDD Java", "JUnit", "gerar testes do BDD" | Testes JUnit 5 (Given-When-Then) a partir dos cenários BDD |
 
 ### Fase: Arquitetura .NET
 
@@ -312,6 +319,11 @@ plugins/
 │       ├── angular-shared-layer/     # com assets/ e references/
 │       └── angular-rxjs-transversal/ # com assets/ e references/
 │
+├── architecture-java/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       └── architecture-unit-test/   # com References/
+│
 └── business-docs/
     ├── .claude-plugin/plugin.json
     └── skills/
@@ -334,6 +346,7 @@ docs/
 ├── arquitetura/
 │   └── landscape.md                  # visão de todos os sistemas (arch-c4, opcional)
 ├── projeto-a/
+│   ├── project-config.json           # configuração lida pelas skills
 │   ├── project.md
 │   ├── repositorios.md               # só com código em vários repositórios (multi-repo)
 │   ├── discovery/

@@ -2,14 +2,14 @@
 name: discovery-init
 description: Inicia um novo projeto na pasta de documentação (workspace com vários projetos), criando docs/{projeto}/project.md, a estrutura de pastas e o registro em docs/workspace.md. Use quando o usuário disser "iniciar projeto", "novo projeto", "começar discovery", "criar projeto", "setup do projeto", "quero começar um projeto", "adicionar projeto ao workspace". NÃO use se o projeto já foi iniciado — nesses casos leia o docs/{projeto}/project.md existente.
 metadata:
-  version: 3.0.0
+  version: 3.1.0
   category: discovery
-  output: docs/{projeto}/project.md, docs/workspace.md
+  output: docs/{projeto}/project-config.json, docs/{projeto}/project.md, docs/workspace.md
 ---
 
 # Discovery Init
 
-Skill responsável por iniciar um projeto dentro da **pasta de documentação** (workspace), coletar as informações básicas, criar `docs/{projeto}/project.md`, montar a estrutura de pastas e registrar o projeto em `docs/workspace.md`.
+Skill responsável por iniciar um projeto dentro da **pasta de documentação** (workspace), coletar as informações básicas, criar `docs/{projeto}/project-config.json` e `docs/{projeto}/project.md`, montar a estrutura de pastas e registrar o projeto em `docs/workspace.md`.
 
 > **Workspace:** a raiz de trabalho é uma pasta só de documentação que reúne vários projetos. Cada projeto fica em `docs/{projeto}/` (kebab-case). O código de cada projeto continua no próprio repositório, registrado no `project.md`. Nunca crie esses arquivos no repositório de skills.
 
@@ -46,11 +46,36 @@ Faça as perguntas abaixo uma de cada vez, em tom conversacional:
 4. **Tipo de projeto** *(opcional)*
    - "Que tipo de sistema é esse? (ex.: web app, API, mobile, integração)"
 
-5. **Responsável** *(opcional)*
+5. **Stack principal** *(opcional)*
+   - "Qual é a tecnologia principal? (ex.: .NET, Angular, Java)" — ajuda as skills a escolher as skills de código.
+
+6. **Responsável** *(opcional)*
 
 ---
 
-### Passo 3 — Gerar `docs/{projeto}/project.md`
+### Passo 3a — Gerar `docs/{projeto}/project-config.json`
+
+Lido pelas outras skills no Passo 0. Descrição de cada campo em `references/project-config-schema.md`.
+
+```json
+{
+  "name": "{Nome do Projeto}",
+  "slug": "{projeto}",
+  "version": "1.0.0",
+  "docs_root": "docs/{projeto}",
+  "repositories": "um",
+  "repository_url": "{url ou a definir}",
+  "code_path": "{caminho local ou a definir}",
+  "project_type": "{tipo do projeto ou a definir}",
+  "tech_stack": "{stack ou a definir}",
+  "responsible": "{responsável ou a definir}",
+  "created_at": "{data atual no formato DD/MM/YYYY}"
+}
+```
+
+Com vários repositórios: `"repositories": "varios"` e `repository_url`/`code_path` com `"ver repositorios.md"`.
+
+### Passo 3b — Gerar `docs/{projeto}/project.md`
 
 ```markdown
 # {Nome do Projeto}
@@ -158,7 +183,8 @@ A coluna **Situação** acompanha a fase atual do projeto (Discovery, Escopo, Es
 - Todos os arquivos vão para a **pasta de documentação (workspace)** — nunca para o repositório de skills nem para o repositório de código.
 - Todo projeto fica em `docs/{projeto}/`, mesmo que o workspace tenha um só projeto.
 - Nome de pasta em kebab-case, sem acentos, confirmado com o usuário.
-- Nunca sobrescreva um `project.md` existente sem confirmação explícita.
+- Crie sempre os dois: `project-config.json` (lido pelas skills) e `project.md` (resumo para pessoas), coerentes entre si.
+- Nunca sobrescreva um `project.md` ou `project-config.json` existente sem confirmação explícita.
 - Nunca reescreva o `workspace.md` inteiro: só acrescente ou atualize a linha do projeto.
 - Se o usuário não souber responder algo, registre como `a definir` e siga.
 - Se o workspace for um repositório Git, não faça commit nem push sem o usuário pedir.
@@ -170,11 +196,14 @@ A coluna **Situação** acompanha a fase atual do projeto (Discovery, Escopo, Es
 **`project.md` já existe para esse projeto**
 Não sobrescreva. Leia o conteúdo atual, apresente os campos e pergunte: "Deseja atualizar algum campo?"
 
+**Projeto tem `project.md` mas não tem `project-config.json`**
+Projeto criado antes do config. Monte o config a partir dos campos do `project.md`, mostre e crie após confirmação.
+
 **Projeto existe em `docs/` mas não está no `workspace.md`**
 Acontece com projetos criados antes do workspace. Leia o `project.md` e acrescente a linha no `workspace.md`.
 
 **Documentos antigos em `docs/` sem pasta de projeto** (ex.: `docs/project.md`, `docs/discovery/`)
-Estrutura anterior, de um projeto por repositório. Proponha mover para `docs/{projeto}/` (com `git mv`, se for repositório Git) e só mova após confirmação.
+Estrutura anterior, de um projeto por repositório (inclusive com `docs/project-config.json`). Proponha mover para `docs/{projeto}/` (com `git mv`, se for repositório Git) e só mova após confirmação.
 
 **Projeto de um repositório passou a ter vários**
 Use a skill `multi-repo` (Cadastrar): ela cria `docs/{projeto}/repositorios.md` com o repositório atual e os novos, e atualiza o `project.md` e o `workspace.md`.

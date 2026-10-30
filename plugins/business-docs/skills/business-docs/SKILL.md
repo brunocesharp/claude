@@ -35,6 +35,7 @@ A raiz de trabalho é uma pasta de documentação com vários projetos, cada um 
 2. Senão, leia `docs/workspace.md`: com um único projeto, use-o e avise; com vários, liste e pergunte qual.
 3. Sem `docs/workspace.md`, procure `docs/*/project.md`.
 4. Se o projeto não existir, ofereça iniciá-lo com `discovery-init`.
+5. Leia `docs/{projeto}/project-config.json` (nome, stack, repositório; ver o schema em `discovery-init/references/project-config-schema.md`). Se não existir, use o `project.md` e ofereça criar o config a partir dele.
 
 `{projeto}` é a pasta escolhida; todos os caminhos abaixo são relativos à raiz de trabalho.
 
