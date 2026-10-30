@@ -100,8 +100,10 @@ Com a confirmação:
 ### Passo 7 — Próximo passo: sessão nova
 
 > "A story **{id}** está pronta para desenvolvimento em `docs/{projeto}/implementacao/stories/{id}.md`.
-> Implemente numa **sessão nova**, para começar só com a story como contexto: abra o Claude Code no repositório **{repositório principal}** (com `--add-dir` do workspace e dos outros repositórios da story) e peça `dev-story {id}`. Ou, aqui: `/clear` e depois `dev-story {id}`.
+> Implemente numa **sessão nova**, para começar só com a story como contexto: abra o Claude Code no repositório **{repositório principal}** (com `--add-dir` do workspace e dos outros repositórios da story) e peça `dev-story {id}`. Posso abrir essa janela para você. Ou, aqui: `/clear` e depois `dev-story {id}`.
 > {checkpoint: true} Esta story é um **checkpoint**: acompanhe a implementação de perto e revise antes de seguir para a próxima."
+
+Para abrir a janela: `session.py` sem `--launch` (mostre o `display`) e, com a confirmação, com `--launch` — `--cwd` = repositório principal, `--add-dir` = workspace e demais repositórios, `--prompt "dev-story {id}"`.
 
 Se o `dev-story` não estiver instalado, diga que a story pode ser implementada à mão seguindo as Tarefas, marcando-as e preenchendo o Registro do desenvolvimento.
 

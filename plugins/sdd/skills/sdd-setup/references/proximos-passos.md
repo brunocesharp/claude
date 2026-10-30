@@ -47,5 +47,6 @@ Os passos do discovery são recomendados, não obrigatórios: se o usuário já 
 ## 3. Rodar
 
 - Skill longa (discovery, especificação, arquitetura, plano): sugira uma sessão nova (`/clear` e depois o pedido) para começar com o contexto limpo, e ofereça rodar aqui mesmo.
+- `dev-story` e `story-review` rodam no repositório de código: ofereça abrir a janela nova com `uv run _sdd/scripts/session.py --cwd {repositório} --add-dir {workspace} --prompt "dev-story {id}"` (mostre o `display`; `--launch` só com confirmação).
 - Se o usuário pedir uma sequência, rode uma skill por vez e confira o resultado com ele antes da próxima.
 - Não mude nada por iniciativa própria.

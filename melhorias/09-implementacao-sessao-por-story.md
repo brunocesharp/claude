@@ -3,7 +3,7 @@
 - **Pedido:** "Implementação quero seguir Uma sessão nova por story, com a spec como única fonte de verdade" (linha 9)
 - **Tamanho:** G
 - **Depende de:** 06, 08 (e 13 para vários repositórios)
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -54,3 +54,49 @@ Skill `dev-story` que implementa **uma** story a partir do story file, numa sess
 ## Arquivos impactados
 
 `plugins/<delivery>/skills/dev-story/**` (novo); `plan-execution/references/skill-mapping.md` (reaproveitar o mapeamento tarefa → skill de código); `README.md`, `CLAUDE.md`, `0.0 - contexto-projeto-skills.md`.
+
+## Resultado (30/10/2026)
+
+**Skill `dev-story`** (plugin `delivery`). Etapas:
+- **Passo 0 próprio:** a skill roda no repositório de código e acha a story e o workspace pelo id ou pelo caminho, procurando o `_sdd/` nos diretórios da sessão.
+- **Sessão nova:** se a conversa já tem outro contexto, oferece abrir uma janela nova, usar `/clear` ou seguir ali mesmo.
+- **Pré-condições:**
+  - estado da story;
+  - `story.py check`;
+  - árvore Git limpa em cada repositório;
+  - branch `feat/{id}` criada com confirmação, sem confirmação em `auto_mode`.
+- **Implementação tarefa por tarefa:** teste antes do código conforme `delivery.tdd`, skills de código indicadas na story, `[x]` só com o teste passando, provedor antes do consumidor.
+- **Regra da fonte única:** quando algo está ambíguo, a skill para e pergunta. Se a resposta muda o que a story promete, sugere `correct-course` e marca `blocked`.
+- **Checkpoint:** pausa ao fim da tarefa que define o padrão e ao fim da story, mesmo em `auto_mode`.
+- **Fechamento:**
+  - suíte completa e build;
+  - Registro do desenvolvimento datado, com o modelo usado;
+  - Arquivos alterados por repositório, a partir do `git`;
+  - `review` só com tudo verde;
+  - mensagem de commit oferecida, nunca executada.
+- **Revisão:** em sessão nova ou em subagente, conforme `delivery.review_mode`.
+
+**Abrir sessão nova por script** (a verificação pedida): **dá para fazer.**
+- O Claude não limpa a própria sessão. O `session.py` monta o comando que abre outra janela de terminal com `claude --add-dir ... "dev-story {id}"`:
+  - Windows Terminal: `wt -w new -d {repo} cmd /k claude ...`;
+  - Windows sem `wt`: `cmd /c start`;
+  - macOS: `osascript` com o Terminal;
+  - Linux: `gnome-terminal`, `konsole` ou `x-terminal-emulator`.
+- Por padrão só mostra o comando. `--launch` abre a janela e a skill só o usa com confirmação.
+- O prompt é restrito a caracteres seguros, para não ser interpretado pelo shell.
+- A janela não foi aberta de verdade nos testes. O comando foi conferido nesta máquina (`wt` + `claude.exe`).
+
+**Perguntas do setup** (registro `delivery`): `delivery.tdd` (recomendado), `delivery.auto_mode` (nao) e `delivery.review_mode` (sessao-nova). O `review_depth` entra com a tarefa 10.
+
+**Referência:** `comandos-por-stack.md`, com build e testes de .NET, Angular, Node, Maven, Gradle e Python.
+
+**Decisões aplicadas:**
+- Sessão aberta no repositório de código, com o workspace via `--add-dir`.
+- TDD recomendado, configurável.
+- Revisão em sessão nova por padrão, com a opção de subagente. Ficou como pergunta do setup porque a customização (tarefa 04) ainda não existe.
+
+**Critérios de aceite:**
+- Skill e comandos por stack: feitos.
+- 47 testes, incluindo a montagem do comando em cada plataforma.
+- Ainda não foram feitos os testes práticos: implementar a story de exemplo num repositório real e parar diante de uma story ambígua. Fazer no primeiro uso.
+- Nenhum commit é feito pela skill: regra explícita.
