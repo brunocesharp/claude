@@ -2,16 +2,16 @@
 name: direcao-arte-fundacao
 description: >
   Conduz a fundação da direção de arte de um projeto digital, estabelecendo e documentando
-  a identidade visual completa. Use quando o usuário mencionar "direção de arte", "identidade visual",
+  a identidade visual completa em docs/{projeto}/direcao-arte/fundacao.md. Use quando o usuário mencionar "direção de arte", "identidade visual",
   "criar guia visual", "definir estilo visual", "briefing visual", "paleta de cores do projeto",
   "tipografia do projeto", "sistema visual", "pilares visuais", "style guide", "design system",
   "padrão visual", "linguagem visual", "visual identity" ou pedir para definir como o produto deve parecer.
   NÃO use para especificação de componentes individuais (use architecture-angular),
   nem para validação de acessibilidade/legibilidade (use direcao-arte-validacao).
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   category: design
-  output: "{docs_root}/direcao-arte/fundacao.md"
+  output: "docs/{projeto}/direcao-arte/fundacao.md"
 ---
 
 # Direção de Arte — Fundação
@@ -31,12 +31,12 @@ Execute este gate antes de qualquer processamento.
 
 **1.1 Pertinência** — A solicitação envolve decisões de identidade visual ou sistema visual do projeto? Se não, retorne **NÃO EXECUTAR** e identifique a skill adequada.
 
-**1.2 Existência** — Verifique se `{docs_root}/direcao-arte/fundacao.md` já existe.
+**1.2 Projeto** — Identifique o projeto pelo Passo 0 (abaixo). Sem projeto identificado e sem as informações mínimas (nome, tipo e público-alvo), o estado é BLOQUEADA.
+
+**1.3 Existência** — Verifique se `docs/{projeto}/direcao-arte/fundacao.md` já existe.
 - Existe e está aprovado: pergunte se é revisão, atualização ou consulta — não sobrescreva silenciosamente.
 - Existe como rascunho: ofereça continuar de onde parou.
 - Não existe: prossiga normalmente.
-
-**1.3 Pré-requisitos** — Leia `docs/project-config.json` e extraia `docs_root`, `name`, `project_type`, `tech_stack`. Se não existir, solicite as informações mínimas: nome do projeto, tipo e público-alvo.
 
 **1.4 Estado:** EXECUTAR / NÃO EXECUTAR / BLOQUEADA (se não houver informações mínimas do projeto).
 
@@ -44,13 +44,28 @@ Execute este gate antes de qualquer processamento.
 
 ## Pré-requisito
 
-Leia `docs/project-config.json` e extraia:
-- `docs_root` (padrão: `"docs"`)
+### Passo 0 — Identificar o projeto
+
+A raiz de trabalho é uma pasta de documentação com vários projetos, cada um em `docs/{projeto}/`.
+
+1. Se o usuário citou o projeto, use a pasta dele.
+2. Senão, leia `docs/workspace.md`: com um único projeto, use-o e avise; com vários, liste e pergunte qual.
+3. Sem `docs/workspace.md`, procure `docs/*/project.md`.
+4. Se o projeto não existir, ofereça iniciá-lo com `discovery-init`.
+5. Leia `docs/{projeto}/project-config.json` (nome, stack, repositório; ver o schema em `discovery-init/references/project-config-schema.md`). Se não existir, use o `project.md` e ofereça criar o config a partir dele.
+
+`{projeto}` é a pasta escolhida; todos os caminhos abaixo são relativos à raiz de trabalho.
+
+Do config, use:
 - `name` — nome do projeto
 - `project_type` — tipo de produto (web-app, mobile, dashboard, etc.)
 - `tech_stack` — tecnologia principal
 
-Se `{docs_root}/direcao-arte/fundacao.md` já existir, leia-o completamente e extraia todas as decisões aprovadas. **Não repita perguntas já respondidas.**
+Se faltar alguma dessas informações, pergunte (nome, tipo e público-alvo são o mínimo para começar).
+
+Leia também, se existirem, `docs/{projeto}/discovery/vision.md` (público-alvo e proposta de valor) e `docs/{projeto}/arquitetura/arquitetura.md` (contêineres de interface e tecnologias), para não perguntar o que já está documentado.
+
+Se `docs/{projeto}/direcao-arte/fundacao.md` já existir, leia-o completamente e extraia todas as decisões aprovadas. **Não repita perguntas já respondidas.**
 
 ---
 
@@ -192,7 +207,7 @@ Liste todas as decisões consolidadas e pergunte:
 
 ## Gerar o Documento
 
-Crie `{docs_root}/direcao-arte/fundacao.md` com a estrutura abaixo.
+Crie `docs/{projeto}/direcao-arte/fundacao.md` com a estrutura abaixo.
 
 Se a pasta não existir, crie-a antes de escrever.
 
@@ -307,7 +322,7 @@ FUNÇÃO → DIREÇÃO → ESTADO → IDENTIDADE → INTERAÇÃO → TEMA → DE
 
 ## Após Gerar o Documento
 
-> "Documento salvo em `{docs_root}/direcao-arte/fundacao.md`.
+> "Documento salvo em `docs/{projeto}/direcao-arte/fundacao.md`.
 >
 > **Resumo:**
 > - {N} dimensões visuais definidas
@@ -341,7 +356,7 @@ FUNÇÃO → DIREÇÃO → ESTADO → IDENTIDADE → INTERAÇÃO → TEMA → DE
 - [ ] Grid e composição especificados
 - [ ] Iconografia especificada com regra de uso
 - [ ] Estados e interações documentados
-- [ ] Documento salvo em `{docs_root}/direcao-arte/fundacao.md`
+- [ ] Documento salvo em `docs/{projeto}/direcao-arte/fundacao.md`
 - [ ] Pontos em aberto registrados com responsáveis
 
 **CONCLUÍDA** — todos os critérios atendidos.
@@ -356,7 +371,7 @@ Ao concluir, informe:
 
 > "**Handoff — Fundação Visual**
 >
-> Artefato: `{docs_root}/direcao-arte/fundacao.md`
+> Artefato: `docs/{projeto}/direcao-arte/fundacao.md`
 > Status: {CONCLUÍDA | CONCLUÍDA COM PENDÊNCIAS}
 >
 > Este documento é a referência autoritativa para todas as decisões visuais do projeto.
