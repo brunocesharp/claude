@@ -120,7 +120,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-research`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
-| `delivery` | `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` |
+| `delivery` | `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course`, `execucao-recorrente` |
 | `architecture-docs` | `arch-c4`, `arch-adr` |
 | `architecture-dotnet` | `architecture-init`, `architecture-entities`, `architecture-feature`, `architecture-repository`, `architecture-external-service`, `architecture-controller`, `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | `architecture-angular` | `angular-core-layer`, `angular-feature-layer`, `angular-shared-layer`, `angular-rxjs-transversal` |
@@ -319,6 +319,7 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 | `story-review` | "revisar a story", "story-review", "a story está pronta?" | Bloco na seção Revisão + correções `R{n}` (story → `done` ou `in-progress`) |
 | `retrospective` | "retrospectiva", "fechar o épico", "lições do épico" | `implementacao/retrospectivas/epic-N-{data}.md` (veredito; épico → `done`) |
 | `correct-course` | "mudou o requisito", "mudança de rumo", "a story não dá", "replanejar" | `implementacao/mudancas/{data}-{slug}.md` (proposta; aplicada após aprovação) |
+| `execucao-recorrente` | "execução recorrente", "executar as stories automaticamente", "agendar a execução das stories", "adicionar repositório na execução recorrente" | Stories prontas implementadas via `dev-story`; motivo das falhas na story e em `_sdd/execucao-recorrente/log/` |
 
 ### Fase: Deploy .NET
 
@@ -339,7 +340,7 @@ Todas as saídas de documentação ficam dentro de `docs/{projeto}/` (ver "Estru
 
 ## Customizar as skills
 
-As skills do fluxo (`spec-functional`, `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective` e `correct-course`) podem ser ajustadas **por projeto**, sem editar o plugin. Cada uma traz um `customize.toml` com os campos customizáveis e os padrões. O override fica em `docs/{projeto}/_custom/<skill>.toml`, que atualizar o plugin nunca toca.
+As skills do fluxo (`spec-functional`, `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` e `execucao-recorrente`) podem ser ajustadas **por projeto**, sem editar o plugin. Cada uma traz um `customize.toml` com os campos customizáveis e os padrões. O override fica em `docs/{projeto}/_custom/<skill>.toml`, que atualizar o plugin nunca toca.
 
 ```
 > customizar a story-review do projeto loja: desligar a lente de contratos e acrescentar uma de acessibilidade
@@ -425,7 +426,8 @@ plugins/
 │       ├── dev-story/                # implementação em sessão nova (references/comandos-por-stack.md)
 │       ├── story-review/             # revisão adversarial (references: lentes, triagem, template-revisao)
 │       ├── retrospective/            # retrospectiva do épico por evidências (references/template-retrospectiva.md)
-│       └── correct-course/           # mudança de rumo (references/template-proposta.md)
+│       ├── correct-course/           # mudança de rumo (references/template-proposta.md)
+│       └── execucao-recorrente/      # roda as stories prontas sem supervisão (scripts/recorrente.py, references/agendamento.md)
 │
 ├── spec-plan/
 │   ├── .claude-plugin/plugin.json
@@ -780,6 +782,28 @@ Mudança de rumo no meio da entrega: requisito novo ou errado, story ambígua qu
 - **Proposta:** grava em `mudancas/` as edições antes → depois e o efeito no quadro.
 - **Aplicação:** só depois da sua aprovação. Story `done` nunca é reaberta (vira uma story de ajuste), e nada é apagado do quadro (o que sai vira `dropped`). Mudanças maiores são encaminhadas às skills donas (`spec-functional`, `arch-adr`, `arch-c4`).
 
+### execucao-recorrente
+
+Transforma o fluxo de stories num agent que roda sozinho. Os repositórios verificados (workspaces ou pastas de projeto) ficam num **arquivo de configuração** (`~/.claude/execucao-recorrente.toml`), em duas listas: `prioritarios` e `sem_prioridade`. Depois é só agendar a skill, por exemplo a cada 5 minutos (`references/agendamento.md`: tarefa agendada do Claude Desktop, `/loop` ou `claude -p` com o Agendador de Tarefas do Windows).
+
+```toml
+[repositorios]
+prioritarios = ['D:\repos\docs-loja']
+sem_prioridade = ['D:\repos\docs-estoque']
+```
+
+Em cada rodada, a skill:
+
+- não inicia nada se já há uma tarefa em andamento (trava global: **uma tarefa por vez**);
+- retoma primeiro a story `in-progress` que ela mesma começou e não terminou;
+- senão, inicia a próxima story executável dos repositórios **prioritários** (`ready-for-dev` com as dependências prontas e sem checkpoint) e, só se nenhum prioritário tiver tarefa, a dos **sem prioridade**;
+- roda o `dev-story` num contexto limpo, em modo não supervisionado: onde a skill perguntaria, ela registra a dúvida e para;
+- registra o resultado. Quando não consegue concluir, o **motivo** vai para o Registro do desenvolvimento da story, para o log mensal e, se precisa de uma pessoa ou estourou as tentativas, a story vai para `blocked`.
+
+Só entram projetos com `implementacao/sprint-status.yaml`; projeto sem quadro fica fora da fila. Story pulada (ex.: "aguardando commit") vai para o log uma vez por motivo, não a cada rodada.
+
+Nunca pega story que uma pessoa está implementando, nunca faz push nem merge, e só faz commit local se o projeto ligar `commit_ao_concluir`. Cada projeto pode desligar a execução ou liberar também a `story-review` e a `create-story` (`_custom/execucao-recorrente.toml`).
+
 ### sprint-planning
 
 Mantém o `docs/{projeto}/implementacao/sprint-status.yaml`, a fonte única do andamento da entrega, inspirado no BMAD. Cada story passa por `backlog → ready-for-dev → in-progress → review → done`, e também pode ficar `blocked` ou `dropped`. Gera e sincroniza o quadro a partir dos arquivos de épico, sempre com uma prévia antes de gravar. A sincronização nunca rebaixa nem remove estados: o que sumiu dos épicos aparece como órfão, para você decidir. A skill também mostra o quadro por épico e a próxima story, muda estados a pedido (com transições validadas pelo `status.py`) e atualiza o `project.md` e a Situação do `workspace.md`.
@@ -897,8 +921,8 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
 | Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
-| Customização das skills por projeto (BMAD) | Implementado | `sdd-customize`, `customize.toml` nas 8 skills do fluxo |
-| Entrega por stories (BMAD) | Implementado | `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` |
+| Customização das skills por projeto (BMAD) | Implementado | `sdd-customize`, `customize.toml` nas 9 skills do fluxo |
+| Entrega por stories (BMAD) | Implementado | `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course`, `execucao-recorrente` |
 | Pesquisa de mercado e concorrentes | Implementado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |

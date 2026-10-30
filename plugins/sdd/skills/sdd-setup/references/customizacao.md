@@ -54,6 +54,7 @@ Ordem de ativação: resolver a customização → `activation_steps_prepend` �
 | `story-review` | `lenses` (por `id`), `block_on` |
 | `retrospective` | `team_questions` |
 | `correct-course` | `approvers` |
+| `execucao-recorrente` | `habilitado`, `acoes`, `max_tentativas`, `commit_ao_concluir` |
 
 O `customize.toml` de cada skill descreve cada campo.
 

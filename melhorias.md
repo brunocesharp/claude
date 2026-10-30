@@ -11,3 +11,4 @@ O que quero implementar no meu sdd-full
 	- quero implementar sprint-status.yaml, em que cada story passa por backlog, ready-for-dev, in-progress, review e done. Nas suas skills, a situação só existe no nível do escopo e como checkbox no project.md.
 	- Um arquivo por tarefa com contexto completo
 	- Manter a possibilidade de varios repositorios para um projeto
+	- Executar as tarefas dos projetos construídos com estas skills de forma recorrente (ex.: a cada 5 minutos), sem supervisão
