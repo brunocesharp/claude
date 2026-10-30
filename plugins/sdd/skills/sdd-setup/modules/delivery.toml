@@ -1,11 +1,10 @@
 # Registro do módulo (plugin) delivery. A versão acompanha plugins/delivery/.claude-plugin/plugin.json.
-# A pergunta de profundidade da revisão (delivery.review_depth) entra junto com a skill story-review.
 
 [module]
 code = "delivery"
 plugin = "delivery"
 version = "1.0.0"
-skills = ["sprint-planning", "create-story", "dev-story"]
+skills = ["sprint-planning", "create-story", "dev-story", "story-review"]
 
 [[module.config_questions]]
 key = "delivery.tdd"
@@ -16,6 +15,11 @@ default = "recomendado"
 key = "delivery.auto_mode"
 prompt = "Permitir que o dev-story rode sem supervisão (sem pausas para confirmar) em stories sem checkpoint? (sim/nao)"
 default = "nao"
+
+[[module.config_questions]]
+key = "delivery.review_depth"
+prompt = "Profundidade padrão da story-review: completa (várias lentes em paralelo) ou rapida (um revisor)?"
+default = "completa"
 
 [[module.config_questions]]
 key = "delivery.review_mode"

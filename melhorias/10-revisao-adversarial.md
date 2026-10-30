@@ -3,7 +3,7 @@
 - **Pedido:** "Verificação e fechamento quero seguir revisão adversarial" (linha 10)
 - **Tamanho:** M
 - **Depende de:** 06, 08, 09
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -52,3 +52,50 @@ Skill `code-review` (nome a definir para não confundir com o comando do Claude 
 ## Arquivos impactados
 
 `plugins/<delivery>/skills/<nome>/**` (novo), `README.md`, `CLAUDE.md`, `0.0 - contexto-projeto-skills.md`.
+
+## Resultado (30/10/2026)
+
+**Skill `story-review`** (plugin `delivery`). Etapas:
+1. Sessão separada da implementação: janela nova, `/clear` ou subagente.
+2. Preparar: `story.py check`, diff e integridade.
+3. Lentes.
+4. Triagem.
+5. Registrar na story.
+6. Decidir com o usuário.
+7. Próximo passo.
+
+**Lentes** (`references/lentes.md`):
+1. Aderência aos critérios e às tarefas `[x]`.
+2. Integridade do registro, feita por script.
+3. Correção e casos de borda.
+4. Segurança.
+5. Testes. A revisão **roda** a suíte, em vez de confiar no registro.
+6. Arquitetura e padrões.
+7. Contratos, quando há vários repositórios.
+
+No modo completo, cada lente roda num subagente, em paralelo, que recebe só a story, o diff e a lente. No modo rápido, um revisor cobre as lentes 1, 3 e 5.
+
+**Triagem** (`references/triagem.md`, do BMAD v7):
+- Verificar no código, dar severidade `high`/`medium`/`low` e descartar com motivo.
+- Encaminhar para corrigir (tarefa `R{n}`), adiar (só problema pré-existente; vira story nova via `sync`) ou decisão.
+- Resultado: aprovada, correções ou decisão pendente.
+
+**Script `review.py`:**
+- `diff` grava num arquivo o diff de todos os repositórios: commits desde a base, alterações não commitadas e arquivos novos não rastreados.
+- `integrity` compara "Arquivos alterados" com o git: arquivos não declarados, declarados sem mudança, alterações não commitadas e branch.
+- A base é detectada pelo `origin/HEAD` ou por `main`/`master`/`develop`.
+
+**Pergunta do setup:** `delivery.review_depth` (completa).
+
+**Desvio do plano: sem "mínimo de achados".** Em vez de uma cota (o BMAD v6 pede de 3 a 10), cada lente que não acha nada registra o que verificou. Uma cota incentiva achado inventado, e achado inventado é descartado na triagem e desacredita a revisão.
+
+**Decisões aplicadas:**
+- Nome `story-review`.
+- A revisão descreve e só aplica com confirmação. "Aplicar agora" é opcional e vale só para correções pequenas; o padrão é devolver ao `dev-story`.
+- Sem troca de modelo por padrão.
+
+**Critérios de aceite:**
+- Skill com lentes, triagem e template: feita.
+- O teste com um defeito plantado é coberto pelo script: o arquivo fora da lista e o arquivo declarado sem mudança aparecem (50 testes).
+- O defeito de lógica plantado e a tarefa marcada sem implementação dependem das lentes, ou seja, do modelo. Fazer no primeiro uso.
+- As transições de estado usam o `status.py`.

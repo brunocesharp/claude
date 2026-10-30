@@ -120,7 +120,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
-| `delivery` | `sprint-planning`, `create-story`, `dev-story` (as demais skills do ciclo de stories estão em construção) |
+| `delivery` | `sprint-planning`, `create-story`, `dev-story`, `story-review` (as demais skills do ciclo de stories estão em construção) |
 | `architecture-docs` | `arch-c4`, `arch-adr` |
 | `architecture-dotnet` | `architecture-init`, `architecture-entities`, `architecture-feature`, `architecture-repository`, `architecture-external-service`, `architecture-controller`, `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | `architecture-angular` | `angular-core-layer`, `angular-feature-layer`, `angular-shared-layer`, `angular-rxjs-transversal` |
@@ -314,6 +314,7 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 | `sprint-planning` | "planejar o sprint", "gerar o sprint-status", "como está o sprint", "qual a próxima story", "bloquear story" | `implementacao/sprint-status.yaml` |
 | `create-story` | "criar story", "preparar a próxima story", "ready for dev" | `implementacao/stories/{id}.md` (story → `ready-for-dev`) |
 | `dev-story` | "dev-story", "implementar a story", "retomar a story" | Código na branch `feat/{id}` + Registro e Arquivos alterados na story (story → `review`) |
+| `story-review` | "revisar a story", "story-review", "a story está pronta?" | Bloco na seção Revisão + correções `R{n}` (story → `done` ou `in-progress`) |
 
 ### Fase: Deploy .NET
 
@@ -380,7 +381,8 @@ plugins/
 │   └── skills/
 │       ├── sprint-planning/          # quadro de épicos e stories (usa _sdd/scripts/status.py)
 │       ├── create-story/             # arquivo da story com contexto completo (references/template-story.md)
-│       └── dev-story/                # implementação em sessão nova (references/comandos-por-stack.md)
+│       ├── dev-story/                # implementação em sessão nova (references/comandos-por-stack.md)
+│       └── story-review/             # revisão adversarial (references: lentes, triagem, template-revisao)
 │
 ├── spec-plan/
 │   ├── .claude-plugin/plugin.json
@@ -701,6 +703,14 @@ Depois, a skill:
 
 Se a story estiver ambígua ou incompleta, a skill para e pergunta, ou sugere `correct-course`; nunca inventa o requisito. Respeita os checkpoints e o `delivery.auto_mode`. Nunca faz commit nem push sem pedido.
 
+### story-review
+
+Revisão adversarial da story, sempre numa sessão separada da implementação. Parte do princípio de que há defeitos, mas nunca inventa achado: lente sem achados registra o que checou.
+
+No modo completo (`delivery.review_depth`), cada lente roda num subagente, em paralelo. As lentes são aderência aos critérios, correção e casos de borda, segurança, testes (a revisão roda a suíte), arquitetura e contratos. Um script (`review.py`) gera o diff de todos os repositórios e confere se os Arquivos alterados declarados batem com o git.
+
+Na triagem, cada achado é verificado no código, recebe severidade e é encaminhado: **corrigir** (vira tarefa `R{n}`), **adiar** (só problema pré-existente; vira story nova) ou **decisão**. Os descartados ficam registrados com o motivo. A story vai para `done` com a sua confirmação, ou volta para `in-progress` com as correções. Só altera código com confirmação.
+
 ### sprint-planning
 
 Mantém o `docs/{projeto}/implementacao/sprint-status.yaml`, a fonte única do andamento da entrega, inspirado no BMAD. Cada story passa por `backlog → ready-for-dev → in-progress → review → done`, e também pode ficar `blocked` ou `dropped`. Gera e sincroniza o quadro a partir dos arquivos de épico, sempre com uma prévia antes de gravar. A sincronização nunca rebaixa nem remove estados: o que sumiu dos épicos aparece como órfão, para você decidir. A skill também mostra o quadro por épico e a próxima story, muda estados a pedido (com transições validadas pelo `status.py`) e atualiza o `project.md` e a Situação do `workspace.md`.
@@ -815,7 +825,7 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
 | Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
-| Entrega por stories (BMAD) | Em construção | `plan-epics`, `sprint-planning`, `create-story` e `dev-story` prontos; `dev-story`, `story-review`, `retrospective`, `correct-course` planejados |
+| Entrega por stories (BMAD) | Em construção | `plan-epics`, `sprint-planning`, `create-story`, `dev-story` e `story-review` prontos; `dev-story`, `story-review`, `retrospective`, `correct-course` planejados |
 | Pesquisa de mercado e concorrentes | Planejado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |

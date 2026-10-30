@@ -10,7 +10,7 @@ Criada e atualizada pela skill `sdd-setup`; lida por todas as skills de document
 │   ├── config.toml         # equipe — versionado no Git
 │   ├── config.user.toml    # pessoal — no .gitignore (_sdd/*.user.toml)
 │   ├── version.toml        # versões do último setup (gerado, não editar)
-│   └── scripts/            # cópia dos scripts de runtime: config.py, workspace.py, status.py, epics.py, story.py, session.py, sddlib.py
+│   └── scripts/            # cópia dos scripts de runtime: config.py, workspace.py, status.py, epics.py, story.py, review.py, session.py, sddlib.py
 └── docs/                   # (ou o valor de paths.docs_root)
 ```
 
@@ -40,6 +40,7 @@ Configuração **do projeto** (nome, stack, repositório) continua em `docs/{pro
 | `backlog.prefixes` | spec-plan | config.toml | `sim` | `sim`: títulos com `[FEATURE]`, `[TASK]`, `[HT]`...; `nao`: títulos sem prefixo |
 | `delivery.tdd` | delivery | config.toml | `recomendado` | `dev-story`: `obrigatorio` = teste sempre antes do código; `recomendado` = pode inverter, registrando o motivo |
 | `delivery.auto_mode` | delivery | config.toml | `nao` | `sim`: `dev-story` sem pausas de confirmação em stories sem checkpoint (continua parando em ambiguidade) |
+| `delivery.review_depth` | delivery | config.toml | `completa` | `story-review`: `completa` = uma lente por subagente, em paralelo; `rapida` = um revisor (aderência, correção, testes) |
 | `delivery.review_mode` | delivery | config.toml | `sessao-nova` | Onde o `story-review` roda depois do `dev-story`: `sessao-nova` ou `subagente` |
 
 Termos de código (nomes de classe, chaves, cenários Gherkin `Dado/Quando/Então` ou `Given/When/Then`) seguem `language.documents`.
