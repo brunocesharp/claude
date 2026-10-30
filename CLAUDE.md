@@ -22,7 +22,7 @@ plugins/
             └── references/
 ```
 
-Plugins: `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`. Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
+Plugins: `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`, `art-direction` (direção de arte). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
 
 ## Frontmatter obrigatório no SKILL.md
 

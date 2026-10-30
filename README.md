@@ -10,8 +10,9 @@ Este repositório contém **skills modulares** para o Claude Code que cobrem tod
 - **Escopo** — formalizar o que será construído
 - **Especificação** — detalhar regras de negócio com BDD
 - **Arquitetura (documentação)** — descrever o sistema no modelo C4 e registrar decisões (ADR)
+- **Direção de arte** — definir a identidade visual do produto
 - **Plano de Execução** — decompor features em tarefas ordenadas
-- **Arquitetura (código)** — gerar código .NET e Angular seguindo Clean Architecture e CQRS
+- **Arquitetura (código)** — gerar código .NET, Angular e testes Java seguindo Clean Architecture e CQRS
 - **Deploy** — publicar em homologação e produção
 
 **Por que usar?**
@@ -38,9 +39,29 @@ No Claude Code, dentro do seu projeto:
 /plugin install architecture-angular@claude
 /plugin install architecture-java@claude
 /plugin install business-docs@claude
+/plugin install art-direction@claude
 ```
 
-Instale apenas os plugins relevantes para o seu projeto. Para padronizar o time sem que cada dev digite os comandos, declare o marketplace e os plugins no `.claude/settings.json` do projeto:
+Instale apenas os plugins relevantes para o seu projeto. Quando houver plugins ou versões novas no repositório, atualize o catálogo e recarregue:
+
+```
+/plugin marketplace update claude
+/reload-plugins
+```
+
+| Plugin | Skills |
+|--------|--------|
+| `workspace` | `multi-repo` |
+| `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
+| `spec-plan` | `spec-functional`, `plan-execution` |
+| `architecture-docs` | `arch-c4`, `arch-adr` |
+| `architecture-dotnet` | `architecture-init`, `architecture-entities`, `architecture-feature`, `architecture-repository`, `architecture-external-service`, `architecture-controller`, `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
+| `architecture-angular` | `angular-core-layer`, `angular-feature-layer`, `angular-shared-layer`, `angular-rxjs-transversal` |
+| `architecture-java` | `architecture-unit-test` |
+| `business-docs` | `business-docs` |
+| `art-direction` | `direcao-arte-fundacao` |
+
+Para padronizar o time sem que cada dev digite os comandos, declare o marketplace e os plugins no `.claude/settings.json` do projeto:
 
 ```json
 {
@@ -99,6 +120,7 @@ A `multi-repo` cria `docs/{projeto}/repositorios.md`, que as skills usam para sa
 > especificação funcional
 > documentar a arquitetura (C4)
 > registrar decisão de arquitetura
+> definir a direção de arte
 > plano de execução
 > criar entidade Pedido
 > criar command ProcessarPedido
@@ -147,6 +169,25 @@ Descreve a estrutura do sistema em níveis de abstração, seguindo *The C4 mode
 |-------|---------|------------|-------|
 | `arch-c4` | "arquitetura", "modelo C4", "diagrama de contexto/contêineres/componentes/deployment" | C4 model, Mermaid C4 | `arquitetura/arquitetura.md` (+ `componentes/`, `dinamicos/`) |
 | `arch-adr` | "ADR", "decisão de arquitetura", "por que escolhemos" | Architecture Decision Records (Nygard) | `arquitetura/decisoes/ADR-NNN-titulo.md` |
+
+### Fase: Direção de Arte
+
+Baseada nas obras de Richard Poulin (*Layout*, *Type*, *The Language of Graphic Design*): a arquitetura funcional vem antes de qualquer escolha estética.
+
+| Skill | Gatilho | Saída |
+|-------|---------|-------|
+| `direcao-arte-fundacao` | "direção de arte", "identidade visual", "style guide", "paleta de cores do projeto", "tipografia do projeto", "design system" | `direcao-arte/fundacao.md` |
+
+### Fase: Arquitetura Angular
+
+Skills para gerar a solução Angular por camada, com Signals, RxJS e NgRx.
+
+| Skill | Gatilho | Camada | Saída |
+|-------|---------|--------|-------|
+| `angular-core-layer` | "camada core", "interceptor", "guard", "SignalR Angular", "error handler" | Core | Services, hubs, HTTP, interceptors, guards, resolvers, models |
+| `angular-feature-layer` | "criar feature Angular", "smart/dumb component", "NgRx feature", "reactive form" | Feature | Páginas, componentes, store NgRx, formulários, rotas lazy |
+| `angular-shared-layer` | "componente compartilhado", "pipe", "directive", "PrimeNG", "Angular Material" | Shared | Dumb components, pipes, directives, integração com biblioteca de UI |
+| `angular-rxjs-transversal` | "RxJS", "switchMap", "combineLatest", "unsubscribe", "toSignal" | Todas | Guia de operadores e padrões RxJS por camada |
 
 ### Fase: Arquitetura Java
 
@@ -324,14 +365,24 @@ plugins/
 │   └── skills/
 │       └── architecture-unit-test/   # com References/
 │
-└── business-docs/
+├── business-docs/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       └── business-docs/
+│           ├── SKILL.md
+│           └── references/
+│               ├── areas.md
+│               └── template-business-rule.md
+│
+└── art-direction/
     ├── .claude-plugin/plugin.json
     └── skills/
-        └── business-docs/
+        └── direcao-arte-fundacao/
             ├── SKILL.md
             └── references/
-                ├── areas.md
-                └── template-business-rule.md
+                ├── guia-processo.md
+                ├── template-mestre.md
+                └── fontes.md
 ```
 
 ---
@@ -369,6 +420,8 @@ docs/
 │   │   └── decisoes/
 │   │       ├── README.md             # índice dos ADRs
 │   │       └── ADR-001-titulo.md
+│   ├── direcao-arte/
+│   │   └── fundacao.md               # identidade visual (direcao-arte-fundacao)
 │   ├── plano-execucao/
 │   │   └── titulo-do-escopo/
 │   │       ├── execution-plan.md
@@ -441,6 +494,14 @@ Baseada no **modelo C4** de Simon Brown. Conduz em blocos: vocabulário, context
 
 Registra uma decisão de arquitetura por arquivo (contexto, opções, decisão, consequências), numerada (`ADR-001`), com índice em `decisoes/README.md`. Decisão aceita não é editada: é substituída por outro ADR. Resolve os pontos em aberto do `arquitetura.md`.
 
+### direcao-arte-fundacao
+
+Conduz a fundação da identidade visual em blocos, cada um confirmado antes do próximo: fundamentos do projeto, auditoria e arquitetura visual, conceito e direção de arte, sistema visual (cores, tipografia, grid, iconografia) e fechamento com validação. Gera `direcao-arte/fundacao.md`, que serve de base para as telas e para as skills Angular. Se o documento já existe, continua de onde parou ou revisa, sem repetir perguntas já respondidas.
+
+### business-docs
+
+Lê o código implementado (.NET e Angular) e documenta as regras de negócio por área em `business/{area}.md`, numeradas (`RN-001`) e com arquivo e linha de cada regra. O mapa de áreas do código fica em `business/areas.md`. Com vários repositórios, prioriza os de backend.
+
 ### architecture-init
 
 Define e documenta a estrutura de camadas Clean Architecture para a solução .NET. Serve como referência para todas as outras skills de arquitetura.
@@ -465,6 +526,14 @@ Gera integrações com APIs externas usando padrão **Adapter/Gateway**. Herda d
 
 Gera endpoints ASP.NET Core (Controller ou Minimal API) com Request/Response models, validators FluentValidation, documentação OpenAPI e tratamento de erros via Result Pattern. Usa `ISender` do MediatR.
 
+### angular-core-layer / feature-layer / shared-layer / rxjs-transversal
+
+Geram a solução Angular por camada: Core (serviços, HTTP, SignalR, interceptors, guards, tratamento de erro), Feature (páginas, smart e dumb components, store NgRx, formulários reativos, rotas lazy) e Shared (componentes reutilizáveis, pipes, directives, biblioteca de UI). A `angular-rxjs-transversal` complementa as três com os operadores e padrões RxJS de cada camada.
+
+### architecture-unit-test
+
+Gera testes unitários Java (JUnit 5) a partir dos cenários BDD da especificação, mantendo a estrutura Given-When-Then e os padrões de cada camada.
+
 ### plan-execution
 
 Analisa a especificação funcional (e a arquitetura C4, se existir) e decompõe em entregas incrementais com tarefas ordenadas por camada (Domain → Infrastructure → Application → Presentation). Usa os contêineres e tecnologias do C4 para escolher a skill correta para cada tarefa e respeita os ADRs aceitos. Inclui estimativas de esforço.
@@ -483,7 +552,8 @@ Igual ao homolog, com etapas extras: confirmação explícita do usuário, valid
 
 - **Product Managers** — para conduzir discovery estruturado e gerar escopos
 - **Tech Leads** — para garantir alinhamento antes de codar e definir arquitetura
-- **Desenvolvedores .NET** — para gerar código seguindo padrões Clean Architecture
+- **Designers e diretores de arte** — para definir e documentar a identidade visual do produto
+- **Desenvolvedores .NET, Angular e Java** — para gerar código e testes seguindo os padrões do time
 - **Analistas de Sistemas** — para especificação funcional com BDD
 
 ---
@@ -509,6 +579,9 @@ discovery-vision ──► discovery-opportunity ──► discovery-assumptions
                           │
                           ▼
                 arch-c4 ◄──► arch-adr
+                          │
+                          ▼
+              direcao-arte-fundacao (opcional)
                           │
                           ▼
                   plan-execution ──► multi-repo (vários repositórios)
@@ -564,7 +637,11 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Arquitetura (documentação C4 + ADR) | Implementado | `arch-c4`, `arch-adr` |
 | Workspace com vários projetos | Implementado | todas as skills de documentação |
 | Vários repositórios por projeto | Implementado | `multi-repo` |
+| Direção de Arte (fundação) | Implementado | `direcao-arte-fundacao` |
+| Direção de Arte (validação) | Planejado | `direcao-arte-validacao` |
 | Arquitetura .NET | Implementado | 6 skills |
+| Arquitetura Angular | Implementado | 4 skills |
+| Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |
