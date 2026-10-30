@@ -4,7 +4,7 @@
 code = "delivery"
 plugin = "delivery"
 version = "1.0.0"
-skills = ["sprint-planning", "create-story", "dev-story", "story-review"]
+skills = ["sprint-planning", "create-story", "dev-story", "story-review", "retrospective"]
 
 [[module.config_questions]]
 key = "delivery.tdd"

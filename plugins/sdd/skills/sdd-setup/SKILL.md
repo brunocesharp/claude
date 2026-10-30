@@ -34,6 +34,7 @@ Leia antes de executar:
 | `epics.py` | `_sdd/scripts/` (cópia) | Valida os arquivos de épico, a cobertura cenário → story e extrai o texto literal da spec |
 | `story.py` | `_sdd/scripts/` (cópia) | Confere a completude do arquivo de uma story |
 | `review.py` | `_sdd/scripts/` (cópia) | Revisão: diff de todos os repositórios da story e integridade do registro (Arquivos alterados × git) |
+| `retro.py` | `_sdd/scripts/` (cópia) | Inventário de evidências de um épico para a retrospectiva |
 | `session.py` | `_sdd/scripts/` (cópia) | Monta (e, com confirmação, executa) o comando que abre uma sessão nova do Claude numa janela de terminal |
 
 Os de `_sdd/scripts/` são usados também pelas skills dos outros plugins. O plugin traz ainda um hook que valida o `sprint-status.yaml` sempre que o Claude grava ou edita esse arquivo (precisa do `uv`; sem ele, o hook não faz nada).

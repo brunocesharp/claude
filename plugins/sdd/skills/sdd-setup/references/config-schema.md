@@ -10,7 +10,7 @@ Criada e atualizada pela skill `sdd-setup`; lida por todas as skills de document
 │   ├── config.toml         # equipe — versionado no Git
 │   ├── config.user.toml    # pessoal — no .gitignore (_sdd/*.user.toml)
 │   ├── version.toml        # versões do último setup (gerado, não editar)
-│   └── scripts/            # cópia dos scripts de runtime: config.py, workspace.py, status.py, epics.py, story.py, review.py, session.py, sddlib.py
+│   └── scripts/            # cópia dos scripts de runtime: config.py, workspace.py, status.py, epics.py, story.py, review.py, retro.py, session.py, sddlib.py
 └── docs/                   # (ou o valor de paths.docs_root)
 ```
 

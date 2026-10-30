@@ -3,7 +3,7 @@
 - **Pedido:** "Verificação e fechamento quero seguir ... retrospectiva" (linha 10)
 - **Tamanho:** M
 - **Depende de:** 06, 08, 10
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -47,3 +47,32 @@ Skill `retrospective` que fecha um épico com base em evidências, decide se o p
 ## Arquivos impactados
 
 `plugins/<delivery>/skills/retrospective/**` (novo), `README.md`, `CLAUDE.md`, `0.0 - contexto-projeto-skills.md`.
+
+## Resultado (30/10/2026)
+
+**Skill `retrospective`** (plugin `delivery`). Etapas:
+1. Escolher o épico. Se houver story aberta, avisa e pergunta.
+2. Histórico do git, **opcional**: perguntado. Repositório ausente vai para "Fontes não lidas".
+3. Ler só o que o inventário aponta.
+4. Conversa com o time, opcional e registrada como percepção.
+5. Escrever, pelo template, com fonte em todo achado.
+6. Encaminhar, com confirmação:
+   - reconciliação de spec ou arquitetura → skills donas;
+   - story nova e ajustes → `plan-epics` + `sync`;
+   - stories já iniciadas → `correct-course`.
+7. Fechar: retrospectiva `done`; épico `done` só com confirmação, e com veredito `rejected` só a pedido.
+
+**Script `retro.py evidence`:**
+- Por story: estado, rodadas e resultados de revisão, achados por severidade e encaminhamento, tarefas `R{n}` abertas, desvios, pendências, checkpoint.
+- Por épico: retrospectiva anterior (veredito e itens de ação feitos/abertos), mudanças de rumo que citam o épico ou suas stories e totais.
+- Com `--repo` (opcional): commits por story.
+
+**Template:** `references/template-retrospectiva.md`, com os critérios do veredito.
+
+**Decisões aplicadas:** retrospectiva opcional (o `next` sugere, mas não obriga); leitura do git opcional.
+
+**Critérios de aceite:**
+- Template e regras de evidência: feitos.
+- O épico de exemplo com revisões, retrospectiva anterior e mudança de rumo é coberto por teste no script (54 testes).
+- A escrita do documento depende do modelo: verificar no primeiro uso.
+- Nenhum artefato é alterado sem confirmação: regra explícita, e a skill só grava a retrospectiva.

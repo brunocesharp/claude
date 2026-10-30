@@ -9,6 +9,7 @@ Uso (a partir da raiz do workspace):
   uv run _sdd/scripts/epics.py --project docs/{projeto} validate
   uv run _sdd/scripts/epics.py --project docs/{projeto} coverage --escopo {escopo}
   uv run _sdd/scripts/epics.py --project docs/{projeto} spec --escopo {escopo} 1.1 RN-1.2
+  uv run _sdd/scripts/epics.py --project docs/{projeto} impact [--escopo {escopo}] 1.3 RN-1.2
 
 Formato do frontmatter: sdd-setup/references/sprint-status.md (seção "Entrada: frontmatter dos épicos").
 """
@@ -122,6 +123,37 @@ def coverage(project: Path, escopo: str) -> dict:
     }
 
 
+def impact(project: Path, ids: list[str], escopo: str | None) -> dict:
+    """Stories cujo covers cita algum dos ids (cenários ou regras que mudaram), agrupadas pelo estado no quadro."""
+    from status import STATUS_FILE, find, load
+
+    status_path = project / STATUS_FILE
+    board = load(status_path) if status_path.is_file() else None
+    affected = []
+    for epic in read_epic_files(project):
+        if escopo and epic.get("escopo") != escopo:
+            continue
+        for story in epic.get("stories") or []:
+            hits = [ref for ref in (story.get("covers") or []) if ref in ids]
+            if not hits:
+                continue
+            state, file = "não está no quadro", None
+            if board is not None:
+                try:
+                    _, node, _ = find(board, str(story["id"]))
+                    state, file = node["status"], node.get("file")
+                except SddError:
+                    pass
+            affected.append({"id": story["id"], "epic": epic["id"], "title": story.get("title"),
+                             "status": state, "file": file, "covers": hits})
+    by_status: dict[str, list[str]] = {}
+    for row in affected:
+        by_status.setdefault(row["status"], []).append(row["id"])
+    covered = {ref for row in affected for ref in row["covers"]}
+    return {"ids": ids, "affected": affected, "by_status": by_status,
+            "not_covered": [i for i in ids if i not in covered]}
+
+
 HEADING = re.compile(r"^#{1,4}\s")
 
 
@@ -160,6 +192,9 @@ def main() -> None:
     spec = sub.add_parser("spec", help="texto literal de cenários e regras, pelo id")
     spec.add_argument("--escopo", required=True)
     spec.add_argument("ids", nargs="+", help='ex.: 1.1 1.2 RN-1.1')
+    imp = sub.add_parser("impact", help="stories que cobrem cenários ou regras que mudaram")
+    imp.add_argument("--escopo")
+    imp.add_argument("ids", nargs="+")
     args = parser.parse_args()
 
     project = args.project.resolve()
@@ -168,6 +203,8 @@ def main() -> None:
             emit(validate(project))
         elif args.command == "coverage":
             emit(coverage(project, args.escopo))
+        elif args.command == "impact":
+            emit(impact(project, args.ids, args.escopo))
         else:
             emit(extract(project, args.escopo, args.ids))
     except SddError as exc:
