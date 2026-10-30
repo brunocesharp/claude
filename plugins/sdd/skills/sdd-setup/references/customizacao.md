@@ -45,6 +45,7 @@ Ordem de ativação: resolver a customização → `activation_steps_prepend` �
 
 | Skill | Campos próprios |
 |-------|-----------------|
+| `discovery-research` | `default_region`, `known_competitors`, `strong_competitor_criteria`, `min_criteria`, `max_strong_competitors` |
 | `spec-functional` | `gherkin_keywords`, `template`, `extra_rules` |
 | `plan-epics` | `max_stories_per_epic`, `max_size`, `checkpoint_rules`, `title_prefixes` |
 | `sprint-planning` | `situacao_format` |

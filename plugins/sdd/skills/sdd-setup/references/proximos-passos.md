@@ -10,6 +10,7 @@ Responda a partir dos arquivos do workspace, não de memória. Os arquivos são 
 | Existe | Significa |
 |--------|-----------|
 | `discovery/*.md` | Quais etapas do discovery rodaram (vision, opportunity, assumptions, stakeholders, success-metrics) |
+| `discovery/pesquisa/` | Pesquisa de mercado e concorrentes (`discovery-research`) |
 | `escopo/{escopo}/escopo.md` | Escopo fechado |
 | `especificacao/{escopo}/spec-functional.md` | Especificação do escopo |
 | `arquitetura/arquitetura.md`, `arquitetura/decisoes/` | C4 e ADRs |
@@ -30,7 +31,7 @@ Uma recomendação principal, com o motivo, e no máximo duas alternativas.
 |----------|---------------|
 | Sem `_sdd/` | `sdd-setup` |
 | Sem projeto | `discovery-init` |
-| Projeto sem discovery | `discovery-vision` (sistema existente: `arch-c4` no modo Levantamento) |
+| Projeto sem discovery | `discovery-vision` (sistema existente: `arch-c4` no modo Levantamento); produto novo em mercado com concorrência: `discovery-research` antes ou logo depois da visão |
 | Discovery parcial | A próxima etapa que falta: vision → opportunity → assumptions → stakeholders → metrics |
 | Discovery completo, sem escopo | `discovery-scoped` |
 | Escopo sem especificação | `spec-functional` |

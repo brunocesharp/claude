@@ -36,6 +36,7 @@ Leia antes de executar:
 | `story.py` | `_sdd/scripts/` (cópia) | Confere a completude do arquivo de uma story |
 | `review.py` | `_sdd/scripts/` (cópia) | Revisão: diff de todos os repositórios da story e integridade do registro (Arquivos alterados × git) |
 | `retro.py` | `_sdd/scripts/` (cópia) | Inventário de evidências de um épico para a retrospectiva |
+| `research.py` | `_sdd/scripts/` (cópia) | Confere as citações de um documento de pesquisa (`discovery-research`) |
 | `customize.py` | `_sdd/scripts/` (cópia) | Resolve a customização de uma skill para um projeto (base `customize.toml` + `docs/{projeto}/_custom/<skill>.toml`) |
 | `session.py` | `_sdd/scripts/` (cópia) | Monta (e, com confirmação, executa) o comando que abre uma sessão nova do Claude numa janela de terminal |
 

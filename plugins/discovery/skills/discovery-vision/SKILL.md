@@ -34,6 +34,7 @@ Antes de iniciar, verifique se o arquivo `docs/{projeto}/project.md` existe.
 
 - **Se não existir**: informe o usuário que é necessário iniciar o projeto primeiro e pergunte: "Quer que eu inicie o projeto agora usando a skill discovery-init?"
 - **Se existir**: leia o arquivo para extrair o nome do projeto e contexto já registrado. Use essas informações para personalizar as perguntas.
+- **Pesquisa** (`discovery/pesquisa/`, skill `discovery-research`), se existir: use os concorrentes fortes e as lacunas de diferenciação no Bloco 3 (Proposta de Valor: "o que fazemos que os concorrentes não fazem?") e os segmentos no Bloco 2. Cite a pesquisa no `vision.md` em vez de repetir números.
 
 ---
 

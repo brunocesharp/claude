@@ -3,7 +3,7 @@
 - **Pedido:** "para Ideia / pesquisa quero implementar no meu pesquisa de mercado, concorrentes fortes" (linha 7)
 - **Tamanho:** M
 - **Depende de:** `discovery-init` (já existe). Independente das demais tarefas.
-- **Situação:** [ ] a fazer
+- **Situação:** [x] implementada em 30/10/2026 — ver "Resultado" no fim.
 
 ## Contexto
 
@@ -48,3 +48,42 @@ Skill `discovery-research` que faz pesquisa de **mercado** e de **concorrentes**
 ## Arquivos impactados
 
 `plugins/discovery/skills/discovery-research/**` (novo), `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-scoped`, `README.md`, `0.0 - contexto-projeto-skills.md`, `CLAUDE.md` (estrutura `docs/{projeto}/discovery/pesquisa/`).
+
+## Resultado (30/10/2026)
+
+**Skill `discovery-research`** (plugin `discovery`). Etapas:
+1. Enquadrar: modo, pergunta de pesquisa, recorte e o que o time já sabe.
+2. Mostrar o plano de busca e pedir ok.
+3. Mercado.
+4. Concorrentes: panorama, classificação dos fortes com confirmação, fichas, matriz, posicionamento em `quadrantChart` e lacunas.
+5. Escrever e conferir com `research.py check`.
+6. Encaminhar para visão, oportunidades e hipóteses.
+
+Há também um modo de atualização, que nunca apaga fichas nem fontes e registra tudo em Revisões.
+
+**Referências:**
+- `guia-fontes.md`: formato da citação, qualidade das fontes, divergência e atualidade, limites.
+- `template-mercado.md`: TAM/SAM/SOM com premissas explícitas, segmentos, tendências, regulação, implicações.
+- `template-concorrentes.md`: panorama direto/indireto/substituto, matriz, fichas, posicionamento, lacunas.
+
+**Script `research.py check`:**
+- Cada frase ou célula de tabela com número (%, moeda, mil/milhões/bilhões) precisa da própria `[n]` ou de `(estimativa: ...)`.
+- `[n]` citado precisa existir em Fontes, e cada fonte precisa ter link e data de acesso.
+- Ignora frontmatter, blocos de código, Limites e Revisões.
+
+**Customização (decisão "sim"):** `strong_competitor_criteria` + `min_criteria` (concorrente forte = atende a pelo menos N critérios), `max_strong_competitors`, `known_competitors` e `default_region`.
+
+**Integração:**
+- `discovery-vision`: diferenciação e segmentos.
+- `discovery-opportunity`: lacunas e pontos fracos viram dores candidatas.
+- `discovery-assumptions`: limites, estimativas e premissas não confirmadas viram hipóteses.
+- `discovery-scoped`: copia a pasta `pesquisa/` no snapshot do escopo.
+
+**Decisões aplicadas:** só mercado e concorrentes; a busca é feita pela própria skill, sem depender de `deep-research`; critério de concorrente forte customizável.
+
+**Critérios de aceite:**
+- Skill, templates e guia de fontes: feitos.
+- Nenhum número sem fonte ou sem marca de estimativa: conferido por script, coberto por teste (78 testes no total).
+- As 4 skills de discovery leem a pesquisa: feito.
+- README e contexto atualizados.
+- A pesquisa em si (busca e síntese) depende do modelo e da busca na web: verificar no primeiro uso.

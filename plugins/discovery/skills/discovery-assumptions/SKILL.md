@@ -38,6 +38,7 @@ Verifique se `docs/{projeto}/project.md` existe.
 
 - **Se não existir**: pergunte "Quer que eu inicie o projeto agora usando a skill discovery-init?"
 - **Se existir**: leia também `vision.md` e `opportunity.md` — eles são a melhor fonte para identificar hipóteses implícitas.
+- **Pesquisa** (`discovery/pesquisa/`, skill `discovery-research`), se existir: cada item de "Limites da pesquisa", cada número marcado como estimativa e cada premissa de mercado não confirmada vira candidata a hipótese (com a pesquisa como evidência atual).
 
 ---
 

@@ -38,6 +38,7 @@ Verifique se `docs/{projeto}/project.md` existe.
 
 - **Se não existir**: pergunte "Quer que eu inicie o projeto agora usando a skill discovery-init?"
 - **Se existir**: leia o arquivo. Se `vision.md` também existir, use-o para contextualizar as perguntas.
+- **Pesquisa** (`discovery/pesquisa/`, skill `discovery-research`), se existir: as lacunas e os pontos fracos dos concorrentes (temas recorrentes nas avaliações) são candidatos a dores não atendidas e as tentativas anteriores incluem as soluções concorrentes. Confirme com o usuário antes de registrar como oportunidade.
 
 ---
 

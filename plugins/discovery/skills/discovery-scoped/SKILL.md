@@ -60,6 +60,7 @@ Leia todos os arquivos em `docs/{projeto}/discovery/`:
 - `assumptions.md` — hipóteses críticas
 - `stakeholders.md` — envolvidos, interesses
 - `success-metrics.md` — métricas, critérios de sucesso
+- `pesquisa/` — mercado e concorrentes (`discovery-research`), se existir
 
 **Validação:**
 - Pelo menos `vision.md` OU `opportunity.md` deve existir
@@ -138,7 +139,8 @@ docs/{projeto}/escopo/{titulo-kebab}/
     ├── opportunity.md     (cópia, se relevante)
     ├── assumptions.md     (cópia, se relevante)
     ├── stakeholders.md    (cópia, se relevante)
-    └── success-metrics.md (cópia, se relevante)
+    ├── success-metrics.md (cópia, se relevante)
+    └── pesquisa/          (cópia da pasta, se relevante)
 ```
 
 **Validação:**

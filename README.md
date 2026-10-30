@@ -118,7 +118,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 |--------|--------|
 | `sdd` | `sdd-setup`, `sdd-customize` |
 | `workspace` | `multi-repo` |
-| `discovery` | `discovery-init`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
+| `discovery` | `discovery-init`, `discovery-research`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
 | `delivery` | `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` |
 | `architecture-docs` | `arch-c4`, `arch-adr` |
@@ -202,6 +202,7 @@ A `multi-repo` cria `docs/{projeto}/repositorios.md`, que as skills usam para sa
 ### 4. Siga o fluxo
 
 ```
+> pesquisar o mercado e os concorrentes
 > definir visão do projeto
 > mapear oportunidades
 > levantar hipóteses
@@ -408,6 +409,7 @@ plugins/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
 │       ├── discovery-init/
+│       ├── discovery-research/      # mercado e concorrentes com fontes (references: templates, guia de fontes)
 │       ├── discovery-vision/
 │       ├── discovery-opportunity/   # com references/
 │       ├── discovery-assumptions/   # com references/
@@ -571,7 +573,8 @@ docs/
 │   │   ├── opportunity.md
 │   │   ├── assumptions.md
 │   │   ├── stakeholders.md
-│   │   └── success-metrics.md
+│   │   ├── success-metrics.md
+│   │   └── pesquisa/                 # mercado-{tema}.md e concorrentes.md (discovery-research)
 │   ├── escopo/
 │   │   └── titulo-do-escopo/
 │   │       ├── escopo.md
@@ -648,6 +651,15 @@ Ponto de entrada. Coleta nome, descrição, URL do repositório, caminho local d
 ### multi-repo
 
 Para projetos com o código em vários repositórios. Cadastra os repositórios em `docs/{projeto}/repositorios.md` (URL, caminho local, papel, stack, contêineres C4 que implementa, contratos entre eles e deploy), detectando o que dá pelo Git. Mostra o panorama de todos (branch, alterações, atrás/à frente), clona os que faltam e coordena entregas que atravessam repositórios — um escopo do `plan-execution` ou uma story do fluxo de entrega (registro em `implementacao/multi-repo/{id}.md`, branch `feat/{id}`): repositórios afetados, contratos compatíveis ou não (expandir e contrair, versão nova, feature flag), ordem provedor antes do consumidor, mesma branch em todos. Nada que altere um repositório é feito sem confirmação, e commit, push e merge só a pedido.
+
+### discovery-research
+
+Pesquisa de **mercado** e de **concorrentes** com busca na web e **fontes citadas**. Toda afirmação traz `[n]` com link e data de acesso, ou é marcada como estimativa. O `research.py check` confere isso.
+
+- **Mercado:** tamanho (TAM/SAM/SOM quando há dado), segmentos, tendências, regulação e sinais de demanda.
+- **Concorrentes:** concorrentes diretos e indiretos, substitutos (o que as pessoas usam hoje no lugar), fichas dos concorrentes **fortes**, matriz comparativa, posicionamento e lacunas de diferenciação. O critério de concorrente forte é customizável por projeto.
+
+A pesquisa alimenta a visão, as oportunidades e as hipóteses. Os limites da pesquisa viram hipóteses a validar.
 
 ### discovery-vision / opportunity / assumptions / stakeholders / metrics
 
@@ -801,6 +813,9 @@ sdd-setup (uma vez por workspace)
 discovery-init
      │
      ▼
+discovery-research (opcional: mercado e concorrentes)
+     │
+     ▼
 discovery-vision ──► discovery-opportunity ──► discovery-assumptions
      │                                               │
      └──────────────────────────────────────────────┘
@@ -884,7 +899,7 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
 | Customização das skills por projeto (BMAD) | Implementado | `sdd-customize`, `customize.toml` nas 8 skills do fluxo |
 | Entrega por stories (BMAD) | Implementado | `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` |
-| Pesquisa de mercado e concorrentes | Planejado | `discovery-research` |
+| Pesquisa de mercado e concorrentes | Implementado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |
 | Especificação Não-Funcional | Planejado | `spec-nonfunctional` |
