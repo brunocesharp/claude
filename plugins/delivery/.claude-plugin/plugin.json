@@ -1,12 +1,12 @@
 {
   "name": "delivery",
-  "description": "Ciclo de entrega por stories (inspirado no BMAD): quadro de épicos e stories no sprint-status.yaml, story com contexto completo, implementação em sessão nova, revisão adversarial, retrospectiva e correct course.",
-  "version": "1.0.0",
+  "description": "Ciclo de entrega por stories (inspirado no BMAD): quadro de épicos e stories no sprint-status.yaml, story com contexto completo, implementação em sessão nova, revisão adversarial, retrospectiva, correct course e execução recorrente sem supervisão.",
+  "version": "1.1.0",
   "author": {
     "name": "brunocesharp"
   },
   "homepage": "https://github.com/brunocesharp/claude/tree/main/plugins/delivery",
   "repository": "https://github.com/brunocesharp/claude",
   "license": "MIT",
-  "keywords": ["sprint", "stories", "epics", "delivery", "status", "bmad"]
+  "keywords": ["sprint", "stories", "epics", "delivery", "status", "bmad", "automacao", "agendamento"]
 }

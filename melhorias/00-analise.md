@@ -44,6 +44,7 @@ O `melhorias.md` cita conceitos de **duas versões diferentes do BMAD**:
 | 11 | [11-retrospectiva.md](11-retrospectiva.md) | Retrospectiva de épico | 10 | M |
 | 12 | [12-correct-course.md](12-correct-course.md) | Mudança de rumo no meio do sprint | 10 | M |
 | 13 | [13-multi-repo-no-fluxo.md](13-multi-repo-no-fluxo.md) | Vários repositórios no fluxo de stories | 13 | M |
+| 14 | [14-execucao-recorrente.md](14-execucao-recorrente.md) | Execução recorrente das stories, sem supervisão | 14 | M |
 
 Tamanho: P = até meio dia, M = 1 a 2 dias, G = 3 dias ou mais (escrita de skill + referências + teste num workspace real).
 
@@ -56,6 +57,7 @@ Tamanho: P = até meio dia, M = 1 a 2 dias, G = 3 dias ou mais (escrita de skill
                                └──> 04 customização                                          11 retrospectiva <─────┤
                                                                                               12 correct-course <────┘
 05 pesquisa (independente)            13 multi-repo: atravessa 06–12 (aplicar junto ou logo depois de cada uma)
+                                      14 execução recorrente: depois de 06, 08 e 09 (roda o dev-story sem supervisão)
 ```
 
 Ordem de execução recomendada:
