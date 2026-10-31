@@ -27,7 +27,7 @@
     {
       "name": "delivery",
       "source": "./plugins/delivery",
-      "description": "Ciclo de entrega por stories (inspirado no BMAD): quadro de épicos e stories no sprint-status.yaml, story com contexto completo, implementação em sessão nova, revisão adversarial, retrospectiva, correct course e execução recorrente sem supervisão."
+      "description": "Ciclo de entrega por stories (inspirado no BMAD): quadro de épicos e stories no sprint-status.yaml, story com contexto completo, implementação em sessão nova, revisão adversarial, retrospectiva, correct course e criação e execução recorrentes de stories sem supervisão."
     },
     {
       "name": "architecture-docs",

@@ -3,21 +3,22 @@
 # requires-python = ">=3.11"
 # dependencies = ["pyyaml>=6"]
 # ///
-"""Apoio da skill execucao-recorrente: lê o arquivo de configuração (repositórios prioritários e sem
-prioridade), acha a próxima story a executar, controla a trava global (uma tarefa por vez) e registra
-o resultado de cada execução. Imprime JSON; em erro, 'error: <msg>' e código 1.
+"""Apoio das skills execucao-recorrente (perfil execucao: dev-story/story-review) e criacao-story-recorrente
+(perfil criacao: create-story): lê o arquivo de configuração (repositórios prioritários e sem prioridade),
+acha a próxima story, controla a trava global do perfil (uma tarefa por vez) e registra o resultado de cada
+execução. Imprime JSON; em erro, 'error: <msg>' e código 1.
 
-Uso (de qualquer pasta):
-  uv run scripts/recorrente.py config [--config ARQ]            # mostra/valida a configuração
-  uv run scripts/recorrente.py init-config [--config ARQ]       # cria o arquivo modelo (nunca sobrescreve)
-  uv run scripts/recorrente.py scan [--config ARQ]              # fila na ordem de execução
-  uv run scripts/recorrente.py lock adquirir|liberar [--config ARQ] [--expira-min 90] [--dono "..."]
-  uv run scripts/recorrente.py registrar {workspace} --projeto loja --id 1-2-listar-produtos \\
-      --acao dev-story --resultado iniciada|concluida|falhou|bloqueada|pulada [--motivo "..."]
+Uso (de qualquer pasta; --perfil vem antes do comando, padrão execucao):
+  uv run scripts/recorrente.py [--perfil execucao|criacao] config [--config ARQ]       # mostra/valida
+  uv run scripts/recorrente.py [--perfil ...] init-config [--config ARQ]               # cria o modelo
+  uv run scripts/recorrente.py [--perfil ...] scan [--config ARQ]                      # fila em ordem
+  uv run scripts/recorrente.py [--perfil ...] lock adquirir|liberar [--config ARQ] [--expira-min 90] [--dono "..."]
+  uv run scripts/recorrente.py [--perfil ...] registrar {workspace} --projeto loja --id 1-2-listar-produtos \\
+      --acao dev-story --resultado iniciada|concluida|falhou|bloqueada|pulada|aguardando [--motivo "..."]
 
-Configuração: --config, senão a variável EXECUCAO_RECORRENTE_CONFIG, senão ~/.claude/execucao-recorrente.toml.
-A trava global fica ao lado dela (execucao-recorrente.lock.json). Estado e log de cada workspace ficam em
-{workspace}/_sdd/execucao-recorrente/. Regras na SKILL.md da skill.
+Configuração: --config, senão a variável do perfil (EXECUCAO_RECORRENTE_CONFIG / CRIACAO_STORY_RECORRENTE_CONFIG),
+senão ~/.claude/{skill}.toml. A trava global fica ao lado dela ({nome}.lock.json). Estado e log de cada
+workspace ficam em {workspace}/_sdd/{skill}/. Regras na SKILL.md de cada skill.
 """
 
 from __future__ import annotations
@@ -32,25 +33,29 @@ from pathlib import Path
 
 import yaml
 
-SKILL_DIR = Path(__file__).resolve().parent.parent
-STATE_DIR = Path("_sdd") / "execucao-recorrente"
+SKILLS_ROOT = Path(__file__).resolve().parents[2]   # plugins/delivery/skills
 STATUS_FILE = Path("implementacao") / "sprint-status.yaml"
 ACOES = ("dev-story", "story-review", "create-story")
-RESULTADOS = ("iniciada", "concluida", "falhou", "bloqueada", "pulada")
+RESULTADOS = ("iniciada", "concluida", "falhou", "bloqueada", "pulada", "aguardando")
 GRUPOS = (("prioritarios", "prioritario"), ("sem_prioridade", "sem-prioridade"))
-CONFIG_ENV = "EXECUCAO_RECORRENTE_CONFIG"
-DEFAULT_CONFIG = Path("~/.claude/execucao-recorrente.toml")
-LOG_HEADER = ("# Execução recorrente — log de {mes}\n\n"
+PERFIS = {
+    "execucao": {"skill": "execucao-recorrente", "env": "EXECUCAO_RECORRENTE_CONFIG",
+                 "acoes": ("dev-story", "story-review"), "titulo": "Execução recorrente"},
+    "criacao": {"skill": "criacao-story-recorrente", "env": "CRIACAO_STORY_RECORRENTE_CONFIG",
+                "acoes": ("create-story",), "titulo": "Criação recorrente de stories"},
+}
+PERFIL = PERFIS["execucao"]
+LOG_HEADER = ("# {titulo} — log de {mes}\n\n"
               "| Data | Projeto | Story | Ação | Resultado | Tentativa | Motivo |\n"
               "|------|---------|-------|------|-----------|-----------|--------|\n")
-CONFIG_TEMPLATE = """# Configuração da skill execucao-recorrente.
+CONFIG_TEMPLATE = """# Configuração da skill {skill}.
 # Cada caminho pode ser a raiz de um workspace (tem _sdd/ ou docs/), a pasta de um projeto
-# (docs/{projeto}) ou qualquer pasta dentro de um workspace. Use aspas simples para caminhos do Windows.
+# (docs/{{projeto}}) ou qualquer pasta dentro de um workspace. Use aspas simples para caminhos do Windows.
 #
-# Ordem de execução: 1) retoma a tarefa in-progress que a execução recorrente começou e não terminou;
+# Ordem: 1) retoma a tarefa que esta skill começou e não terminou;
 # 2) a próxima tarefa dos repositórios prioritários, na ordem da lista;
 # 3) só se nenhum prioritário tiver tarefa, a próxima dos repositórios sem prioridade.
-# Uma tarefa por vez: enquanto uma execução está em andamento, as outras rodadas não iniciam nada.
+# Uma tarefa por vez: enquanto uma rodada está em andamento, as outras não iniciam nada.
 
 [repositorios]
 prioritarios = [
@@ -99,7 +104,7 @@ def read_toml(path: Path) -> dict:
 
 
 def config_path(arg: str | None) -> Path:
-    raw = arg or os.environ.get(CONFIG_ENV) or str(DEFAULT_CONFIG)
+    raw = arg or os.environ.get(PERFIL["env"]) or f"~/.claude/{PERFIL['skill']}.toml"
     return Path(raw).expanduser()
 
 
@@ -131,17 +136,26 @@ def load_config(path: Path) -> dict:
 
 
 def project_config(project: Path) -> dict:
-    """Campos próprios da skill: padrão do customize.toml + override do projeto (o override substitui o valor)."""
-    base = dict(read_toml(SKILL_DIR / "customize.toml").get("workflow", {}))
-    override = read_toml(project / "_custom" / "execucao-recorrente.toml").get("workflow", {})
+    """Campos próprios da skill do perfil: padrão do customize.toml + override do projeto (o override substitui)."""
+    skill = PERFIL["skill"]
+    base = dict(read_toml(SKILLS_ROOT / skill / "customize.toml").get("workflow", {}))
+    override = read_toml(project / "_custom" / f"{skill}.toml").get("workflow", {})
     base.update(override)
-    acoes = [a for a in base.get("acoes", ["dev-story"]) if a in ACOES]
-    return {
-        "habilitado": bool(base.get("habilitado", True)),
-        "acoes": acoes,
-        "max_tentativas": int(base.get("max_tentativas", 3)),
-        "commit_ao_concluir": bool(base.get("commit_ao_concluir", False)),
-    }
+    cfg = {"habilitado": bool(base.get("habilitado", True)), "max_tentativas": int(base.get("max_tentativas", 3)),
+           "avisos": []}
+    if PERFIL is PERFIS["criacao"]:
+        deps = base.get("dependencias_em", ["review", "done"])
+        cfg.update({"acoes": ["create-story"], "max_prontas": int(base.get("max_prontas", 2)),
+                    "dependencias_em": [str(d) for d in deps] if isinstance(deps, list) else ["review", "done"],
+                    "exige_confirmacao": bool(base.get("exige_confirmacao", False)), "commit_ao_concluir": False})
+        return cfg
+    pedidas = base.get("acoes", ["dev-story"])
+    cfg["acoes"] = [a for a in pedidas if a in PERFIL["acoes"]]
+    if "create-story" in pedidas:
+        cfg["avisos"].append("acoes = create-story não vale mais na execucao-recorrente: use a skill "
+                             "criacao-story-recorrente")
+    cfg["commit_ao_concluir"] = bool(base.get("commit_ao_concluir", False))
+    return cfg
 
 
 def docs_root(workspace: Path) -> Path:
@@ -186,7 +200,7 @@ def projects_of(workspace: Path) -> list[Path]:
 
 
 def state_dir(workspace: Path) -> Path:
-    return workspace / STATE_DIR
+    return workspace / "_sdd" / PERFIL["skill"]
 
 
 def load_estado(workspace: Path) -> dict:
@@ -238,7 +252,8 @@ def append_log(workspace: Path, now: datetime, row: list[str]) -> Path:
     folder = state_dir(workspace) / "log"
     folder.mkdir(parents=True, exist_ok=True)
     path = folder / f"{now:%Y-%m}.md"
-    text = path.read_text(encoding="utf-8") if path.is_file() else LOG_HEADER.format(mes=f"{now:%m/%Y}")
+    text = (path.read_text(encoding="utf-8") if path.is_file()
+            else LOG_HEADER.format(titulo=PERFIL["titulo"], mes=f"{now:%m/%Y}"))
     cells = [c.replace("|", "\\|").replace("\n", " ").strip() for c in row]
     text += "| " + " | ".join(cells) + " |\n"
     path.write_text(text, encoding="utf-8")
@@ -268,14 +283,32 @@ def story_frontmatter(project: Path, story: dict) -> dict:
     return data if isinstance(data, dict) else {}
 
 
+def epic_meta(project: Path) -> dict[str, dict]:
+    """depends_on/checkpoint de cada story, do frontmatter dos épicos (a story em backlog ainda não tem arquivo)."""
+    meta: dict[str, dict] = {}
+    for path in sorted((project / "implementacao" / "epicos").glob("epic-*.md")):
+        text = path.read_text(encoding="utf-8")
+        end = text.find("\n---", 3)
+        if not text.startswith("---") or end == -1:
+            continue
+        try:
+            data = yaml.safe_load(text[3:end]) or {}
+        except yaml.YAMLError:
+            continue
+        for story in data.get("stories") or []:
+            if isinstance(story, dict) and story.get("id"):
+                meta[str(story["id"])] = story
+    return meta
+
+
 def candidates(workspace: Path, project: Path, estado: dict, prioridade: str) -> dict:
-    """Stories executáveis de um projeto: retomadas (in-progress da execução recorrente) e novas."""
+    """Stories executáveis de um projeto: retomadas (começadas por esta skill e não terminadas) e novas."""
     cfg = project_config(project)
     nome = project.name
     out = {"projeto": nome, "path": str(project), "prioridade": prioridade, "config": cfg,
            "retomadas": [], "novas": [], "puladas": []}
     if not cfg["habilitado"]:
-        out["puladas"].append({"id": None, "motivo": "execução recorrente desligada no projeto (habilitado = false)"})
+        out["puladas"].append({"id": None, "motivo": f"{PERFIL['skill']} desligada no projeto (habilitado = false)"})
         return out
     try:
         data = yaml.safe_load((project / STATUS_FILE).read_text(encoding="utf-8")) or {}
@@ -283,8 +316,10 @@ def candidates(workspace: Path, project: Path, estado: dict, prioridade: str) ->
         out["erro"] = f"sprint-status.yaml inválido: {exc}"
         return out
     order = [(epic_id, story_id, story) for epic_id, epic in (data.get("epics") or {}).items()
-             if epic.get("status") != "dropped" for story_id, story in (epic.get("stories") or {}).items()]
-    status_of = {sid: s.get("status") for _e, sid, s in order}
+             if epic.get("status") not in ("dropped", "done")
+             for story_id, story in (epic.get("stories") or {}).items()]
+    status_of = {sid: s.get("status") for epic in (data.get("epics") or {}).values()
+                 for sid, s in (epic.get("stories") or {}).items()}
 
     def item(epic_id: str, story_id: str, story: dict, acao: str, retomada: bool = False) -> dict:
         reg = estado["stories"].get(f"{nome}/{story_id}", {})
@@ -298,11 +333,19 @@ def candidates(workspace: Path, project: Path, estado: dict, prioridade: str) ->
         reg = estado["stories"].get(f"{nome}/{story_id}", {})
         return reg.get("acao") == acao and reg.get("tentativas", 0) >= cfg["max_tentativas"]
 
-    def pular(story_id: str, motivo: str) -> None:
+    def pular(story_id: str | None, motivo: str) -> None:
         out["puladas"].append({"id": story_id, "motivo": motivo})
 
     limite = f"limite de {cfg['max_tentativas']} tentativas atingido"
-    buckets: dict[str, list[dict]] = {"review": [], "ready-for-dev": [], "backlog": []}
+    if PERFIL is PERFIS["criacao"]:
+        _criacao(project, order, status_of, estado, nome, cfg, out, item, esgotada, pular, limite)
+    else:
+        _execucao(project, order, status_of, estado, nome, cfg, out, item, esgotada, pular, limite)
+    return out
+
+
+def _execucao(project, order, status_of, estado, nome, cfg, out, item, esgotada, pular, limite) -> None:
+    buckets: dict[str, list[dict]] = {"review": [], "ready-for-dev": []}
     for epic_id, story_id, story in order:
         st = story.get("status")
         reg = estado["stories"].get(f"{nome}/{story_id}", {})
@@ -330,21 +373,53 @@ def candidates(workspace: Path, project: Path, estado: dict, prioridade: str) ->
                 pular(story_id, limite)
             else:
                 buckets["ready-for-dev"].append(item(epic_id, story_id, story, "dev-story"))
-        elif st == "backlog" and "create-story" in cfg["acoes"]:
+    out["novas"] = buckets["review"] + buckets["ready-for-dev"]
+
+
+def _criacao(project, order, status_of, estado, nome, cfg, out, item, esgotada, pular, limite) -> None:
+    """Uma story nova por projeto: a primeira do backlog, na ordem de build, com as dependências prontas."""
+    meta = epic_meta(project)
+    prontas = sum(1 for _e, _sid, s in order if s.get("status") == "ready-for-dev")
+    out["prontas"] = prontas
+    nova = None
+    for epic_id, story_id, story in order:
+        if story.get("status") != "backlog":
+            continue
+        reg = estado["stories"].get(f"{nome}/{story_id}", {})
+        criando = reg.get("acao") == "create-story"
+        if criando and reg.get("ultimo_resultado") == "em-andamento":
             if esgotada(story_id, "create-story"):
                 pular(story_id, limite)
             else:
-                buckets["backlog"].append(item(epic_id, story_id, story, "create-story"))
-    # create-story só para a primeira story do backlog (a próxima na ordem de build)
-    out["novas"] = buckets["review"] + buckets["ready-for-dev"] + buckets["backlog"][:1]
-    return out
+                out["retomadas"].append(item(epic_id, story_id, story, "create-story", retomada=True))
+            continue
+        if criando and reg.get("ultimo_resultado") == "aguardando":
+            pular(story_id, "arquivo da story pronto, aguardando confirmação de uma pessoa para ready-for-dev")
+            continue
+        if nova is not None:
+            continue
+        pendentes = [d for d in (meta.get(story_id, {}).get("depends_on") or [])
+                     if status_of.get(d) not in cfg["dependencias_em"]]
+        if pendentes:
+            pular(story_id, "depende de " + ", ".join(f"{d} ({status_of.get(d, 'inexistente')})" for d in pendentes))
+        elif esgotada(story_id, "create-story"):
+            pular(story_id, limite)
+        else:
+            nova = item(epic_id, story_id, story, "create-story")
+    if out["retomadas"]:
+        return
+    if prontas >= cfg["max_prontas"]:
+        pular(None, f"já há {prontas} stories ready-for-dev (limite max_prontas = {cfg['max_prontas']})")
+    elif nova is not None:
+        out["novas"].append(nova)
 
 
 def scan(cfg: dict, lock: dict) -> dict:
     now = agora()
     em_andamento = lock_ativo(lock, now)
-    result = {"agora": now.isoformat(), "config": cfg["path"], "em_andamento": em_andamento, "lock": lock,
-              "grupos": [], "fila": [], "erros": [], "avisos": list(cfg["avisos"])}
+    result = {"perfil": PERFIL["skill"], "agora": now.isoformat(), "config": cfg["path"],
+              "em_andamento": em_andamento, "lock": lock, "grupos": [], "fila": [], "erros": [],
+              "avisos": list(cfg["avisos"])}
     retomadas: list[dict] = []
     novas: dict[str, list[dict]] = {}
     vistos: set[Path] = set()
@@ -374,10 +449,11 @@ def scan(cfg: dict, lock: dict) -> dict:
                 vistos.add(proj)
                 info = candidates(workspace, proj, estado, nome)
                 entry["projetos"].append(info)
+                result["avisos"] += [f"{info['projeto']}: {a}" for a in info["config"]["avisos"]]
                 retomadas.extend(info["retomadas"])
                 novas[nome].extend(info["novas"])
         result["grupos"].append(grupo)
-    # 1) retomar o que a execução recorrente deixou in-progress; 2) prioritários; 3) sem prioridade
+    # 1) retomar o que esta skill começou e não terminou; 2) prioritários; 3) sem prioridade
     result["fila"] = retomadas + novas["prioritario"] + novas["sem-prioridade"]
     if em_andamento:
         result["escolhida"] = None
@@ -411,6 +487,8 @@ def cmd_lock(path: Path, acao: str, expira_min: int, dono: str) -> dict:
 
 
 def cmd_registrar(workspace: Path, projeto: str, story_id: str, acao: str, resultado: str, motivo: str) -> dict:
+    if acao not in PERFIL["acoes"]:
+        raise RecError(f"a ação {acao} não pertence à skill {PERFIL['skill']} (use {', '.join(PERFIL['acoes'])})")
     now = agora()
     project = docs_root(workspace) / projeto
     cfg = project_config(project) if project.is_dir() else {"max_tentativas": 3}
@@ -440,7 +518,7 @@ def cmd_registrar(workspace: Path, projeto: str, story_id: str, acao: str, resul
     elif resultado == "falhou":
         reg["tentativas"] = reg.get("tentativas", 0) + 1
         reg["ultimo_resultado"] = "falhou"
-    elif resultado in ("concluida", "bloqueada"):
+    elif resultado in ("concluida", "bloqueada", "aguardando"):
         reg["ultimo_resultado"] = resultado
     reg["ultima_execucao"] = now.isoformat()
     reg["motivo"] = motivo
@@ -457,7 +535,10 @@ def cmd_registrar(workspace: Path, projeto: str, story_id: str, acao: str, resul
 
 
 def main() -> None:
+    global PERFIL
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--perfil", choices=tuple(PERFIS), default="execucao",
+                        help="execucao (dev-story/story-review) ou criacao (create-story)")
     sub = parser.add_subparsers(dest="command", required=True)
     for name, text in (("config", "mostra e valida a configuração"),
                        ("init-config", "cria o arquivo de configuração modelo (nunca sobrescreve)"),
@@ -468,7 +549,7 @@ def main() -> None:
     lockp.add_argument("acao", choices=("adquirir", "liberar"))
     lockp.add_argument("--config")
     lockp.add_argument("--expira-min", type=int, help="padrão: execucao.lock_expira_min da configuração (90)")
-    lockp.add_argument("--dono", default="execucao-recorrente")
+    lockp.add_argument("--dono")
     regp = sub.add_parser("registrar", help="registra o resultado de uma execução no estado e no log do workspace")
     regp.add_argument("workspace")
     regp.add_argument("--projeto", required=True)
@@ -477,6 +558,7 @@ def main() -> None:
     regp.add_argument("--resultado", required=True, choices=RESULTADOS)
     regp.add_argument("--motivo", default="")
     args = parser.parse_args()
+    PERFIL = PERFIS[args.perfil]
     try:
         if args.command == "registrar":
             workspace, _project = resolve_dir(args.workspace)
@@ -488,14 +570,14 @@ def main() -> None:
                 emit({"criado": False, "config": str(path), "motivo": "já existe; nada foi alterado"})
                 return
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(CONFIG_TEMPLATE, encoding="utf-8")
+            path.write_text(CONFIG_TEMPLATE.format(skill=PERFIL["skill"]), encoding="utf-8")
             emit({"criado": True, "config": str(path)})
             return
         if args.command == "lock":
             expira = args.expira_min
             if expira is None:
                 expira = load_config(path)["lock_expira_min"] if path.is_file() else 90
-            emit(cmd_lock(lock_path(path), args.acao, expira, args.dono))
+            emit(cmd_lock(lock_path(path), args.acao, expira, args.dono or PERFIL["skill"]))
             return
         cfg = load_config(path)
         if args.command == "config":

@@ -209,8 +209,9 @@ def test_override_do_projeto(env):
     custom.mkdir()
     (custom / "execucao-recorrente.toml").write_text('[workflow]\nacoes = ["create-story"]\n', encoding="utf-8")
     out = scan(env)
-    assert (out["escolhida"]["projeto"], out["escolhida"]["id"], out["escolhida"]["acao"]) == \
-        ("loja", "1-5-exportar", "create-story")
+    # create-story é da skill criacao-story-recorrente: aqui o projeto fica sem ações e o scan avisa
+    assert out["escolhida"]["projeto"] == "estoque"
+    assert any("criacao-story-recorrente" in a for a in out["avisos"])
     (custom / "execucao-recorrente.toml").write_text("[workflow]\nhabilitado = false\n", encoding="utf-8")
     assert scan(env)["escolhida"]["projeto"] == "estoque"
 
