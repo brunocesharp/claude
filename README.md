@@ -120,7 +120,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-research`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
-| `delivery` | `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course`, `execucao-recorrente` |
+| `delivery` | `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course`, `execucao-recorrente`, `criacao-story-recorrente` |
 | `architecture-docs` | `arch-c4`, `arch-adr` |
 | `architecture-dotnet` | `architecture-init`, `architecture-entities`, `architecture-feature`, `architecture-repository`, `architecture-external-service`, `architecture-controller`, `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | `architecture-angular` | `angular-core-layer`, `angular-feature-layer`, `angular-shared-layer`, `angular-rxjs-transversal` |
@@ -319,6 +319,7 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 | `story-review` | "revisar a story", "story-review", "a story está pronta?" | Bloco na seção Revisão + correções `R{n}` (story → `done` ou `in-progress`) |
 | `retrospective` | "retrospectiva", "fechar o épico", "lições do épico" | `implementacao/retrospectivas/epic-N-{data}.md` (veredito; épico → `done`) |
 | `correct-course` | "mudou o requisito", "mudança de rumo", "a story não dá", "replanejar" | `implementacao/mudancas/{data}-{slug}.md` (proposta; aplicada após aprovação) |
+| `criacao-story-recorrente` | "criar stories automaticamente", "criação recorrente de stories", "agendar o create-story", "manter stories prontas" | Stories do backlog criadas via `create-story` (→ `ready-for-dev`); motivo das falhas em `_sdd/criacao-story-recorrente/log/` |
 | `execucao-recorrente` | "execução recorrente", "executar as stories automaticamente", "agendar a execução das stories", "adicionar repositório na execução recorrente" | Stories prontas implementadas via `dev-story`; motivo das falhas na story e em `_sdd/execucao-recorrente/log/` |
 
 ### Fase: Deploy .NET
@@ -340,7 +341,7 @@ Todas as saídas de documentação ficam dentro de `docs/{projeto}/` (ver "Estru
 
 ## Customizar as skills
 
-As skills do fluxo (`spec-functional`, `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course` e `execucao-recorrente`) podem ser ajustadas **por projeto**, sem editar o plugin. Cada uma traz um `customize.toml` com os campos customizáveis e os padrões. O override fica em `docs/{projeto}/_custom/<skill>.toml`, que atualizar o plugin nunca toca.
+As skills do fluxo (`spec-functional`, `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course`, `execucao-recorrente` e `criacao-story-recorrente`) podem ser ajustadas **por projeto**, sem editar o plugin. Cada uma traz um `customize.toml` com os campos customizáveis e os padrões. O override fica em `docs/{projeto}/_custom/<skill>.toml`, que atualizar o plugin nunca toca.
 
 ```
 > customizar a story-review do projeto loja: desligar a lente de contratos e acrescentar uma de acessibilidade
@@ -427,7 +428,8 @@ plugins/
 │       ├── story-review/             # revisão adversarial (references: lentes, triagem, template-revisao)
 │       ├── retrospective/            # retrospectiva do épico por evidências (references/template-retrospectiva.md)
 │       ├── correct-course/           # mudança de rumo (references/template-proposta.md)
-│       └── execucao-recorrente/      # roda as stories prontas sem supervisão (scripts/recorrente.py, references/agendamento.md)
+│       ├── execucao-recorrente/      # roda as stories prontas sem supervisão (scripts/recorrente.py, references/agendamento.md)
+│       └── criacao-story-recorrente/ # cria as stories do backlog sem supervisão (scripts/story_recorrente.py, references/agendamento.md)
 │
 ├── spec-plan/
 │   ├── .claude-plugin/plugin.json
@@ -802,7 +804,21 @@ Em cada rodada, a skill:
 
 Só entram projetos com `implementacao/sprint-status.yaml`; projeto sem quadro fica fora da fila. Story pulada (ex.: "aguardando commit") vai para o log uma vez por motivo, não a cada rodada.
 
-Nunca pega story que uma pessoa está implementando, nunca faz push nem merge, e só faz commit local se o projeto ligar `commit_ao_concluir`. Cada projeto pode desligar a execução ou liberar também a `story-review` e a `create-story` (`_custom/execucao-recorrente.toml`).
+Nunca pega story que uma pessoa está implementando, nunca faz push nem merge, e só faz commit local se o projeto ligar `commit_ao_concluir`. Cada projeto pode desligar a execução ou liberar também a `story-review` (`_custom/execucao-recorrente.toml`).
+
+### criacao-story-recorrente
+
+A mesma lógica da `execucao-recorrente`, para o `create-story`: mantém o backlog convertido em stories prontas. Os repositórios ficam no arquivo `~/.claude/criacao-story-recorrente.toml`, nas listas `prioritarios` e `sem_prioridade`, e a skill é agendada (por exemplo a cada 15 minutos).
+
+Em cada rodada, a skill:
+
+- não inicia nada se já há uma criação em andamento (uma por vez) e retoma primeiro a que ela mesma deixou pela metade;
+- senão, cria a primeira story do backlog, na ordem de build, dos repositórios **prioritários** e, só se nenhum tiver story a criar, dos **sem prioridade**;
+- só cria quando as dependências da story já estão em `review` ou `done` (para levar os aprendizados da anterior) e enquanto o projeto tem menos de `max_prontas` stories em `ready-for-dev` (padrão 2);
+- roda o `create-story` num contexto limpo e move a story para `ready-for-dev` quando o `story.py check` passa — ou deixa o arquivo aguardando uma pessoa, com `exige_confirmacao = true`;
+- o que exigiria perguntar ao usuário (dúvida de requisito, spec que mudou, contrato sem estratégia, story grande demais) vira `blocked` com o motivo, nunca requisito inventado.
+
+Usa o mesmo script da `execucao-recorrente`. Com arquivos de configuração separados, criação e implementação rodam em paralelo; com o mesmo arquivo, compartilham listas e trava (uma tarefa por vez no total).
 
 ### sprint-planning
 
@@ -921,8 +937,8 @@ Do workspace, dê acesso ao código com `/add-dir {caminho}` (ou `claude --add-d
 | Testes Java | Implementado | `architecture-unit-test` |
 | Plano de Execução | Implementado | `plan-execution` |
 | Setup e estado do workspace (BMAD) | Implementado | `sdd-setup`, scripts em `_sdd/scripts/` |
-| Customização das skills por projeto (BMAD) | Implementado | `sdd-customize`, `customize.toml` nas 9 skills do fluxo |
-| Entrega por stories (BMAD) | Implementado | `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course`, `execucao-recorrente` |
+| Customização das skills por projeto (BMAD) | Implementado | `sdd-customize`, `customize.toml` nas 10 skills do fluxo |
+| Entrega por stories (BMAD) | Implementado | `plan-epics`, `sprint-planning`, `create-story`, `dev-story`, `story-review`, `retrospective`, `correct-course`, `execucao-recorrente`, `criacao-story-recorrente` |
 | Pesquisa de mercado e concorrentes | Implementado | `discovery-research` |
 | Deploy .NET | Implementado | `deploy-dotnet-homolog`, `deploy-dotnet-prod` |
 | Documentação de Negócio | Implementado | `business-docs` |

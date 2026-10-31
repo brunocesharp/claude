@@ -6,7 +6,7 @@
 [module]
 code = "sdd"
 plugin = "sdd"
-version = "1.0.1"
+version = "1.0.2"
 skills = ["sdd-setup", "sdd-customize"]
 
 [[module.config_questions]]

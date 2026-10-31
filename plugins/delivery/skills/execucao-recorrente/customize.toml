@@ -16,8 +16,8 @@ on_complete = ""
 habilitado = true
 # Ações que a execução recorrente pode fazer sozinha neste projeto, na ordem de prioridade do status.py next:
 #   "dev-story"    — implementa stories ready-for-dev e retoma as in-progress que ela mesma começou;
-#   "story-review" — revisa stories em review (num subagente, contexto separado da implementação);
-#   "create-story" — gera o arquivo da próxima story do backlog.
+#   "story-review" — revisa stories em review (num subagente, contexto separado da implementação).
+# Para criar stories do backlog sem supervisão, use a skill criacao-story-recorrente.
 # O valor do projeto substitui esta lista.
 acoes = ["dev-story"]
 # Falhas seguidas na mesma story e ação antes de parar de tentar (a story vai para blocked com o motivo).

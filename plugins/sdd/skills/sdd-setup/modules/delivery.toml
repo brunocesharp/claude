@@ -3,8 +3,8 @@
 [module]
 code = "delivery"
 plugin = "delivery"
-version = "1.1.0"
-skills = ["sprint-planning", "create-story", "dev-story", "story-review", "retrospective", "correct-course", "execucao-recorrente"]
+version = "1.2.0"
+skills = ["sprint-planning", "create-story", "dev-story", "story-review", "retrospective", "correct-course", "execucao-recorrente", "criacao-story-recorrente"]
 
 [[module.config_questions]]
 key = "delivery.tdd"

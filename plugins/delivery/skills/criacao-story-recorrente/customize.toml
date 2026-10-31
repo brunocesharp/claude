@@ -1,0 +1,27 @@
+# Campos customizáveis desta skill e seus valores padrão. NÃO edite este arquivo (o plugin o sobrescreve).
+# Para customizar num projeto, crie docs/{projeto}/_custom/{skill}.toml só com o que muda
+# (skill sdd-customize; regras em sdd-setup/references/customizacao.md).
+
+[workflow]
+# Fatos válidos durante toda a skill: texto literal ou "file:glob" relativo à raiz do workspace
+# (ex.: "file:docs/padroes/*.md").
+persistent_facts = []
+# Passos extras, em linguagem natural, antes do fluxo e depois dele.
+activation_steps_prepend = []
+activation_steps_append = []
+# O que fazer ao terminar com sucesso (ex.: "lembre de atualizar o card no Redmine"). Vazio = nada.
+on_complete = ""
+
+# false desliga a criação recorrente neste projeto (o projeto continua na lista, mas é pulado).
+habilitado = true
+# Máximo de stories em ready-for-dev por projeto. Com esse número de stories prontas, não cria outra:
+# evita stories escritas muito antes da implementação, sem os aprendizados das anteriores.
+max_prontas = 2
+# Estados em que as stories de depends_on (frontmatter do épico) precisam estar para a story ser criada.
+# ["review", "done"]: a anterior já tem Registro do desenvolvimento. ["done"]: só depois da revisão.
+dependencias_em = ["review", "done"]
+# false = com story.py check sem problemas, a story vai sozinha para ready-for-dev.
+# true  = grava o arquivo e para em backlog, aguardando uma pessoa confirmar (create-story Passo 5).
+exige_confirmacao = false
+# Falhas seguidas na mesma story antes de parar de tentar (a story vai para blocked com o motivo).
+max_tentativas = 3

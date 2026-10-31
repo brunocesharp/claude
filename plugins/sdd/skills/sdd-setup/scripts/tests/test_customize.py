@@ -137,7 +137,7 @@ def test_skill_sem_customize(tmp_path):
 CUSTOMIZABLE = ["discovery/skills/discovery-research", "spec-plan/skills/spec-functional", "spec-plan/skills/plan-epics", "delivery/skills/sprint-planning",
                 "delivery/skills/create-story", "delivery/skills/dev-story", "delivery/skills/story-review",
                 "delivery/skills/retrospective", "delivery/skills/correct-course",
-                "delivery/skills/execucao-recorrente"]
+                "delivery/skills/execucao-recorrente", "delivery/skills/criacao-story-recorrente"]
 
 
 @pytest.mark.parametrize("skill", CUSTOMIZABLE)

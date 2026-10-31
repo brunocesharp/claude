@@ -1,6 +1,6 @@
 ---
 name: execucao-recorrente
-description: Executa, sem supervisão e de forma recorrente (ex.: a cada 5 minutos, por uma tarefa agendada), as stories prontas dos repositórios listados num arquivo de configuração, classificados como prioritários e sem prioridade — uma tarefa por vez; se não há tarefa em andamento, retoma a que ela mesma deixou in-progress ou inicia uma nova, primeiro dos repositórios prioritários e, só se nenhum tiver tarefa, dos sem prioridade. Roda o dev-story num contexto limpo e, quando não consegue concluir, registra o motivo na story, no log e, se for o caso, move a story para blocked. Use quando o usuário disser "execucao-recorrente", "execução recorrente", "executar as stories automaticamente", "rodar as tarefas pendentes dos projetos", "agendar a execução das stories", "processar a fila de stories", "adicionar repositório na execução recorrente". NÃO use para implementar uma story específica acompanhando (use dev-story), preparar stories (use create-story), revisar (use story-review), ver ou mudar o quadro (use sprint-planning) ou mudar requisito (use correct-course).
+description: Executa, sem supervisão e de forma recorrente (ex.: a cada 5 minutos, por uma tarefa agendada), as stories prontas dos repositórios listados num arquivo de configuração, classificados como prioritários e sem prioridade — uma tarefa por vez; se não há tarefa em andamento, retoma a que ela mesma deixou in-progress ou inicia uma nova, primeiro dos repositórios prioritários e, só se nenhum tiver tarefa, dos sem prioridade. Roda o dev-story num contexto limpo e, quando não consegue concluir, registra o motivo na story, no log e, se for o caso, move a story para blocked. Use quando o usuário disser "execucao-recorrente", "execução recorrente", "executar as stories automaticamente", "rodar as tarefas pendentes dos projetos", "agendar a execução das stories", "processar a fila de stories", "adicionar repositório na execução recorrente". NÃO use para implementar uma story específica acompanhando (use dev-story), preparar uma story (use create-story), criar stories sem supervisão (use criacao-story-recorrente), revisar (use story-review), ver ou mudar o quadro (use sprint-planning) ou mudar requisito (use correct-course).
 metadata:
   version: 1.0.0
   category: implementation
@@ -14,9 +14,11 @@ Processa a fila de stories de vários repositórios **sem ninguém olhando**, **
 
 **Só trabalha com o quadro de stories**: entram apenas os projetos com `docs/{projeto}/implementacao/sprint-status.yaml` (fluxo `plan-epics` → `sprint-planning` → `create-story`). Projeto sem quadro, inclusive o que só tem `plan-execution`, fica fora da fila com uma nota no `scan`; para incluí-lo, gere o quadro.
 
-Ela não implementa nada por conta própria: escolhe a story, prepara o terreno e entrega a story ao `dev-story` (ou à `story-review`/`create-story`, se o projeto liberar) num contexto limpo, com as regras do modo não supervisionado. O que não puder ser feito sem uma pessoa vira **motivo registrado**, nunca suposição.
+Ela não implementa nada por conta própria: escolhe a story, prepara o terreno e entrega a story ao `dev-story` (ou à `story-review`, se o projeto liberar) num contexto limpo, com as regras do modo não supervisionado. O que não puder ser feito sem uma pessoa vira **motivo registrado**, nunca suposição.
 
 Leia antes de executar: `sdd-setup/references/sprint-status.md` (plugin `sdd`; estados e transições) e a SKILL.md do `dev-story`.
+
+Para manter stories prontas para ela implementar, agende também a `criacao-story-recorrente`, que roda o `create-story` com a mesma lógica (configuração, prioridades, uma tarefa por vez) e usa o mesmo script.
 
 ---
 
@@ -68,7 +70,7 @@ O resultado traz `em_andamento` (trava global ativa), `escolhida`, `motivo`, a `
 
 1. **Tarefa em andamento** (`em_andamento: true`) → não inicia nada. Responda `tarefa em andamento: {motivo}` e termine.
 2. **Retomar**: story `in-progress` que a própria execução recorrente começou e não terminou (a rodada anterior morreu, estourou o contexto ou falhou por erro técnico) — vem antes de qualquer tarefa nova, de qualquer grupo.
-3. **Nova tarefa dos repositórios prioritários**, na ordem da lista; dentro de cada projeto, a ordem do `status.py next`: `review` (se `story-review` estiver em `acoes`) → `ready-for-dev` na ordem de build → primeira `backlog` (se `create-story` estiver em `acoes`).
+3. **Nova tarefa dos repositórios prioritários**, na ordem da lista; dentro de cada projeto, a ordem do `status.py next`: `review` (se `story-review` estiver em `acoes`) → `ready-for-dev` na ordem de build. Stories em `backlog` são da `criacao-story-recorrente`.
 4. **Só se nenhum prioritário tiver tarefa**, nova tarefa dos repositórios **sem prioridade**, na mesma regra.
 
 Ficam **fora** da fila, com o motivo em `puladas`:
@@ -171,7 +173,7 @@ MOTIVO: {uma frase; vazio se concluida}
 RESUMO: {o que foi feito, arquivos e testes}
 ```
 
-Para `story-review`: acrescente que a revisão aplica correções só se a própria skill permitir sem confirmação; achado de **decisão** = `bloqueada`. Para `create-story`: a story só vai para `ready-for-dev` se o `story.py check` passar.
+Para `story-review`: acrescente que a revisão aplica correções só se a própria skill permitir sem confirmação; achado de **decisão** = `bloqueada`.
 
 ## Passo 4 — Registrar o resultado
 
@@ -179,7 +181,7 @@ Confira o que o subagente disse contra o `sprint-status.yaml` (`status.py show`)
 
 | Resultado | Quando | Na story | No estado/log |
 |-----------|--------|----------|---------------|
-| `concluida` | Story em `review` (dev-story), `done`/`in-progress` com correções (story-review) ou `ready-for-dev` (create-story) | O que a skill já escreveu | `registrar … --resultado concluida --motivo "{resumo curto}"` |
+| `concluida` | Story em `review` (dev-story), `done`/`in-progress` com correções (story-review) | O que a skill já escreveu | `registrar … --resultado concluida --motivo "{resumo curto}"` |
 | `bloqueada` | Precisa de decisão humana (regra da fonte única, checkpoint descoberto, decisão da revisão) | `status.py set {id} blocked` + linha no Histórico: `\| {data} \| {de} → blocked \| execucao-recorrente \| {motivo} \|` | `registrar … --resultado bloqueada --motivo "{motivo}"` |
 | `falhou` | Erro técnico: build/teste que não conseguiu corrigir, ferramenta ou repositório ausente, subagente interrompido, contexto estourado | Bloco no Registro do desenvolvimento (abaixo); a story fica onde está (`in-progress` é retomada na próxima rodada) | `registrar … --resultado falhou --motivo "{motivo}"` |
 
