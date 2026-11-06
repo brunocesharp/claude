@@ -22,7 +22,7 @@ plugins/
             └── references/
 ```
 
-Plugins: `sdd` (hub `sdd-setup`: setup, status e próximo passo; `sdd-customize`), `delivery` (ciclo de stories: `sprint-planning`... e as recorrentes sem supervisão: `criacao-story-recorrente` cria as stories e `execucao-recorrente` as implementa), `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`, `art-direction` (direção de arte). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
+Plugins: `sdd` (hub `sdd-setup`: setup, status e próximo passo; `sdd-customize`; `sdd-dashboard`: portfólio, Kanban e atenção), `delivery` (ciclo de stories: `sprint-planning`... e as recorrentes sem supervisão: `criacao-story-recorrente` cria as stories e `execucao-recorrente` as implementa), `workspace` (multi-repo), `discovery`, `spec-plan`, `architecture-docs` (C4 e ADR), `architecture-dotnet`, `architecture-angular`, `architecture-java`, `business-docs`, `art-direction` (direção de arte). Para adicionar uma skill, crie a pasta em `plugins/<plugin>/skills/<nome-da-skill>/`.
 
 ## Frontmatter obrigatório no SKILL.md
 
@@ -47,7 +47,7 @@ O `name` é o identificador usado para invocar a skill e citado nas outras skill
 As skills de documentação rodam numa **pasta só de documentação** (workspace) que reúne vários projetos. O código de cada projeto fica no próprio repositório; o caminho local fica no `project.md`.
 
 ```
-_sdd/                                 # sdd-setup: config.toml (time), config.user.toml (pessoal), version.toml, scripts/
+_sdd/                                 # sdd-setup: configuração, versões e scripts; sdd-dashboard: dashboard/
 docs/
 ├── workspace.md                      # projetos: pasta, repositório, código local, situação (discovery-init)
 ├── arquitetura/landscape.md          # visão de todos os sistemas (arch-c4, opcional)
@@ -90,7 +90,7 @@ Nada fica guardado nos arquivos da skill por projeto: configuração específica
 
 - Cada plugin que precisa de configuração declara as perguntas em `plugins/sdd/skills/sdd-setup/modules/<plugin>.toml` (`key`, `prompt`, `default`, `scope` team|user). A `version` do registro é igual à do `plugin.json`: ao subir uma, suba a outra (há teste). Chaves e uso em `sdd-setup/references/config-schema.md`.
 - Scripts em Python ≥ 3.11, executados com `uv run` (fallback `python`), só biblioteca padrão ou dependências inline (PEP 723). Imprimem JSON; em erro, `error: <mensagem>` e código 1. Os de runtime são copiados pelo setup para `_sdd/scripts/`, de onde as skills de qualquer plugin os chamam (`${CLAUDE_PLUGIN_ROOT}` só vale dentro do próprio plugin). Toda skill que usa script descreve o caminho sem `uv`.
-- Runtime em `_sdd/scripts/`: `config.py` (configuração), `workspace.py` (projetos, fase, quadro do sprint), `epics.py` (validação dos épicos, cobertura cenário → story, texto literal da spec), `story.py` (completude do arquivo da story), `review.py` (diff e integridade do registro na revisão), `retro.py` (evidências do épico), `customize.py` (customização por projeto), `research.py` (citações da pesquisa), `session.py` (abre sessão nova do Claude numa janela de terminal, só com confirmação) e `status.py` (estados do `sprint-status.yaml`, com as transições de `sdd-setup/references/sprint-status.md`). `setup.py` e `migrate.py` rodam da pasta da skill. O hook do plugin (`plugins/sdd/hooks/hooks.json`) valida o `sprint-status.yaml` a cada Write/Edit.
+- Runtime em `_sdd/scripts/`: `config.py` (configuração), `workspace.py` (projetos, fase, quadro do sprint), `dashboard.py` (snapshot JSON, HTML e preview localhost para o VS Code), `epics.py` (validação dos épicos, cobertura cenário → story, texto literal da spec), `story.py` (completude do arquivo da story), `review.py` (diff e integridade do registro na revisão), `retro.py` (evidências do épico), `customize.py` (customização por projeto), `research.py` (citações da pesquisa), `session.py` (abre sessão nova do Claude numa janela de terminal, só com confirmação) e `status.py` (estados do `sprint-status.yaml`, com as transições de `sdd-setup/references/sprint-status.md`). `setup.py` e `migrate.py` rodam da pasta da skill. O hook do plugin (`plugins/sdd/hooks/hooks.json`) valida o `sprint-status.yaml` a cada Write/Edit.
 - Testes: `uv run --no-project --with pytest --with pyyaml pytest plugins/sdd/skills/sdd-setup/scripts/tests plugins/delivery/skills/execucao-recorrente/scripts/tests plugins/delivery/skills/criacao-story-recorrente/scripts/tests`.
 - Script de skill que atravessa vários workspaces (ex.: `execucao-recorrente/scripts/recorrente.py`) roda da pasta da própria skill (`${CLAUDE_SKILL_DIR}/scripts/`), não de `_sdd/scripts/`; guarda o estado em `{workspace}/_sdd/<skill>/`; a configuração dela (ex.: `~/.claude/execucao-recorrente.toml`) fica fora do plugin, que a atualização sobrescreve. As duas skills recorrentes usam o mesmo `recorrente.py` (`--perfil execucao|criacao`); a `criacao-story-recorrente` o chama pelo `scripts/story_recorrente.py` dela.
 

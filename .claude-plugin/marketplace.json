@@ -7,7 +7,7 @@
     {
       "name": "sdd",
       "source": "./plugins/sdd",
-      "description": "Hub do workspace: setup e atualização da configuração (_sdd/), status da instalação e dos projetos e recomendação do próximo passo."
+      "description": "Hub do workspace: setup e configuração (_sdd/), status, próximo passo e dashboard visual dos projetos."
     },
     {
       "name": "workspace",

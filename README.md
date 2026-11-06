@@ -116,7 +116,7 @@ Use um caminho só (plugins **ou** Skills CLI) para a mesma skill: com as duas c
 
 | Plugin | Skills |
 |--------|--------|
-| `sdd` | `sdd-setup`, `sdd-customize` |
+| `sdd` | `sdd-setup`, `sdd-customize`, `sdd-dashboard` |
 | `workspace` | `multi-repo` |
 | `discovery` | `discovery-init`, `discovery-research`, `discovery-vision`, `discovery-opportunity`, `discovery-assumptions`, `discovery-stakeholders`, `discovery-metrics`, `discovery-scoped` |
 | `spec-plan` | `spec-functional`, `plan-epics`, `plan-execution` |
@@ -230,6 +230,7 @@ A `multi-repo` cria `docs/{projeto}/repositorios.md`, que as skills usam para sa
 |-------|---------|-------|
 | `sdd-customize` | "customizar a skill", "desligar uma lente", "padrões do time na skill" | `docs/{projeto}/_custom/{skill}.toml` |
 | `sdd-setup` | "sdd setup", "configurar o workspace", "sdd status", "o que faço agora", "por onde começo" | `_sdd/config.toml`, `_sdd/config.user.toml`, `_sdd/version.toml`, `_sdd/scripts/` |
+| `sdd-dashboard` | "dashboard", "painel do projeto", "acompanhar tarefas", "Kanban no VS Code" | `_sdd/dashboard/index.html`, `_sdd/dashboard/project-status.json` |
 | `multi-repo` | "vários repositórios", "cadastrar repositório", "status dos repositórios", "criar branch em todos", "feature em mais de um repositório" | `repositorios.md`, `plano-execucao/{escopo}/mudanca-multi-repo.md` |
 
 ### Fase: Discovery
@@ -387,6 +388,7 @@ plugins/
 │   ├── .claude-plugin/plugin.json
 │   └── skills/
 │       ├── sdd-customize/            # grava overrides esparsos por projeto
+│       ├── sdd-dashboard/            # portfólio, Kanban, atenção e automações em HTML
 │       └── sdd-setup/
 │           ├── SKILL.md
 │           ├── modules/              # registro de cada plugin: versão, skills, perguntas e migrações
@@ -394,7 +396,7 @@ plugins/
 │           │   ├── config-schema.md
 │           │   ├── proximos-passos.md
 │           │   └── sprint-status.md  # formato, estados e transições do sprint-status.yaml
-│           └── scripts/              # setup, migrate, config, workspace, status, hook (+ tests/)
+│           └── scripts/              # setup, config, workspace, dashboard, status, hook (+ tests/)
 │   └── hooks/hooks.json              # valida o sprint-status.yaml a cada Write/Edit
 │
 ├── workspace/
@@ -647,6 +649,10 @@ src/
 ### sdd-setup
 
 Hub do workspace, no papel do `bmad setup` do BMAD. No **setup**, faz só as perguntas ainda sem resposta (cada plugin declara as suas em `sdd-setup/modules/<plugin>.toml`) e grava em `_sdd/config.toml` (time) e `_sdd/config.user.toml` (pessoal), sem nunca alterar um valor existente. Também copia os scripts para `_sdd/scripts/` e registra as versões. O **status** mostra plugins e versões, perguntas pendentes, scripts desatualizados, proteção do `.gitignore` e os projetos. A **ajuda** lê o estado do projeto e recomenda a próxima skill. Não instala plugins nem faz commit.
+
+### sdd-dashboard
+
+Consolida os dados que já existem no workspace em um snapshot JSON e em um dashboard HTML somente leitura. A visão reúne portfólio, progresso, Kanban, fila de atenção e os últimos resultados da criação e execução recorrentes. O modo `serve` publica o painel apenas em `127.0.0.1`, para abri-lo no **Simple Browser** do VS Code; as transições de estado continuam sendo feitas pelo `status.py`.
 
 ### discovery-init
 

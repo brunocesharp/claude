@@ -31,6 +31,7 @@ Leia antes de executar:
 | `migrate.py` | `${CLAUDE_SKILL_DIR}/scripts/` | Lista e registra migrações declaradas pelos módulos |
 | `config.py` | `_sdd/scripts/` (cópia) | Configuração resolvida, em JSON |
 | `workspace.py` | `_sdd/scripts/` (cópia) | Projetos: fase, situação, repositórios, quadro do sprint e próxima ação |
+| `dashboard.py` | `_sdd/scripts/` (cópia) | Snapshot JSON e dashboard HTML; servidor localhost opcional para o VS Code |
 | `status.py` | `_sdd/scripts/` (cópia) | Lê, valida e muda estados do `sprint-status.yaml`; `sync` com os épicos |
 | `epics.py` | `_sdd/scripts/` (cópia) | Valida os arquivos de épico, a cobertura cenário → story e extrai o texto literal da spec |
 | `story.py` | `_sdd/scripts/` (cópia) | Confere a completude do arquivo de uma story |
