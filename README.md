@@ -321,7 +321,7 @@ Skills para geração de código seguindo Clean Architecture, DDD, CQRS e Result
 | `retrospective` | "retrospectiva", "fechar o épico", "lições do épico" | `implementacao/retrospectivas/epic-N-{data}.md` (veredito; épico → `done`) |
 | `correct-course` | "mudou o requisito", "mudança de rumo", "a story não dá", "replanejar" | `implementacao/mudancas/{data}-{slug}.md` (proposta; aplicada após aprovação) |
 | `criacao-story-recorrente` | "criar stories automaticamente", "criação recorrente de stories", "agendar o create-story", "manter stories prontas" | Stories do backlog criadas via `create-story` (→ `ready-for-dev`); motivo das falhas em `_sdd/criacao-story-recorrente/log/` |
-| `execucao-recorrente` | "execução recorrente", "executar as stories automaticamente", "agendar a execução das stories", "adicionar repositório na execução recorrente" | Stories prontas implementadas via `dev-story`; motivo das falhas na story e em `_sdd/execucao-recorrente/log/` |
+| `execucao-recorrente` | "execução recorrente", "agente de entrega", "executar as stories automaticamente", "deixar rodando em loop", "agendar a execução das stories", "adicionar repositório na execução recorrente" | Próxima tarefa possível (retomar, desbloquear, revisar, implementar, criar) feita sem supervisão, em worktree; motivo das falhas na story e em `_sdd/execucao-recorrente/log/` |
 
 ### Fase: Deploy .NET
 
@@ -423,6 +423,7 @@ plugins/
 │
 ├── delivery/
 │   ├── .claude-plugin/plugin.json
+│   ├── agents/agente-entrega.md      # agente de entrega: a execucao-recorrente em modo contínuo (claude --agent)
 │   └── skills/
 │       ├── sprint-planning/          # quadro de épicos e stories (usa _sdd/scripts/status.py)
 │       ├── create-story/             # arquivo da story com contexto completo (references/template-story.md)
@@ -430,7 +431,7 @@ plugins/
 │       ├── story-review/             # revisão adversarial (references: lentes, triagem, template-revisao)
 │       ├── retrospective/            # retrospectiva do épico por evidências (references/template-retrospectiva.md)
 │       ├── correct-course/           # mudança de rumo (references/template-proposta.md)
-│       ├── execucao-recorrente/      # roda as stories prontas sem supervisão (scripts/recorrente.py, references/agendamento.md)
+│       ├── execucao-recorrente/      # agente de entrega sem supervisão (scripts/recorrente.py, references/agendamento.md)
 │       └── criacao-story-recorrente/ # cria as stories do backlog sem supervisão (scripts/story_recorrente.py, references/agendamento.md)
 │
 ├── spec-plan/
@@ -792,7 +793,7 @@ Mudança de rumo no meio da entrega: requisito novo ou errado, story ambígua qu
 
 ### execucao-recorrente
 
-Transforma o fluxo de stories num agent que roda sozinho. Os repositórios verificados (workspaces ou pastas de projeto) ficam num **arquivo de configuração** (`~/.claude/execucao-recorrente.toml`), em duas listas: `prioritarios` e `sem_prioridade`. Depois é só agendar a skill, por exemplo a cada 5 minutos (`references/agendamento.md`: tarefa agendada do Claude Desktop, `/loop` ou `claude -p` com o Agendador de Tarefas do Windows).
+É o **agente de entrega**: um fluxo de stories que roda sozinho e procura sempre a próxima tarefa possível, para não ficar parado. Os repositórios verificados (workspaces ou pastas de projeto) ficam num **arquivo de configuração** (`~/.claude/execucao-recorrente.toml`), em duas listas: `prioritarios` e `sem_prioridade`.
 
 ```toml
 [repositorios]
@@ -800,17 +801,28 @@ prioritarios = ['D:\repos\docs-loja']
 sem_prioridade = ['D:\repos\docs-estoque']
 ```
 
-Em cada rodada, a skill:
+Há duas formas de rodar (`references/agendamento.md`):
+- **Modo contínuo**: `/loop /execucao-recorrente --continuo`, ou o agente `delivery:agente-entrega` com `claude --agent`. Faz uma tarefa atrás da outra e escolhe sozinho quando acordar de novo: 1 minuto com fila, 30 minutos sem nada.
+- **Rodada única**, agendada a intervalos fixos: tarefa agendada do Claude Desktop, ou `claude -p` com o Agendador de Tarefas do Windows.
 
-- não inicia nada se já há uma tarefa em andamento (trava global: **uma tarefa por vez**);
-- retoma primeiro a story `in-progress` que ela mesma começou e não terminou;
-- senão, inicia a próxima story executável dos repositórios **prioritários** (`ready-for-dev` com as dependências prontas e sem checkpoint) e, só se nenhum prioritário tiver tarefa, a dos **sem prioridade**;
-- roda o `dev-story` num contexto limpo, em modo não supervisionado: onde a skill perguntaria, ela registra a dúvida e para;
-- registra o resultado. Quando não consegue concluir, o **motivo** vai para o Registro do desenvolvimento da story, para o log mensal e, se precisa de uma pessoa ou estourou as tentativas, a story vai para `blocked`.
+A cada tarefa, a skill:
 
-Só entram projetos com `implementacao/sprint-status.yaml`; projeto sem quadro fica fora da fila. Story pulada (ex.: "aguardando commit") vai para o log uma vez por motivo, não a cada rodada.
+- não inicia nada se já há uma tarefa em andamento (trava global, renovada durante a tarefa: **uma tarefa por vez**);
+- escolhe a próxima tarefa possível nesta ordem:
+  1. **retomar** o que ela mesma começou, inclusive a story que a `story-review` devolveu com correções;
+  2. **desbloquear** a story que ela bloqueou por causa de **ambiente** (repositório, ferramenta) ou **técnica** (falhas seguidas), quando a causa mudou;
+  3. **revisar** (`story-review`) as stories em `review`;
+  4. **implementar** (`dev-story`) as `ready-for-dev` com as dependências prontas e sem checkpoint;
+  5. **criar** (`create-story`) a próxima story do backlog quando faltam stories prontas.
 
-Nunca pega story que uma pessoa está implementando, nunca faz push nem merge, e só faz commit local se o projeto ligar `commit_ao_concluir`. Cada projeto pode desligar a execução ou liberar também a `story-review` (`_custom/execucao-recorrente.toml`).
+  Os repositórios **sem prioridade** só entram quando nenhum prioritário tem tarefa;
+- roda a tarefa num contexto limpo, em modo não supervisionado: onde a skill perguntaria, ela registra a dúvida e para;
+- trabalha cada story numa **worktree** própria (`{repositório}.worktrees/{id}`), então uma story não espera o commit de outra no mesmo repositório;
+- registra o resultado. Quando não consegue concluir, o **motivo** vai para o Registro do desenvolvimento da story e para o log mensal. Se precisa de uma pessoa ou estourou as tentativas, a story vai para `blocked`, com a causa registrada. Bloqueios de decisão nunca voltam sozinhos: entram na lista de **atenção** do `scan`.
+
+Só entram projetos com `implementacao/sprint-status.yaml`; projeto sem quadro fica fora da fila. Story pulada vai para o log uma vez por motivo, não a cada rodada.
+
+Nunca pega story que uma pessoa está implementando. Nunca faz push nem merge, nem apaga worktrees, e só faz commit local se o projeto ligar `commit_ao_concluir`. Cada projeto escolhe o que a automação pode fazer (`acoes`: `dev-story`, `story-review`, `create-story`), o `isolamento` (`worktree` ou `checkout`) e pode desligar tudo (`_custom/execucao-recorrente.toml`).
 
 ### criacao-story-recorrente
 
@@ -824,7 +836,7 @@ Em cada rodada, a skill:
 - roda o `create-story` num contexto limpo e move a story para `ready-for-dev` quando o `story.py check` passa — ou deixa o arquivo aguardando uma pessoa, com `exige_confirmacao = true`;
 - o que exigiria perguntar ao usuário (dúvida de requisito, spec que mudou, contrato sem estratégia, story grande demais) vira `blocked` com o motivo, nunca requisito inventado.
 
-Usa o mesmo script da `execucao-recorrente`. Com arquivos de configuração separados, criação e implementação rodam em paralelo; com o mesmo arquivo, compartilham listas e trava (uma tarefa por vez no total).
+Usa o mesmo script e o mesmo estado da `execucao-recorrente`, que já cria stories na fila dela (ação `create-story`). Use esta skill só se quiser **apenas** a criação. Para rodar as duas, passe o mesmo arquivo de configuração às duas (mesma trava) ou tire `create-story` das `acoes` da execução.
 
 ### sprint-planning
 

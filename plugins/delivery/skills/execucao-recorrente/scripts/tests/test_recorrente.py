@@ -112,17 +112,20 @@ def test_prioritario_vem_antes_do_sem_prioridade(env):
 
 
 def test_sem_tarefa_no_prioritario_usa_o_sem_prioridade(env):
-    set_status(env["prio"], "loja", "1-2-listar", "review")
+    set_status(env["prio"], "loja", "1-2-listar", "done")
     out = scan(env)
     assert out["escolhida"]["projeto"] == "estoque" and out["escolhida"]["prioridade"] == "sem-prioridade"
     assert "sem-prioridade" in out["motivo"]
 
 
 def test_sem_tarefas_em_nenhum_grupo(env):
-    set_status(env["prio"], "loja", "1-2-listar", "review")
+    set_status(env["prio"], "loja", "1-2-listar", "done")
     set_status(env["sem"], "estoque", "1-2-listar", "done")
     out = scan(env)
     assert out["escolhida"] is None and "sem tarefas" in out["motivo"]
+    assert out["espera_sugerida_s"] == 1800
+    # o checkpoint de 1-3-editar precisa de uma pessoa: vai para a lista de atenção
+    assert {(a["projeto"], a["id"]) for a in out["atencao"]} >= {("loja", "1-3-editar"), ("estoque", "1-3-editar")}
 
 
 def test_tarefa_em_andamento_impede_iniciar_outra(env):
@@ -207,13 +210,205 @@ def test_projeto_sem_sprint_status_fica_fora(env, tmp_path):
 def test_override_do_projeto(env):
     custom = env["prio"] / "docs" / "loja" / "_custom"
     custom.mkdir()
-    (custom / "execucao-recorrente.toml").write_text('[workflow]\nacoes = ["create-story"]\n', encoding="utf-8")
+    (custom / "execucao-recorrente.toml").write_text('[workflow]\nacoes = ["create-story", "deploy"]\n',
+                                                     encoding="utf-8")
     out = scan(env)
-    # create-story é da skill criacao-story-recorrente: aqui o projeto fica sem ações e o scan avisa
+    # só criação na loja, e ela já tem 2 stories prontas (max_prontas): a vez é do estoque
     assert out["escolhida"]["projeto"] == "estoque"
-    assert any("criacao-story-recorrente" in a for a in out["avisos"])
+    assert any("deploy" in a for a in out["avisos"])
     (custom / "execucao-recorrente.toml").write_text("[workflow]\nhabilitado = false\n", encoding="utf-8")
     assert scan(env)["escolhida"]["projeto"] == "estoque"
+
+
+def story_file(workspace: Path, projeto: str, story_id: str) -> Path:
+    return workspace / "docs" / projeto / "implementacao" / "stories" / f"{story_id}.md"
+
+
+def historico(workspace: Path, projeto: str, story_id: str, *linhas: str) -> None:
+    path = story_file(workspace, projeto, story_id)
+    text = path.read_text(encoding="utf-8")
+    if "## Histórico" not in text:
+        text += "\n## Histórico\n\n| Data | De → para | Por | Observação |\n|------|-----------|-----|------------|\n"
+    path.write_text(text + "".join(f"{linha}\n" for linha in linhas), encoding="utf-8")
+
+
+def reg(workspace: Path, projeto: str, story_id: str, resultado: str, *extra: str, acao: str = "dev-story"):
+    return run("registrar", str(workspace), "--projeto", projeto, "--id", story_id, "--acao", acao,
+               "--resultado", resultado, *extra)
+
+
+def acoes(workspace: Path, projeto: str, lista: str) -> None:
+    custom = workspace / "docs" / projeto / "_custom"
+    custom.mkdir(exist_ok=True)
+    (custom / "execucao-recorrente.toml").write_text(f"[workflow]\nacoes = {lista}\n", encoding="utf-8")
+
+
+def test_review_vem_antes_de_ready_for_dev(env):
+    set_status(env["prio"], "loja", "1-3-editar", "review")
+    out = scan(env)
+    assert out["escolhida"]["id"] == "1-3-editar" and out["escolhida"]["acao"] == "story-review"
+    assert [i["acao"] for i in out["fila"][:2]] == ["story-review", "dev-story"]
+    assert out["espera_sugerida_s"] == 60
+
+
+def test_story_devolvida_pela_revisao_e_retomada(env):
+    # bug: depois da story-review devolver para in-progress, a story ficava parada como "de outra pessoa"
+    reg(env["prio"], "loja", "1-2-listar", "concluida", "--motivo", "2 correções R1, R2", acao="story-review")
+    set_status(env["prio"], "loja", "1-2-listar", "in-progress")
+    out = scan(env)
+    escolhida = out["escolhida"]
+    assert escolhida["id"] == "1-2-listar" and escolhida["acao"] == "dev-story" and escolhida["retomada"] is True
+    assert escolhida["correcoes_revisao"] is True and escolhida["tentativas"] == 0
+    assert "correções da revisão" in out["motivo"]
+
+
+def test_devolvida_por_revisao_manual_e_retomada_pelo_historico(env):
+    reg(env["prio"], "loja", "1-2-listar", "concluida")
+    set_status(env["prio"], "loja", "1-2-listar", "in-progress")
+    puladas = {p["id"]: p["motivo"] for p in scan(env)["grupos"][0]["repositorios"][0]["projetos"][0]["puladas"]}
+    assert "sem ter sido iniciada" in puladas["1-2-listar"]
+    historico(env["prio"], "loja", "1-2-listar", "| 01/11/2026 | review → in-progress | story-review | R1 aberta |")
+    assert scan(env)["escolhida"]["correcoes_revisao"] is True
+
+
+def test_cria_story_quando_nao_ha_o_que_implementar(env):
+    for sid in ("1-2-listar", "1-3-editar", "1-4-importar"):
+        set_status(env["prio"], "loja", sid, "done")
+    out = scan(env)
+    # o prioritário cria antes de o sem prioridade implementar
+    assert out["escolhida"]["projeto"] == "loja" and out["escolhida"]["acao"] == "create-story"
+    assert out["escolhida"]["id"] == "1-5-exportar"
+    code, r = reg(env["prio"], "loja", "1-5-exportar", "iniciada", acao="create-story")
+    assert code == 0 and "criacao-story-recorrente" in r["log"]
+    # a criação interrompida é retomada antes de tudo (estado compartilhado com a criacao-story-recorrente)
+    out = scan(env)
+    assert out["escolhida"]["acao"] == "create-story" and out["escolhida"]["retomada"] is True
+    acoes(env["prio"], "loja", '["dev-story"]')
+    assert scan(env)["escolhida"]["projeto"] == "estoque"
+
+
+def bloquear(env, story_id: str, *extra: str, por: str = "execucao-recorrente"):
+    code, out = reg(env["prio"], "loja", story_id, "bloqueada", "--motivo", "sem o repositório api", *extra)
+    set_status(env["prio"], "loja", story_id, "blocked")
+    historico(env["prio"], "loja", story_id, f"| 02/11/2026 | ready-for-dev → blocked | {por} | x |")
+    return code, out
+
+
+def projeto_loja(out: dict) -> dict:
+    return out["grupos"][0]["repositorios"][0]["projetos"][0]
+
+
+def test_bloqueio_de_ambiente_volta_quando_resolvido(env, tmp_path):
+    falta = tmp_path / "repos" / "api"
+    code, out = bloquear(env, "1-2-listar", "--causa", "ambiente", "--verificar", f"caminho:{falta}")
+    assert code == 0 and out["bloqueio"]["voltar_para"] == "ready-for-dev"
+    out = scan(env)
+    assert out["escolhida"]["projeto"] == "estoque"
+    assert any(a["id"] == "1-2-listar" and "ainda falta" in a["motivo"] for a in out["atencao"])
+    falta.mkdir(parents=True)
+    out = scan(env)
+    escolhida = out["escolhida"]
+    assert escolhida["acao"] == "desbloquear" and escolhida["acao_origem"] == "dev-story"
+    assert escolhida["voltar_para"] == "ready-for-dev" and escolhida["causa"] == "ambiente"
+    assert "desbloquear" in out["motivo"]
+    code, done = reg(env["prio"], "loja", "1-2-listar", "desbloqueada", "--motivo", "repositório clonado")
+    assert code == 0 and done["tentativas"] == 0 and done["voltar_para"] == "ready-for-dev"
+    set_status(env["prio"], "loja", "1-2-listar", "ready-for-dev")
+    assert scan(env)["escolhida"]["id"] == "1-2-listar"
+
+
+def test_ambiente_sem_verificacao_e_recusado(env):
+    code, out = reg(env["prio"], "loja", "1-2-listar", "bloqueada", "--causa", "ambiente", "--motivo", "x")
+    assert code == 1 and "--verificar" in out
+    code, out = reg(env["prio"], "loja", "1-2-listar", "bloqueada", "--causa", "ambiente", "--verificar", "url:x")
+    assert code == 1 and "inválido" in out
+
+
+def test_bloqueio_tecnico_volta_so_quando_algo_muda_e_com_uma_tentativa(env):
+    reg(env["prio"], "loja", "1-2-listar", "iniciada")
+    for _ in range(3):
+        _, last = reg(env["prio"], "loja", "1-2-listar", "falhou", "--motivo", "dotnet test falha")
+    assert last["limite_atingido"] is True and "bloqueada --causa tecnica" in last["proximo"]
+    set_status(env["prio"], "loja", "1-2-listar", "blocked")
+    historico(env["prio"], "loja", "1-2-listar", "| 02/11/2026 | in-progress → blocked | execucao-recorrente | x |")
+    code, out = reg(env["prio"], "loja", "1-2-listar", "bloqueada", "--causa", "tecnica", "--motivo", "falhou 3 vezes")
+    assert code == 0 and out["bloqueio"]["voltar_para"] == "in-progress"
+    out = scan(env)
+    assert out["escolhida"]["projeto"] == "estoque"
+    assert any("nada mudou" in a["motivo"] for a in out["atencao"] if a["id"] == "1-2-listar")
+    # uma pessoa anota a correção na story: a assinatura muda e a story volta com mais uma tentativa
+    path = story_file(env["prio"], "loja", "1-2-listar")
+    path.write_text(path.read_text(encoding="utf-8").replace("# story", "# story\nCorrigido o teste.\n"),
+                    encoding="utf-8")
+    assert scan(env)["escolhida"]["acao"] == "desbloquear"
+    _, done = reg(env["prio"], "loja", "1-2-listar", "desbloqueada")
+    assert done["tentativas"] == 2 and done["voltar_para"] == "in-progress"
+    set_status(env["prio"], "loja", "1-2-listar", "in-progress")
+    escolhida = scan(env)["escolhida"]
+    assert escolhida["retomada"] is True and escolhida["tentativas"] == 2
+
+
+def test_bloqueio_de_decisao_nunca_volta_sozinho(env):
+    bloquear(env, "1-2-listar")   # sem --causa = decisão
+    path = story_file(env["prio"], "loja", "1-2-listar")
+    path.write_text(path.read_text(encoding="utf-8") + "mudou\n", encoding="utf-8")
+    out = scan(env)
+    assert out["escolhida"]["projeto"] == "estoque"
+    assert any("precisa de decisão" in a["motivo"] for a in out["atencao"] if a["id"] == "1-2-listar")
+    code, err = reg(env["prio"], "loja", "1-3-editar", "desbloqueada")
+    assert code == 1 and "uma pessoa" in err
+
+
+def test_bloqueio_de_pessoa_fica_na_atencao(env, tmp_path):
+    set_status(env["prio"], "loja", "1-2-listar", "blocked")
+    out = scan(env)
+    assert any("sem bloqueio automático" in a["motivo"] for a in out["atencao"] if a["id"] == "1-2-listar")
+    # bloqueio automático, mas uma pessoa mexeu depois: o Histórico manda
+    tmp_path.joinpath("ok").mkdir()
+    bloquear(env, "1-3-editar", "--causa", "ambiente", "--verificar", f"caminho:{tmp_path / 'ok'}", por="Ana")
+    puladas = {p["id"]: p["motivo"] for p in projeto_loja(scan(env))["puladas"]}
+    assert "mudança de uma pessoa" in puladas["1-3-editar"]
+
+
+def test_lock_renovar(env):
+    _, out = run("lock", "renovar", "--config", str(env["config"]))
+    assert out["renovado"] is False
+    run("lock", "adquirir", "--config", str(env["config"]), "--expira-min", "1")
+    _, out = run("lock", "renovar", "--config", str(env["config"]), "--expira-min", "60")
+    assert out["renovado"] is True
+    expira = datetime.fromisoformat(out["lock"]["expira_em"])
+    assert expira > datetime.now().astimezone() + timedelta(minutes=50)
+    assert scan(env)["espera_sugerida_s"] == 600
+
+
+def git(repo: Path, *args: str) -> str:
+    result = subprocess.run(["git", "-C", str(repo), "-c", "user.email=t@t", "-c", "user.name=t", *args],
+                            capture_output=True, text=True, encoding="utf-8", check=True)
+    return result.stdout.strip()
+
+
+def test_worktree_da_story(tmp_path):
+    repo = tmp_path / "api"
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "main")
+    (repo / "a.txt").write_text("a", encoding="utf-8")
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "inicial")
+    (repo / "a.txt").write_text("alteração de outra story", encoding="utf-8")   # checkout principal sujo
+    code, out = run("worktree", str(repo), "--id", "1-2-listar")
+    assert code == 0 and out["criado"] is True and out["modo"] == "worktree" and out["base"] == "main"
+    wt = Path(out["caminho"])
+    assert wt == (tmp_path / "api.worktrees" / "1-2-listar").resolve() and (wt / "a.txt").read_text() == "a"
+    assert git(wt, "branch", "--show-current") == "feat/1-2-listar"
+    _, again = run("worktree", str(repo), "--id", "1-2-listar")
+    assert again["criado"] is False and Path(again["caminho"]) == wt
+    # story começada no checkout principal (antes das worktrees): usa o checkout
+    git(repo, "stash", "-q")
+    git(repo, "switch", "-q", "-c", "feat/1-3-editar")
+    _, main = run("worktree", str(repo), "--id", "1-3-editar")
+    assert main["modo"] == "checkout" and Path(main["caminho"]) == repo.resolve()
+    code, err = run("worktree", str(tmp_path / "nao-existe"), "--id", "x")
+    assert code == 1 and "não encontrado" in err
 
 
 def test_config_aceita_pasta_do_projeto_e_aponta_erros(env):

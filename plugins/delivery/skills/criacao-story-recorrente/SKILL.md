@@ -10,7 +10,7 @@ metadata:
 
 # Criação Recorrente de Stories
 
-Mantém o backlog dos projetos **convertido em stories prontas**, sem ninguém olhando, **uma criação por vez**. Cada rodada cria no máximo uma story e termina. Pensada para rodar periodicamente por uma tarefa agendada (`references/agendamento.md`), ao lado da `execucao-recorrente`: esta prepara as stories (`backlog → ready-for-dev`), aquela as implementa.
+Mantém o backlog dos projetos **convertido em stories prontas**, sem ninguém olhando, **uma criação por vez**. Cada rodada cria no máximo uma story e termina. Pensada para rodar periodicamente por uma tarefa agendada (`references/agendamento.md`) quando se quer **só** a criação. A `execucao-recorrente` (agente de entrega) já cria stories na fila dela, com estes mesmos campos e o mesmo estado: usando-a com `create-story` em `acoes`, não agende esta à parte — ou passe às duas o mesmo `--config`, para dividirem a trava.
 
 Ela não escreve a story por conta própria: escolhe qual criar e entrega ao `create-story` num contexto limpo, com as regras do modo não supervisionado. O que exigiria uma pergunta ao usuário vira **motivo registrado** e story `blocked`, nunca requisito inventado.
 
@@ -160,10 +160,10 @@ Confira o que o subagente disse contra o `sprint-status.yaml` (`status.py show`)
 |-----------|--------|----------------------|---------------|
 | `concluida` | Story em `ready-for-dev`, check sem problemas | O que o `create-story` já fez (Passo 6) | `registrar … --resultado concluida --motivo "{n} CA, {n} tarefas"` |
 | `aguardando` | `exige_confirmacao = true`, arquivo pronto e ligado (`attach`), story em `backlog` | Linha no Histórico: aguardando confirmação | `registrar … --resultado aguardando` — a story sai da fila até uma pessoa confirmar (`create-story {id}` para revisar, ou `status.py set {id} ready-for-dev`) |
-| `bloqueada` | Precisa de uma pessoa: dúvida de requisito, spec mudou (`correct-course`), contrato sem estratégia, story grande demais (`plan-epics`) | `status.py set {id} blocked`; se o arquivo da story existe, linha no Histórico: `\| {data} \| backlog → blocked \| criacao-story-recorrente \| {motivo} \|` | `registrar … --resultado bloqueada --motivo "{motivo e skill sugerida}"` |
+| `bloqueada` | Precisa de uma pessoa: dúvida de requisito, spec mudou (`correct-course`), contrato sem estratégia, story grande demais (`plan-epics`) | `status.py set {id} blocked`; se o arquivo da story existe, linha no Histórico: `\| {data} \| backlog → blocked \| criacao-story-recorrente \| {motivo} \|` | Por último: `registrar … --resultado bloqueada --motivo "{motivo e skill sugerida}"` (causa `decisao`, o padrão: só uma pessoa desbloqueia) |
 | `falhou` | Erro técnico: script falhou, subagente interrompido, contexto estourado, check com problemas que ele não corrigiu | A story fica em `backlog`; arquivo pela metade é refeito na próxima tentativa | `registrar … --resultado falhou --motivo "{motivo}"` |
 
-Se o `registrar` devolver `limite_atingido: true`: `status.py set {id} blocked` com a linha no Histórico "falhou {max} vezes: {último motivo}" (se houver arquivo). A story sai da fila; a próxima rodada passa para a próxima story do backlog.
+Se o `registrar` devolver `limite_atingido: true`: `status.py set {id} blocked` com a linha no Histórico "falhou {max} vezes: {último motivo}" (se houver arquivo) e, por último, `registrar … --resultado bloqueada --causa tecnica --motivo "falhou {max} vezes: {último motivo}"` — o agente de entrega (`execucao-recorrente`) a devolve ao backlog com mais uma tentativa quando a story ou o código mudarem. A story sai da fila; a próxima rodada passa para a próxima story do backlog.
 
 **O motivo é obrigatório** em `bloqueada`, `falhou` e `pulada`, concreto o bastante para uma pessoa agir sem reabrir a rodada ("cenário 1.4 citado em covers não existe mais na spec-functional do escopo produtos: rodar correct-course", não "erro na spec"). Story bloqueada **sem arquivo** (parou antes de escrever) tem o motivo só no log e no `estado.json`: diga isso na resposta.
 
